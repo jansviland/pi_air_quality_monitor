@@ -1,8 +1,10 @@
+import asyncio
 import os
 import time
 from flask import Flask, request, jsonify, render_template
 from AirQualityMonitor import AirQualityMonitor
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import redis
 import atexit
 from flask_cors import CORS, cross_origin
@@ -15,6 +17,11 @@ aqm = AirQualityMonitor()
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=aqm.save_measurement_to_redis, trigger="interval", seconds=60)
 scheduler.start()
+
+AsyncScheduler = AsyncIOScheduler()
+AsyncScheduler.add_job(func=aqm.send_measurement_to_azure, trigger="interval", seconds=60)
+AsyncScheduler.start()
+
 atexit.register(lambda: scheduler.shutdown())
 
 def reconfigure_data(measurement):
