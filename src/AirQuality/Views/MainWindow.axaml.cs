@@ -30,6 +30,18 @@ public partial class MainWindow : Window
     {
         // TODO: get data from blob storage or database
 
+        // TODO: can use Axis Span to show the different levels of air quality
+        // 0-50 is good, 51-100 is moderate, 101-150 is unhealthy for sensitive groups, 151-200 is unhealthy, 201-300 is very unhealthy, 301-500 is hazardous
+
+        // TODO: allow for changing style, to dark mode or light mode, use Blue1 style
+
+        // TODO: use ToolTip to special events, like when the air quality is bad
+
+        // TODO: should say that NaN values Break the line, should not fill the gap with a line when values are missing
+
+        // TODO: use brackets to show the range of the data, like [0, 100], for example if something happened in this period of time
+
+
         if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
         {
             var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
