@@ -8,4 +8,4 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = SharedTests
-build_property.ProjectDir = c:\git\pi_air_quality_monitor\ScottPlot4Demo\Shared\ScottPlotTests\
+build_property.ProjectDir = C:\git\pi_air_quality_monitor\ScottPlot4Demo\Shared\ScottPlotTests\
