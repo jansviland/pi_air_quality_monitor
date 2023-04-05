@@ -3,31 +3,62 @@
         xmlns:vm="using:AirQuality.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+        xmlns:local="clr-namespace:AirQuality.Views"
+        xmlns:System="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AirQuality.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="AirQuality"
-        
+
         Width="800"
-        Height="600"
-        >
+        Height="600">
+
+    <!-- <Window.Styles> -->
+    <!--     <Style Selector="ListBox"> -->
+    <!--         <Setter Property="Background" Value="#2c3e50"/> -->
+    <!--         <Setter Property="Foreground" Value="#ecf0f1"/> -->
+    <!--         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/> -->
+    <!--     </Style> -->
+    <!--     <Style Selector="ListBoxItem"> -->
+    <!--         <Setter Property="Padding" Value="10"/> -->
+    <!--         <Setter Property="FontSize" Value="18"/> -->
+    <!--         <Setter Property="Background" Value="#2c3e50"/> -->
+    <!--         <Setter Property="Foreground" Value="#ecf0f1"/> -->
+    <!--     </Style> -->
+    <!--     <Style Selector="ListBoxItem:selected"> -->
+    <!--         <Setter Property="Background" Value="#34495e"/> -->
+    <!--         <Setter Property="Foreground" Value="#ffffff"/> -->
+    <!--     </Style> -->
+    <!-- </Window.Styles> -->
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel />
     </Design.DataContext>
-
+    
     <Grid ColumnDefinitions="Auto,*">
-        <ListBox Name="MenuListBox" Items="{Binding MenuItems}" SelectedItem="{Binding SelectedMenuItem}" Grid.Column="0" Width="200" Background="LightGray" HorizontalAlignment="Stretch" BorderThickness="0">
+        <ListBox Name="MenuListBox"
+                 Grid.Column="0"
+                 Items="{Binding MenuItems}"
+                 SelectedItem="{Binding SelectedMenuItem}"
+                 Width="200"
+                 HorizontalAlignment="Stretch"
+                 BorderThickness="0">
+
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="5" />
+                    <TextBlock Text="{Binding Name}"
+                               FontWeight="Bold"
+                               Margin="5" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ContentControl Name="ContentControl" Content="{Binding SelectedContent}" Grid.Column="1" Margin="5"/>
+        
+        <ScottPlot:AvaPlot Grid.Column="1" Name="AvaPlot1" />
+
     </Grid>
 
 </Window>
