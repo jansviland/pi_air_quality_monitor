@@ -33,7 +33,8 @@
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}"
                                FontWeight="Bold"
-                               Margin="5" />
+                               Margin="5" 
+                               />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

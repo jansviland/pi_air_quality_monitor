@@ -1,10 +1,6 @@
-﻿using System;
-using ScottPlot;
+﻿namespace AirQuality.ViewModels;
 
-namespace AirQuality.ViewModels;
-
-public class MenuItemViewModel
+public class MenuItemViewModel : ViewModelBase
 {
-    public string Name { get; set; }
-    public Plot Content { get; set; }
+    public string Name { get; set; } = null!;
 }

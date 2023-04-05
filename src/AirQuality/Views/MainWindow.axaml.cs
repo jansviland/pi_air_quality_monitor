@@ -28,6 +28,8 @@ public partial class MainWindow : Window
 
     private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        // TODO: get data from blob storage or database
+
         if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
         {
             var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
