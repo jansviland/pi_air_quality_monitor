@@ -7,7 +7,11 @@
         x:Class="AirQuality.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AirQuality">
+        Title="AirQuality"
+        
+        Width="800"
+        Height="600"
+        >
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -15,9 +19,15 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Panel>
-        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <Button Content="Test" Command="{Binding TestCommand}" />
-    </Panel>
+    <Grid ColumnDefinitions="Auto,*">
+        <ListBox Name="MenuListBox" Items="{Binding MenuItems}" SelectedItem="{Binding SelectedMenuItem}" Grid.Column="0" Width="200" Background="LightGray" HorizontalAlignment="Stretch" BorderThickness="0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="5" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <ContentControl Name="ContentControl" Content="{Binding SelectedContent}" Grid.Column="1" Margin="5"/>
+    </Grid>
 
 </Window>
