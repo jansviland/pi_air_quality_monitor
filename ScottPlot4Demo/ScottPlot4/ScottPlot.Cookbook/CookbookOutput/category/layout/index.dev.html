@@ -1,0 +1,115 @@
+<html><head>  <title>Layout - ScottPlot 4.1 Cookbook</title>  <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css rel=stylesheet></head><body class=bg-light>  <div class='container' style='max-width:1000px'>    <div class='my-4'><code>THIS PAGE IS FOR TESTING ONLY</code></div>    <div class='display-4'>Layout - ScottPlot 4.1 Cookbook</div>    <div class='fs-5'><i>How to customize plot layout, padding, margins, axis spacing, etc.</i></div>    <article class='bg-light shadow rounded my-5'>    <div class='p-3 rounded bg-white'>      This page contains recipes for the <i>Layout</i> category.<br>Visit the <a href='../../index.dev.html'>Cookbook Home Page</a> to view all cookbook recipes.
+<h3 class='mt-5' id='default-layout'>Default Layout</h3>
+<div>ScottPlot has many ways to customize the layout. This example demonstrates the default layout, where padding around the data area is automatically determined by measuring the text in the axis labels and tick labels to ensure there is appropriate padding on all sides.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+plt.Title("Plot Title");
+
+plt.SaveFig("layout_default.png");</pre>
+<img src='../../images/layout_default.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='plot-layout'>Plot Layout</h3>
+<div>Call Layout() to manually define padding on all edges of the data area. This is the easiest way to make room for large custom tick labels. Under the hood, this method sets the minimum size of all 4 primary axes.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+plt.Title("Plot Title");
+plt.Style(figureBackground: Color.SkyBlue);
+
+plt.Layout(left: 100, right: 100, bottom: 100, top: 50);
+
+plt.SaveFig("layout_plot.png");</pre>
+<img src='../../images/layout_plot.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='axis-size'>Axis Size</h3>
+<div>The size of each axis can be individually customized. Note that axes automatically resize themselves to accomodate tick labels, but this method lets users customize the min/max boundaries of axis size. Set both numbers to the same value to force an axis to always be a specific size.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+plt.Title("Plot Title");
+plt.Style(figureBackground: Color.SkyBlue);
+
+plt.XAxis.Layout(minimumSize: 100, maximumSize: 150);
+
+plt.SaveFig("layout_axis_size.png");</pre>
+<img src='../../images/layout_axis_size.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='axis-padding'>Axis Padding</h3>
+<div>Axis label and ticks are enclosed in a rectangle that is automatically sized to accomodate them (optionally limited to a min/max size as seen earlier). This rectangle has a small amount of padding on all sides so axis labels do not touch the final pixel on the edge of the figure. The amount of extra padding around each axis can be customized.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+plt.Title("Plot Title");
+plt.Style(figureBackground: Color.SkyBlue);
+
+plt.XAxis.Layout(padding: 50);
+
+plt.SaveFig("layout_axis_padding.png");</pre>
+<img src='../../images/layout_axis_padding.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='frameless-plot'>Frameless Plot</h3>
+<div>The Frameless() method disables and collapses all axes so the data area is all that appears. Although the figure background is blue in this example, none of it will show, because the data area occupies all of the available space.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.Style(figureBackground: Color.SkyBlue);
+
+plt.Frameless();
+
+plt.SaveFig("layout_frameless.png");</pre>
+<img src='../../images/layout_frameless.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='data-margins'>Data Margins</h3>
+<div>Users who want to define the amount of space around their data can use Margins() to automatically pad data boundaries with a certain percentage of extra space when axis limits are calculated automatically. Note that this operation acts on the axis limits, and does not technically adjust the layout of the plot itself.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+plt.Title("Plot Title");
+plt.Style(figureBackground: Color.SkyBlue);
+
+// 25% horizontal padding means data occupies 75% of horizontal space
+// 40% vertical padding means data occupies 60% of vertical space
+plt.Margins(x: .25, y: .4);
+
+plt.SaveFig("layout_margins.png");</pre>
+<img src='../../images/layout_margins.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='manual-data-area'>Manual Data Area</h3>
+<div>The layout system automatically measures axis labels and ticks to provide a plot with the largest data area possible. However, this can be problematic for animated plots (with changing tick label sizes) or when users wish to achieve pixel-perfect similarity between two different plots. In these cases the user can manually override the layout system and define exactly how large the data area is.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Style(Style.Blue1);
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+var padding = new ScottPlot.PixelPadding(
+    left: 150,
+    right: 30,
+    bottom: 100,
+    top: 10);
+
+plt.ManualDataArea(padding);
+
+plt.SaveFig("layout_manual.png");</pre>
+<img src='../../images/layout_manual.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+    </div>    </article>  </div></body></html>

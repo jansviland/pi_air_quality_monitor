@@ -1,0 +1,123 @@
+<html><head>  <title>Plot Type: Colorbar - ScottPlot 4.1 Cookbook</title>  <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css rel=stylesheet></head><body class=bg-light>  <div class='container' style='max-width:1000px'>    <div class='my-4'><code>THIS PAGE IS FOR TESTING ONLY</code></div>    <div class='display-4'>Plot Type: Colorbar - ScottPlot 4.1 Cookbook</div>    <div class='fs-5'><i>A colorbar displays a colormap beside the data area. Colorbars are typically added to plots containing heatmaps.</i></div>    <article class='bg-light shadow rounded my-5'>    <div class='p-3 rounded bg-white'>      This page contains recipes for the <i>Colorbar</i> category.<br>Visit the <a href='../../index.dev.html'>Cookbook Home Page</a> to view all cookbook recipes.
+<h3 class='mt-5' id='colorbar'>Colorbar</h3>
+<div>A colorbar displays a colormap beside the data area. Colorbars are typically added to plots containing heatmaps.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddColorbar();
+
+// direct attention to the colorbar
+var text = plt.AddText("Colorbar", 5, 0, 24, Color.Red);
+text.Alignment = Alignment.MiddleRight;
+plt.AddArrow(7, 0, 5, 0, color: Color.Red);
+plt.SetAxisLimits(-10, 10, -10, 10);
+
+plt.SaveFig("colorbar_quickstart.png");</pre>
+<img src='../../images/colorbar_quickstart.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='colorbar-for-colormap'>Colorbar for Colormap</h3>
+<div>By default colorbars use the Viridis colormap, but this behavior can be customized and many colormaps are available.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddColorbar(Drawing.Colormap.Turbo);
+
+// direct attention to the colorbar
+var text = plt.AddText("Colorbar", 5, 0, 24, Color.Red);
+text.Alignment = Alignment.MiddleRight;
+plt.AddArrow(7, 0, 5, 0, color: Color.Red);
+plt.SetAxisLimits(-10, 10, -10, 10);
+
+plt.SaveFig("colorbar_colormap.png");</pre>
+<img src='../../images/colorbar_colormap.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='colorbar-ticks'>Colorbar Ticks</h3>
+<div>Tick marks can be added to colorbars. Each tick is described by a position (a fraction of the distance from the bottom to the top) and a string (the tick label).</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+var cb = plt.AddColorbar(Drawing.Colormap.Turbo);
+
+// Add manual ticks (disabling automatic ticks)
+cb.AddTick(0, "-123");
+cb.AddTick(1, "+123");
+cb.AddTick(.5, "0");
+cb.AddTick(.25, "-61.5");
+cb.AddTick(.75, "+61.5");
+
+// To re-enable automatic ticks call cb.AutomaticTicks(true)
+
+// direct attention to the colorbar
+var text = plt.AddText("Colorbar", 5, 0, 24, Color.Red);
+text.Alignment = Alignment.MiddleRight;
+plt.AddArrow(7, 0, 5, 0, color: Color.Red);
+plt.SetAxisLimits(-10, 10, -10, 10);
+
+plt.SaveFig("colorbar_ticks.png");</pre>
+<img src='../../images/colorbar_ticks.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='color-range'>Color Range</h3>
+<div>You can restrict a colorbar to only show a small range of a colormap. In this example we only use the middle of a rainbow colormap.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+var cb = plt.AddColorbar(Drawing.Colormap.Turbo);
+cb.MinValue = -10;
+cb.MaxValue = 10;
+cb.MinColor = .25;
+cb.MaxColor = .75;
+
+// direct attention to the colorbar
+var text = plt.AddText("Colorbar", 5, 0, 24, Color.Red);
+text.Alignment = Alignment.MiddleRight;
+plt.AddArrow(7, 0, 5, 0, color: Color.Red);
+plt.SetAxisLimits(-10, 10, -10, 10);
+
+plt.SaveFig("colorbar_Range.png");</pre>
+<img src='../../images/colorbar_range.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='clipped-value-range'>Clipped value range</h3>
+<div>If data values extend beyond the min/max range displayed by a colorbar you can indicate the colormap is clipping the data values and inequality symbols will be displayed in the tick labeles at the edge of the colorbar.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+var cb = plt.AddColorbar(Drawing.Colormap.Turbo);
+cb.MinValue = -10;
+cb.MaxValue = 10;
+cb.MinIsClipped = true;
+cb.MaxIsClipped = true;
+
+// direct attention to the colorbar
+var text = plt.AddText("Colorbar", 5, 0, 24, Color.Red);
+text.Alignment = Alignment.MiddleRight;
+plt.AddArrow(7, 0, 5, 0, color: Color.Red);
+plt.SetAxisLimits(-10, 10, -10, 10);
+
+plt.SaveFig("colorbar_clip.png");</pre>
+<img src='../../images/colorbar_clip.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='scatter-plot-with-colorbar'>Scatter Plot with Colorbar</h3>
+<div>This example shows how to add differently colored markers to the plot to simulate a scatter plot with points colored according to a colorbar. Note that the colormap generates the colors, and that a colorbar just displays a colormap</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+var cmap = ScottPlot.Drawing.Colormap.Viridis;
+plt.AddColorbar(cmap);
+
+Random rand = new(0);
+for (int i = 0; i < 1000; i++)
+{
+    double x = ScottPlot.DataGen.RandomNormalValue(rand, mean: 0, stdDev: .5);
+    double y = ScottPlot.DataGen.RandomNormalValue(rand, mean: 0, stdDev: .5);
+    double colorFraction = Math.Sqrt(x * x + y * y);
+    System.Drawing.Color c = ScottPlot.Drawing.Colormap.Viridis.GetColor(colorFraction);
+    plt.AddPoint(x, y, c);
+}
+
+plt.SaveFig("colorbar_scatter.png");</pre>
+<img src='../../images/colorbar_scatter.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='colorbar-on-left'>Colorbar on Left</h3>
+<div>A colorbar may be added to the left side of the chart</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddColorbar(rightSide: false);
+
+plt.SaveFig("colorbar_left.png");</pre>
+<img src='../../images/colorbar_left.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+    </div>    </article>  </div></body></html>

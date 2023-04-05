@@ -1,0 +1,50 @@
+<html><head>  <title>Plot Type: Tooltip - ScottPlot 4.1 Cookbook</title>  <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css rel=stylesheet></head><body class=bg-light>  <div class='container' style='max-width:1000px'>    <div class='my-4'><code>THIS PAGE IS FOR TESTING ONLY</code></div>    <div class='display-4'>Plot Type: Tooltip - ScottPlot 4.1 Cookbook</div>    <div class='fs-5'><i>Tooltips are annotations that point to an X/Y coordinate on the plot.</i></div>    <article class='bg-light shadow rounded my-5'>    <div class='p-3 rounded bg-white'>      This page contains recipes for the <i>Tooltip</i> category.<br>Visit the <a href='../../index.dev.html'>Cookbook Home Page</a> to view all cookbook recipes.
+<h3 class='mt-5' id='tooltip-quickstart'>Tooltip Quickstart</h3>
+<div>Tooltips are annotations that point to an X/Y coordinate on the plot</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[] ys = DataGen.Sin(50);
+plt.AddSignal(ys);
+
+plt.AddTooltip(label: "Special Point", x: 17, y: ys[17]);
+
+plt.SaveFig("tooltip_quickstart.png");</pre>
+<img src='../../images/tooltip_quickstart.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='tooltip-font'>Tooltip Font</h3>
+<div>Tooltips fonts can be customized</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[] ys = DataGen.Sin(50);
+plt.AddSignal(ys);
+
+var tt1 = plt.AddTooltip("Top", 12, ys[12]);
+tt1.Font.Color = System.Drawing.Color.Magenta;
+tt1.Font.Size = 24;
+
+var tt2 = plt.AddTooltip("Negative Slope", 25, ys[25]);
+tt2.Font.Name = "Comic Sans MS";
+tt2.Font.Bold = true;
+
+plt.SaveFig("tooltip_font.png");</pre>
+<img src='../../images/tooltip_font.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='tooltip-colors'>Tooltip Colors</h3>
+<div>Tooltips border and fill styles can be customized</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[] ys = DataGen.Sin(50);
+plt.AddSignal(ys);
+
+var tt = plt.AddTooltip("This point has\na negative slope", 25, ys[25]);
+tt.Font.Size = 24;
+tt.Font.Color = System.Drawing.Color.White;
+tt.FillColor = System.Drawing.Color.Blue;
+tt.BorderWidth = 5;
+tt.BorderColor = System.Drawing.Color.Navy;
+tt.ArrowSize = 15;
+
+plt.SaveFig("tooltip_colors.png");</pre>
+<img src='../../images/tooltip_colors.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+    </div>    </article>  </div></body></html>

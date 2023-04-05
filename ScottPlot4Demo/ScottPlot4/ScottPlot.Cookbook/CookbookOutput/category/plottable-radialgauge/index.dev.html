@@ -1,0 +1,236 @@
+<html><head>  <title>Plot Type: Radial Gauge - ScottPlot 4.1 Cookbook</title>  <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css rel=stylesheet></head><body class=bg-light>  <div class='container' style='max-width:1000px'>    <div class='my-4'><code>THIS PAGE IS FOR TESTING ONLY</code></div>    <div class='display-4'>Plot Type: Radial Gauge - ScottPlot 4.1 Cookbook</div>    <div class='fs-5'><i>A radial gauge chart displays scalar data as circular gauges.</i></div>    <article class='bg-light shadow rounded my-5'>    <div class='p-3 rounded bg-white'>      This page contains recipes for the <i>Radial Gauge</i> category.<br>Visit the <a href='../../index.dev.html'>Cookbook Home Page</a> to view all cookbook recipes.
+<h3 class='mt-5' id='radial-gauge'>Radial Gauge</h3>
+<div>A radial gauge chart displays scalar data as circular gauges. </div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[] values = { 100, 80, 65, 45, 20 };
+plt.AddRadialGauge(values);
+
+plt.SaveFig("radialgauge_quickstart.png");</pre>
+<img src='../../images/radialgauge_quickstart.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-colors'>Gauge Colors</h3>
+<div>Gauge colors can be customized by changing the default palette. </div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[] values = { 100, 80, 65, 45, 20 };
+plt.Palette = ScottPlot.Palette.Nord;
+plt.AddRadialGauge(values);
+
+plt.SaveFig("radialgauge_colors.png");</pre>
+<img src='../../images/radialgauge_colors.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='negative-values'>Negative Values</h3>
+<div>Radial gauge plots support positive and negative values.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, -65, 45, -20 };
+plt.AddRadialGauge(values);
+
+plt.SaveFig("radialgauge_negative.png");</pre>
+<img src='../../images/radialgauge_negative.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='sequential-gauge-mode'>Sequential Gauge Mode</h3>
+<div>Sequential gauge mode indicates that the base of each gauge starts at the tip of the previous gauge.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 50 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.GaugeMode = ScottPlot.RadialGaugeMode.Sequential;
+
+plt.SaveFig("radialgauge_mode.png");</pre>
+<img src='../../images/radialgauge_mode.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='reverse-order'>Reverse Order</h3>
+<div>Gauges are displayed from the center outward by default but the order can be customized.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 50 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.GaugeMode = ScottPlot.RadialGaugeMode.Sequential;
+gauges.OrderInsideOut = false;
+
+plt.SaveFig("radialgauge_reverse.png");</pre>
+<img src='../../images/radialgauge_reverse.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='single-gauge-mode'>Single Gauge Mode</h3>
+<div>The SingleGauge mode draws all gauges stacked together as a single gauge. This is useful for showing a progress gauges composed of many individual smaller gauges.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.GaugeMode = ScottPlot.RadialGaugeMode.SingleGauge;
+gauges.MaximumAngle = 180;
+gauges.StartingAngle = 180;
+
+plt.SaveFig("radialgauge_single.png");</pre>
+<img src='../../images/radialgauge_single.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-direction'>Gauge Direction</h3>
+<div>The direction of gauges can be customized. Clockwise is used by default.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.Clockwise = false;
+
+plt.SaveFig("radialgauge_direction.png");</pre>
+<img src='../../images/radialgauge_direction.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-size'>Gauge Size</h3>
+<div>The empty space between gauges can be adjusted as a fraction of their width. </div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+var gauges = plt.AddRadialGauge(values);
+gauges.SpaceFraction = .05;
+
+plt.SaveFig("radialgauge_size.png");</pre>
+<img src='../../images/radialgauge_size.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-caps'>Gauge Caps</h3>
+<div>Caps can be customized for the starting and end of the gauges. </div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.CircularBackground = false;
+gauges.StartCap = System.Drawing.Drawing2D.LineCap.Flat;
+gauges.EndCap = System.Drawing.Drawing2D.LineCap.DiamondAnchor;
+
+plt.SaveFig("radialgauge_caps.png");</pre>
+<img src='../../images/radialgauge_caps.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-starting-angle'>Gauge Starting Angle</h3>
+<div>The starting angle for gauges can be customized. 270 for North (default value), 0 for East, 90 for South, 180 for West, etc.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.StartingAngle = 180;
+
+plt.SaveFig("radialgauge_start.png");</pre>
+<img src='../../images/radialgauge_start.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-angular-range'>Gauge Angular Range</h3>
+<div>By default gauges are full circles (360 degrees) but smaller gauges can be created by customizing the gauge size.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.MaximumAngle = 180;
+
+plt.SaveFig("radialgauge_range.png");</pre>
+<img src='../../images/radialgauge_range.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='show-levels'>Show Levels</h3>
+<div>The value of each gauge is displayed as text by default but this behavior can be overridden. Note that this is different than the labels fiels which is what appears in the legened.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.ShowLevels = false;
+
+plt.SaveFig("radialgauge_levels.png");</pre>
+<img src='../../images/radialgauge_levels.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-label-position'>Gauge Label Position</h3>
+<div>Gauge level text is positioned at the tip of each gauge by default, but this position can be adjusted by the user.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.LabelPositionFraction = 0;
+
+plt.SaveFig("radialgauge_labelpos.png");</pre>
+<img src='../../images/radialgauge_labelpos.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-label-font-percentage'>Gauge Label Font Percentage</h3>
+<div>Size of the gauge level text as a fraction of the gauge width.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.FontSizeFraction = .4;
+
+plt.SaveFig("radialgauge_labelfontsize.png");</pre>
+<img src='../../images/radialgauge_labelfontsize.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-label-color'>Gauge Label Color</h3>
+<div>Level text fonts may be customized.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.Font.Color = Color.Black;
+
+plt.SaveFig("radialgauge_labelcolor.png");</pre>
+<img src='../../images/radialgauge_labelcolor.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gauge-labels-in-legend'>Gauge Labels in Legend</h3>
+<div>Radial gauge labels will appear in the legend if they are assigned. </div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.Labels = new string[] { "alpha", "beta", "gamma", "delta", "epsilon" };
+plt.Legend(true);
+
+plt.SaveFig("radialgauge_legend.png");</pre>
+<img src='../../images/radialgauge_legend.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='background-gauges-dim'>Background Gauges Dim</h3>
+<div>By default the full range of each gauge is drawn as a semitransparent ring. The amount of transparency can be adjusted as desired.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.BackgroundTransparencyFraction = .5;
+
+plt.SaveFig("radialgauge_backdim.png");</pre>
+<img src='../../images/radialgauge_backdim.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='background-gauges-normalization'>Background Gauges Normalization</h3>
+<div>Gauge backgrounds are drawn as full circles by default. This behavior can be disabled to draw partial backgrounds for non-circular gauges.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.Palette = ScottPlot.Palette.Nord;
+double[] values = { 100, 80, 65, 45, 20 };
+
+var gauges = plt.AddRadialGauge(values);
+gauges.CircularBackground = false;
+gauges.MaximumAngle = 180;
+gauges.StartingAngle = 180;
+
+plt.SaveFig("radialgauge_backnorm.png");</pre>
+<img src='../../images/radialgauge_backnorm.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+    </div>    </article>  </div></body></html>

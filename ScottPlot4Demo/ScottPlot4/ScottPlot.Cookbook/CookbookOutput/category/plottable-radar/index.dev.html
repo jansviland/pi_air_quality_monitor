@@ -1,0 +1,267 @@
+<html><head>  <title>Plot Type: Radar Chart - ScottPlot 4.1 Cookbook</title>  <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css rel=stylesheet></head><body class=bg-light>  <div class='container' style='max-width:1000px'>    <div class='my-4'><code>THIS PAGE IS FOR TESTING ONLY</code></div>    <div class='display-4'>Plot Type: Radar Chart - ScottPlot 4.1 Cookbook</div>    <div class='fs-5'><i>Radar charts (also called a spider charts or star charts) represent multi-axis data as a 2D shape on axes arranged circularly around a center point.</i></div>    <article class='bg-light shadow rounded my-5'>    <div class='p-3 rounded bg-white'>      This page contains recipes for the <i>Radar Chart</i> category.<br>Visit the <a href='../../index.dev.html'>Cookbook Home Page</a> to view all cookbook recipes.
+<h3 class='mt-5' id='radar'>Radar</h3>
+<div>A radar chart concisely displays multiple values. Radar plots are also called a spider charts or star charts.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 78,  83, 84, 76, 43 },
+    { 100, 50, 70, 60, 90 }
+};
+
+plt.AddRadar(values);
+
+// improve plot styling
+plt.Frameless();
+plt.Grid(enable: false);
+
+plt.SaveFig("radar_quickstart.png");</pre>
+<img src='../../images/radar_quickstart.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='straight-axis-lines'>Straight Axis Lines</h3>
+<div>Change the axis type to polygon to display radar charts with straight lines.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+        { 78, 83, 84, 76, 43 },
+        { 100, 50, 70, 60, 90 }
+    };
+
+var radarPlot = plt.AddRadar(values);
+radarPlot.AxisType = RadarAxis.Polygon;
+
+plt.SaveFig("radar_straightLines.png");</pre>
+<img src='../../images/radar_straightlines.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='no-axis-lines'>No Axis Lines</h3>
+<div>A radar chart can have no drawn axis as well.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+        { 78, 83, 84, 76, 43 },
+        { 100, 50, 70, 60, 90 }
+    };
+
+var radarPlot = plt.AddRadar(values);
+radarPlot.AxisType = RadarAxis.None;
+radarPlot.ShowAxisValues = false;
+
+plt.SaveFig("radar_noLines.png");</pre>
+<img src='../../images/radar_nolines.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='smooth-radar'>Smooth Radar</h3>
+<div>The Smooth field controls whether radar areas are drawn with smooth or straight lines.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+        { 78, 83, 84, 76, 43 },
+        { 100, 50, 70, 60, 90 }
+    };
+
+var radarPlot = plt.AddRadar(values);
+radarPlot.Smooth = true;
+
+plt.SaveFig("radar_smooth.png");</pre>
+<img src='../../images/radar_smooth.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='labeled-categories'>Labeled Categories</h3>
+<div>Category labels can be displayed on the radar chart.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 5, 3, 10, 15, 3, 2, 256 },
+    { 5, 2, 10, 10, 1, 4, 252 },
+};
+
+var radar = plt.AddRadar(values, independentAxes: true);
+radar.CategoryLabels = new string[] { "Wins", "Poles", "Podiums", "Points Finishes", "DNFs", "Fastest Laps", "Points" };
+radar.GroupLabels = new[] { "Sebastian Vettel", "Fernando Alonso" };
+radar.ShowAxisValues = false;
+
+// customize the plot
+plt.Title("2010 Formula One World Championship");
+plt.Legend();
+
+/* Data represents the 2010 Formula One World Championship
+ * https://en.wikipedia.org/wiki/2010_Formula_One_World_Championship
+ * Note: Alonso did not finish (DNF) in the Malaysian GP, but was included 
+ * here because he completed >90% of the race distance.
+ */
+
+plt.SaveFig("radar_labelCategory.png");</pre>
+<img src='../../images/radar_labelcategory.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='labeled-values'>Labeled Values</h3>
+<div>Labels can be displayed on the arms of the radar chart.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 5, 3, 10, 15, 3, 2 },
+    { 5, 2, 10, 10, 1, 4 },
+};
+
+var radar = plt.AddRadar(values);
+radar.CategoryLabels = new string[] { "Wins", "Poles", "Podiums", "Points Finishes", "DNFs", "Fastest Laps" };
+radar.GroupLabels = new string[] { "Sebastian Vettel", "Fernando Alonso" };
+
+// customize the plot
+plt.Title("2010 Formula One World Championship");
+plt.Legend();
+
+/* Data represents the 2010 Formula One World Championship
+ * https://en.wikipedia.org/wiki/2010_Formula_One_World_Championship
+ * Note: Alonso did not finish (DNF) in the Malaysian GP, but was included 
+ * here because he completed >90% of the race distance.
+ */
+
+plt.SaveFig("radar_labelValue.png");</pre>
+<img src='../../images/radar_labelvalue.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='customizable-polygon-outline'>Customizable polygon outline</h3>
+<div>The thickness of each radar plot's outline can be customized.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 5, 3, 10, 15, 3, 2 },
+    { 5, 2, 10, 10, 1, 4 },
+};
+
+var radar = plt.AddRadar(values);
+radar.OutlineWidth = 3;
+radar.GroupLabels = new string[] { "Sebastian Vettel", "Fernando Alonso" };
+plt.Title("2010 Formula One World Championship");
+plt.Legend();
+
+/* Data represents the 2010 Formula One World Championship
+ * https://en.wikipedia.org/wiki/2010_Formula_One_World_Championship
+ * Note: Alonso did not finish (DNF) in the Malaysian GP, but was included 
+ * here because he completed >90% of the race distance.
+ */
+
+plt.SaveFig("radar_customizePolygonOutline.png");</pre>
+<img src='../../images/radar_customizepolygonoutline.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='customizable-hatching-(pattern)'>Customizable hatching (pattern)</h3>
+<div>The hatch of each radar plot can be customized</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 5, 3, 10, 15, 3, 2 },
+    { 5, 2, 10, 10, 1, 4 },
+};
+
+var radar = plt.AddRadar(values);
+radar.HatchOptions = new HatchOptions[]
+{
+    new() { Pattern = HatchStyle.StripedUpwardDiagonal, Color = Color.FromArgb(100, Color.Gray) },
+    new() { Pattern = HatchStyle.StripedDownwardDiagonal, Color = Color.FromArgb(100, Color.Gray) },
+};
+
+radar.GroupLabels = new string[] { "Sebastian Vettel", "Fernando Alonso" };
+plt.Title("2010 Formula One World Championship");
+plt.Legend();
+
+/* Data represents the 2010 Formula One World Championship
+ * https://en.wikipedia.org/wiki/2010_Formula_One_World_Championship
+ * Note: Alonso did not finish (DNF) in the Malaysian GP, but was included 
+ * here because he completed >90% of the race distance.
+ */
+
+plt.SaveFig("radar_hatch.png");</pre>
+<img src='../../images/radar_hatch.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='categories-with-images'>Categories with images</h3>
+<div>Images can be displayed on the arms of the radar chart. When using images, labels will be ignored so setting them will have no effect.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 5, 15, 3, 2 },
+    { 5, 10, 1, 4 },
+};
+
+var radar = plt.AddRadar(values);
+radar.CategoryImages = CategoryImages;
+radar.GroupLabels = new string[] { "Sebastian Vettel", "Fernando Alonso" };
+
+// customize the plot
+plt.Title("2010 Formula One World Championship");
+plt.Legend();
+
+/* Data represents the 2010 Formula One World Championship
+ * https://en.wikipedia.org/wiki/2010_Formula_One_World_Championship
+ * Note: Alonso did not finish (DNF) in the Malaysian GP, but was included 
+ * here because he completed >90% of the race distance.
+ */
+
+plt.SaveFig("radar_iconValue.png");</pre>
+<img src='../../images/radar_iconvalue.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='independent-axis-scaling'>Independent Axis Scaling</h3>
+<div>Axis scaling can be independent, allowing values for each category to be displayed using a different scale. When independent axis mode is enabled, axis limits are automatically adjusted to fit the range of the data.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = { { 5, 3, 10, 15, 3, 2, 256 }, { 5, 2, 10, 10, 1, 4, 252 }, };
+
+var radar = plt.AddRadar(values, independentAxes: true);
+radar.CategoryLabels = new string[] { "Wins", "Poles", "Podiums", "Points Finishes", "DNFs", "Fastest Laps", "Points" };
+radar.GroupLabels = new string[] { "Sebastian Vettel", "Fernando Alonso" };
+
+// customize the plot
+plt.Title("2010 Formula One World Championship");
+plt.Legend();
+
+/* Data represents the 2010 Formula One World Championship
+ * https://en.wikipedia.org/wiki/2010_Formula_One_World_Championship
+ * Note: Alonso did not finish (DNF) in the Malaysian GP, but was included 
+ * here because he completed >90% of the race distance.
+ */
+
+plt.SaveFig("radar_axisScaling.png");</pre>
+<img src='../../images/radar_axisscaling.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='defined-axis-limits'>Defined Axis Limits</h3>
+<div>Radar charts with independent axis limits use scales fitted to the data by default, but scaling can be controlled by defining the maximum value for each axis.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 5, 3, 10, 15, 3, 2, 256 },
+    { 5, 2, 10, 10, 1, 4, 252 },
+};
+
+double[] maxValues = { 13, 15, 17, 15, 10, 10, 413 };
+
+var radar = plt.AddRadar(values, independentAxes: true, maxValues: maxValues);
+radar.CategoryLabels = new string[] { "Wins", "Poles", "Podiums", "Points Finishes", "DNFs", "Fastest Laps", "Points" };
+radar.GroupLabels = new string[] { "Sebastian Vettel", "Fernando Alonso" };
+
+// customize the plot
+plt.Title("2010 Formula One World Championship");
+plt.Legend();
+
+/* Data represents the 2010 Formula One World Championship
+ * https://en.wikipedia.org/wiki/2010_Formula_One_World_Championship
+ * Note: Alonso did not finish (DNF) in the Malaysian GP, but was included 
+ * here because he completed >90% of the race distance.
+ *
+ * Max values are based on https://en.wikipedia.org/wiki/List_of_Formula_One_World_Drivers%27_Champions.
+ */
+
+plt.SaveFig("radar_axisLimits.png");</pre>
+<img src='../../images/radar_axislimits.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='customization'>Customization</h3>
+<div>Radar charts support customization of the line color and width.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+double[,] values = {
+    { 78,  83, 84, 76, 43 },
+    { 100, 50, 70, 60, 90 }
+};
+
+var radar = plt.AddRadar(values);
+radar.WebColor = System.Drawing.Color.Red;
+radar.LineWidth = 3;
+
+plt.SaveFig("radar_customization.png");</pre>
+<img src='../../images/radar_customization.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+    </div>    </article>  </div></body></html>

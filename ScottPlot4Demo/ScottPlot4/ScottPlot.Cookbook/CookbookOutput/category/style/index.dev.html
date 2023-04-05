@@ -1,0 +1,168 @@
+<html><head>  <title>Style - ScottPlot 4.1 Cookbook</title>  <link href=https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css rel=stylesheet></head><body class=bg-light>  <div class='container' style='max-width:1000px'>    <div class='my-4'><code>THIS PAGE IS FOR TESTING ONLY</code></div>    <div class='display-4'>Style - ScottPlot 4.1 Cookbook</div>    <div class='fs-5'><i>Plots can be styled to customize their colors and fonts.</i></div>    <article class='bg-light shadow rounded my-5'>    <div class='p-3 rounded bg-white'>      This page contains recipes for the <i>Style</i> category.<br>Visit the <a href='../../index.dev.html'>Cookbook Home Page</a> to view all cookbook recipes.
+<h3 class='mt-5' id='default-plot-style'>Default Plot Style</h3>
+<div>This example demonstrates the default plot style.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+plt.Title("Default Style");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_Default.png");</pre>
+<img src='../../images/style_default.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='background-color'>Background Color</h3>
+<div>Plots have two background colors that can be individually customized. The figure background is the background of the whole image. The data background is the background of the rectangle that contains the data. Both background types support transparency, although PNG file export is required.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(
+    figureBackground: Color.LightSkyBlue,
+    dataBackground: Color.Salmon);
+
+plt.SaveFig("style_background.png");</pre>
+<img src='../../images/style_background.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='monospace-style'>Monospace Style</h3>
+<div>Customize many plot features using style presets</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(Style.Monospace);
+plt.Title("Style.Monospace");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_monospace.png");</pre>
+<img src='../../images/style_monospace.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='blue1-style'>Blue1 Style</h3>
+<div>Customize many plot features using style presets</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(Style.Blue1);
+plt.Title("Style.Blue1");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_blue1.png");</pre>
+<img src='../../images/style_blue1.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='blue2-style'>Blue2 Style</h3>
+<div>Customize many plot features using style presets</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(Style.Blue2);
+plt.Title("Style.Blue2");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_blue2.png");</pre>
+<img src='../../images/style_blue2.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='light1-style'>Light1 Style</h3>
+<div>Customize many plot features using style presets</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(Style.Light1);
+plt.Title("Style.Light1");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_light1.png");</pre>
+<img src='../../images/style_light1.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='gray1-style'>Gray1 Style</h3>
+<div>Customize many plot features using style presets</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(Style.Gray1);
+plt.Title("Style.Gray1");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_Gray1.png");</pre>
+<img src='../../images/style_gray1.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='black-style'>Black Style</h3>
+<div>Customize many plot features using style presets</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(Style.Black);
+plt.Title("Style.Black");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_Black.png");</pre>
+<img src='../../images/style_black.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='seaborn-style'>Seaborn Style</h3>
+<div>Customize many plot features using style presets</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51));
+plt.AddSignal(DataGen.Cos(51));
+
+plt.Style(Style.Seaborn);
+plt.Title("Style.Seaborn");
+plt.XLabel("Horizontal Axis");
+plt.YLabel("Vertical Axis");
+
+plt.SaveFig("style_Seaborn.png");</pre>
+<img src='../../images/style_seaborn.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='data-background-image'>Data Background Image</h3>
+<div>A backgorund image can be drawn behind the data area. Users to do this may want to make grid lines semitransparent.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51), 1, Color.Yellow);
+plt.AddSignal(DataGen.Cos(51), 1, Color.Magenta);
+
+Bitmap monaLisaBmp = ScottPlot.DataGen.SampleImage();
+
+plt.Style(
+    grid: Color.FromArgb(50, Color.White),
+    dataBackgroundImage: monaLisaBmp);
+
+plt.SaveFig("misc_background_image_data.png");</pre>
+<img src='../../images/misc_background_image_data.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+<h3 class='mt-5' id='figure-background-image'>Figure Background Image</h3>
+<div>A backgorund image can be drawn behind the entire figure. If you do this you likely want to make your data background transparent.</div>
+<pre class='bg-light border rounded p-3'>var plt = new ScottPlot.Plot(600, 400);
+
+plt.AddSignal(DataGen.Sin(51), 1, Color.Yellow);
+plt.AddSignal(DataGen.Cos(51), 1, Color.Magenta);
+
+Bitmap monaLisaBmp = ScottPlot.DataGen.SampleImage();
+
+plt.Style(
+    grid: Color.FromArgb(50, Color.White),
+    tick: Color.White,
+    dataBackground: Color.FromArgb(50, Color.White),
+    figureBackgroundImage: monaLisaBmp);
+
+plt.SaveFig("misc_background_image_figure.png");</pre>
+<img src='../../images/misc_background_image_figure.png' class='d-block mx-auto my-5 border shadow-sm' style='max-width: 100%;'/>
+
+    </div>    </article>  </div></body></html>
