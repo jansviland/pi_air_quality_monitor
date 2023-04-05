@@ -3,9 +3,7 @@
         xmlns:vm="using:AirQuality.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
-        xmlns:local="clr-namespace:AirQuality.Views"
-        xmlns:System="clr-namespace:System;assembly=System.Runtime"
+        xmlns:scottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AirQuality.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -15,23 +13,6 @@
         Width="800"
         Height="600">
 
-    <!-- <Window.Styles> -->
-    <!--     <Style Selector="ListBox"> -->
-    <!--         <Setter Property="Background" Value="#2c3e50"/> -->
-    <!--         <Setter Property="Foreground" Value="#ecf0f1"/> -->
-    <!--         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/> -->
-    <!--     </Style> -->
-    <!--     <Style Selector="ListBoxItem"> -->
-    <!--         <Setter Property="Padding" Value="10"/> -->
-    <!--         <Setter Property="FontSize" Value="18"/> -->
-    <!--         <Setter Property="Background" Value="#2c3e50"/> -->
-    <!--         <Setter Property="Foreground" Value="#ecf0f1"/> -->
-    <!--     </Style> -->
-    <!--     <Style Selector="ListBoxItem:selected"> -->
-    <!--         <Setter Property="Background" Value="#34495e"/> -->
-    <!--         <Setter Property="Foreground" Value="#ffffff"/> -->
-    <!--     </Style> -->
-    <!-- </Window.Styles> -->
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -57,7 +38,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
         
-        <ScottPlot:AvaPlot Grid.Column="1" Name="AvaPlot1" />
+        <scottPlot:AvaPlot Grid.Column="1" Name="AvaPlot1" />
 
     </Grid>
 

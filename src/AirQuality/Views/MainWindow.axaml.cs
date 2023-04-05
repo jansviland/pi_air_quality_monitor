@@ -1,4 +1,4 @@
-using System.ComponentModel;
+using System;
 using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
@@ -9,6 +9,9 @@ namespace AirQuality.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly Random _rand = new Random();
+    private const int PointCount = 100;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -19,10 +22,31 @@ public partial class MainWindow : Window
         this.AttachDevTools();
 #endif
 
-        double[] dataX = new double[] { 1, 2, 3, 4, 5 };
-        double[] dataY = new double[] { 1, 4, 9, 16, 25 };
-        AvaPlot avaPlot1 = this.Find<AvaPlot>("AvaPlot1");
-        avaPlot1.Plot.AddScatter(dataX, dataY);
-        avaPlot1.Refresh();
+        var listBox = this.FindControl<ListBox>("MenuListBox");
+        listBox.SelectionChanged += MenuListBox_SelectionChanged;
+    }
+
+    private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
+        {
+            var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
+            avaPlot.Plot.Clear();
+            avaPlot.Plot.Title(menuItem.Name);
+
+            // create data sample data
+            double[] ys = DataGen.RandomWalk(_rand, PointCount);
+            TimeSpan ts = TimeSpan.FromSeconds(1); // time between data points
+            double sampleRate = (double)TimeSpan.TicksPerDay / ts.Ticks;
+            var signalPlot = avaPlot.Plot.AddSignal(ys, sampleRate);
+
+            // Then tell the axis to display tick labels using a time format
+            avaPlot.Plot.XAxis.DateTimeFormat(true);
+
+            // Set start date
+            signalPlot.OffsetX = new DateTime(1985, 10, 1).ToOADate();
+
+            avaPlot.Render();
+        }
     }
 }
