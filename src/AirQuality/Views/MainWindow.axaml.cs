@@ -2,6 +2,8 @@ using System;
 using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ScottPlot;
 using ScottPlot.Avalonia;
 
@@ -9,11 +11,18 @@ namespace AirQuality.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly ILogger<MainWindow> _logger;
+
     private readonly Random _rand = new Random();
     private const int PointCount = 100;
 
     public MainWindow()
     {
+    }
+
+    public MainWindow(ILogger<MainWindow> logger, IConfiguration configuration)
+    {
+        _logger = logger;
         InitializeComponent();
 
         DataContext = new MainWindowViewModel();
@@ -24,6 +33,14 @@ public partial class MainWindow : Window
 
         var listBox = this.FindControl<ListBox>("MenuListBox");
         listBox.SelectionChanged += MenuListBox_SelectionChanged;
+
+        // get connection string from appsettings.json
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        // TODO: connect to DB
+        // TODO: show error if connection fails
+        // TODO: get data from DB
+        // TODO: show loading indicator
     }
 
     private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -44,6 +61,8 @@ public partial class MainWindow : Window
 
         if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
         {
+            _logger.LogInformation($"Selected menu item: {menuItem.Name}");
+
             var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
             avaPlot.Plot.Clear();
             avaPlot.Plot.Title(menuItem.Name);
