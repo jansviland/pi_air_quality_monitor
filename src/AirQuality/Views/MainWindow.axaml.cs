@@ -56,6 +56,18 @@ public partial class MainWindow : Window
 
     // TODO: add a feature, should be able to select day, week, month or other time range
 
+    // TODO: make an sql query that count the number of measurements for each month, week, day etc. So we can see if it's possible to find
+    // measurements for that time range. For example if it's around 1440 measurements at the 02.01.2021, then it's possible to show the graph for that day.
+    // it has the full amount of 60 * 24 measurements for that day. Then we should be able to select that day.
+    // if it's 0 measurements for that day, then we should not be able to select that day. It should be greyed out, or something like that
+
+    // TODO: get x amount of measurements from the database at a time, and then add them to the graph, test how many measurements can be shown on the graph at the same time
+    // TODO: make a "live data" feature, for when the sql stream is active, then you should be able to see the measurements in real time, minute by minute
+
+    // TODO: for longer time frames, calculate the average value for each hour, and then show that on the graph
+    // TODO: for even longer time frames, calculate the average value for each day, and then show that on the graph
+    // TODO: store the values locally, so that you don't have to query the database every time you want to show the graph
+
     /// <summary>
     /// Read in all rows from the Dogs1 table and store them in a List.
     /// </summary>
