@@ -13,9 +13,9 @@ public class MainWindowViewModel : ViewModelBase
     {
         MenuItems = new ObservableCollection<MenuItemViewModel>
         {
-            new MenuItemViewModel { Name = "raspberry-pi-jan" },
-            new MenuItemViewModel { Name = "Målestasjon 2" },
-            new MenuItemViewModel { Name = "Målestasjon 3" }
+            new() { Name = "raspberry-pi-jan" },
+            new() { Name = "Målestasjon 2" },
+            new() { Name = "Målestasjon 3" }
         };
 
         SelectedMenuItem = MenuItems[0];

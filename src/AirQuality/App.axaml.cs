@@ -12,13 +12,12 @@ using Serilog;
 
 namespace AirQuality;
 
-public partial class App : Application
+public class App : Application
 {
-    private static IHost Host { get; set; }
+    private static IHost Host { get; set; } = null!;
 
     public static void ConfigureServices(IServiceCollection services)
     {
-        // services.AddTransient<ISolutionService, SolutionService>();
         services.AddSingleton<MainWindow>();
     }
 
