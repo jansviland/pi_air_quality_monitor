@@ -16,7 +16,7 @@ public partial class App : Application
 {
     private static IHost Host { get; set; }
 
-    public void ConfigureServices(IServiceCollection services)
+    public static void ConfigureServices(IServiceCollection services)
     {
         // services.AddTransient<ISolutionService, SolutionService>();
         services.AddSingleton<MainWindow>();
@@ -47,11 +47,6 @@ public partial class App : Application
         {
             desktop.MainWindow = Host.Services.GetRequiredService<MainWindow>();
             desktop.MainWindow.DataContext = new MainWindowViewModel();
-
-            // desktop.MainWindow = new MainWindow
-            // {
-            //     DataContext = new MainWindowViewModel(),
-            // };
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using AirQuality.Models;
 using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ScottPlot;
@@ -15,6 +18,9 @@ public partial class MainWindow : Window
 
     private readonly Random _rand = new Random();
     private const int PointCount = 100;
+
+    private readonly string? _connectionString;
+    private readonly List<Measurement> _measurements = new List<Measurement>();
 
     public MainWindow()
     {
@@ -35,12 +41,54 @@ public partial class MainWindow : Window
         listBox.SelectionChanged += MenuListBox_SelectionChanged;
 
         // get connection string from appsettings.json
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        _connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        _measurements = GetMeasurements();
 
         // TODO: connect to DB
         // TODO: show error if connection fails
         // TODO: get data from DB
         // TODO: show loading indicator
+    }
+
+    /// <summary>
+    /// Read in all rows from the Dogs1 table and store them in a List.
+    /// </summary>
+    private List<Measurement> GetMeasurements()
+    {
+        List<Measurement> measurements = new List<Measurement>();
+        using (SqlConnection con = new SqlConnection(_connectionString))
+        {
+            con.Open();
+
+            using (SqlCommand command = new SqlCommand("SELECT * FROM measurements", con))
+            {
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    measurements.Add(new Measurement()
+                    {
+                        Pm2 = reader.GetDouble(0),
+                        Pm10 = reader.GetDouble(1),
+                        // EventProcessedUtcTime = reader.GetDateTime(2),
+                        // PartitionId = reader.GetInt64(3),
+                        EventEnqueuedUtcTime = reader.GetDateTime(4),
+                        // IoTHub = reader.GetString(5),
+
+                        // unixtime can be null in the database, added it later on, so in some earlier rows it will be null
+                        UnixTime = reader.IsDBNull(6) ? null : reader.GetInt64(6),
+                        // ClientId = reader.GetString(7)
+                    });
+                }
+            }
+        }
+
+        foreach (Measurement measurement in measurements)
+        {
+            Console.WriteLine(measurement);
+        }
+
+        return measurements;
     }
 
     private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
