@@ -68,19 +68,16 @@ public partial class MainWindow : Window
     // TODO: for even longer time frames, calculate the average value for each day, and then show that on the graph
     // TODO: store the values locally, so that you don't have to query the database every time you want to show the graph
 
-    /// <summary>
-    /// Read in all rows from the Dogs1 table and store them in a List.
-    /// </summary>
     private List<Measurement> GetMeasurements(int count)
     {
         List<Measurement> measurements = new();
-        using (SqlConnection con = new SqlConnection(_connectionString))
+        using (var con = new SqlConnection(_connectionString))
         {
             con.Open();
 
-            using (SqlCommand command = new SqlCommand($"SELECT top({count}) * FROM measurements order by unixtime desc", con))
+            using (var command = new SqlCommand($"SELECT top({count}) * FROM measurements order by unixtime desc", con))
             {
-                SqlDataReader reader = command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     measurements.Add(new Measurement()
@@ -98,11 +95,6 @@ public partial class MainWindow : Window
                     });
                 }
             }
-        }
-
-        foreach (Measurement measurement in measurements)
-        {
-            Console.WriteLine(measurement);
         }
 
         return measurements;
@@ -130,18 +122,16 @@ public partial class MainWindow : Window
 
         if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
         {
-            _logger.LogInformation($"Selected menu item: {menuItem.Name}");
-
             var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
             avaPlot.Plot.Clear();
             avaPlot.Plot.Title(menuItem.Name);
 
             // convert the the measurements to arrays
-            double[] xs = new double[_measurements.Count];
-            double[] pm2 = new double[_measurements.Count];
-            double[] pm10 = new double[_measurements.Count];
+            var xs = new double[_measurements.Count];
+            var pm2 = new double[_measurements.Count];
+            var pm10 = new double[_measurements.Count];
 
-            for (int i = 0; i < _measurements.Count; i++)
+            for (var i = 0; i < _measurements.Count; i++)
             {
                 xs[i] = _measurements[i].EventEnqueuedUtcTime.ToOADate();
                 pm2[i] = _measurements[i].Pm2;
@@ -151,20 +141,10 @@ public partial class MainWindow : Window
             // add the measurements to the plot
             avaPlot.Plot.AddScatter(xs, pm2, label: "PM2");
             avaPlot.Plot.AddScatter(xs, pm10, label: "PM10");
-
             avaPlot.Plot.Legend();
 
-            // create data sample data
-            // double[] ys = DataGen.RandomWalk(_rand, PointCount);
-            // TimeSpan ts = TimeSpan.FromSeconds(1); // time between data points
-            // double sampleRate = (double)TimeSpan.TicksPerDay / ts.Ticks;
-            // var signalPlot = avaPlot.Plot.AddSignal(ys, sampleRate);
-
-            // Then tell the axis to display tick labels using a time format
+            // tell the axis to display tick labels using a time format
             avaPlot.Plot.XAxis.DateTimeFormat(true);
-
-            // Set start date
-            // signalPlot.OffsetX = new DateTime(1985, 10, 1).ToOADate();
 
             avaPlot.Render();
         }
