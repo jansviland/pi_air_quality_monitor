@@ -12,7 +12,7 @@ public interface IBlobStorage
     /// </summary>
     public void UpdateLocalFiles();
 
-    public IEnumerable<DateTime> GetDatesWithMeasurments();
+    public List<DateTime> GetDatesWithMeasurments();
 }
 
 public class BlobStorage : IBlobStorage
@@ -87,7 +87,7 @@ public class BlobStorage : IBlobStorage
     }
 
     // Go through all json files, and return a list of dates that have measurements
-    public IEnumerable<DateTime> GetDatesWithMeasurments()
+    public List<DateTime> GetDatesWithMeasurments()
     {
         return _availableDates;
     }

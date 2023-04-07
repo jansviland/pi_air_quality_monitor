@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AirQuality.Common.Models;
 using AirQuality.DataLayer;
@@ -16,6 +17,7 @@ public partial class MainWindow : Window
     private readonly IBlobStorage _blobStorage;
 
     private readonly List<Measurement> _measurements = new();
+    private readonly List<DateTime> _datesWithMeasurements;
 
     public MainWindow()
     {
@@ -43,6 +45,8 @@ public partial class MainWindow : Window
 
         // TODO: this can take a while, so we should show a loading indicator, and show an error if it fails
         _blobStorage.UpdateLocalFiles();
+
+        _datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
 
         // TODO: show error if connection fails
         // TODO: show loading indicator
@@ -112,6 +116,23 @@ public partial class MainWindow : Window
             avaPlot.Plot.XAxis.DateTimeFormat(true);
 
             avaPlot.Render();
+        }
+    }
+
+    private void OnDisplayDateChanged(object sender, CalendarDateChangedEventArgs e)
+    {
+        // Handle the DisplayDateChanged event here
+    }
+
+    private void OnSelectedDatesChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (AvailableDatesCalendar.SelectedDate.HasValue)
+        {
+            SelectedDateTextBlock.Text = $"Selected Date: {AvailableDatesCalendar.SelectedDate.Value.ToShortDateString()}";
+        }
+        else
+        {
+            SelectedDateTextBlock.Text = "No date selected.";
         }
     }
 }

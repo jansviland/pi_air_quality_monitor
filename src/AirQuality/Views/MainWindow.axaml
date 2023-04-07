@@ -10,7 +10,7 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="AirQuality"
 
-        Width="800"
+        Width="1400"
         Height="600">
 
 
@@ -19,27 +19,41 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel />
     </Design.DataContext>
-    
-    <Grid ColumnDefinitions="Auto,*">
-        <ListBox Name="MenuListBox"
-                 Grid.Column="0"
-                 Items="{Binding MenuItems}"
-                 SelectedItem="{Binding SelectedMenuItem}"
-                 Width="200"
-                 HorizontalAlignment="Stretch"
-                 BorderThickness="0">
 
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}"
-                               FontWeight="Bold"
-                               Margin="5" 
-                               />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        
-        <scottPlot:AvaPlot Grid.Column="1" Name="AvaPlot1" />
+    <Grid ColumnDefinitions="Auto,*" RowDefinitions="*, Auto">
+
+        <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Calendar Grid.Column="0" Grid.Row="0" x:Name="AvailableDatesCalendar" SelectionMode="SingleDate"
+                      DisplayDateChanged="OnDisplayDateChanged" SelectedDatesChanged="OnSelectedDatesChanged" />
+
+            <TextBlock Grid.Column="0" Grid.Row="1" x:Name="SelectedDateTextBlock" />
+
+            <ListBox Name="MenuListBox"
+                     Grid.Row="2"
+                     Items="{Binding MenuItems}"
+                     SelectedItem="{Binding SelectedMenuItem}"
+                     HorizontalAlignment="Stretch"
+                     BorderThickness="0"
+                     Margin="0, 10, 0, 0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"
+                                   FontWeight="Bold"
+                                   Margin="5" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+        </Grid>
+
+        <scottPlot:AvaPlot Grid.Column="1" Grid.Row="0" Name="AvaPlot1" />
 
     </Grid>
 
