@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using AirQuality.Common.Models;
 using AirQuality.DataLayer;
@@ -42,6 +41,7 @@ public partial class MainWindow : Window
         // TODO: get data locally from json files, to update, get data from Azure and store locally once. Then use the local data again.
         // _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
 
+        // TODO: this can take a while, so we should show a loading indicator, and show an error if it fails
         _blobStorage.UpdateLocalFiles();
 
         // TODO: show error if connection fails

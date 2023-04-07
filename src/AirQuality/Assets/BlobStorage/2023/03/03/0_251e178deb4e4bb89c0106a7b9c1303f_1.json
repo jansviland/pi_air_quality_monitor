@@ -1,1 +1,0 @@
-[{"pm2":1.7,"pm10":3.9,"EventProcessedUtcTime":"2023-03-03T14:11:58.4325573Z","PartitionId":1,"EventEnqueuedUtcTime":"2023-03-03T14:11:58.2150000Z","IoTHub":{"MessageId":null,"CorrelationId":null,"ConnectionDeviceId":"raspberry-pi-jan","ConnectionDeviceGenerationId":"638112061733821978","EnqueuedTime":"2023-03-03T14:11:58.2070000Z"}}]

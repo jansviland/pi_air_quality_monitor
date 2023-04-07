@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using Azure.Identity;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -9,7 +7,11 @@ namespace AirQuality.DataLayer;
 
 public interface IBlobStorage
 {
+    /// <summary>
+    /// This method should be called on startup to update the local files and update the available dates
+    /// </summary>
     public void UpdateLocalFiles();
+
     public IEnumerable<DateTime> GetDatesWithMeasurments();
 }
 
@@ -17,6 +19,8 @@ public class BlobStorage : IBlobStorage
 {
     private readonly ILogger<BlobStorage> _logger;
     private readonly BlobServiceClient _blobServiceClient;
+
+    private readonly List<DateTime> _availableDates = new List<DateTime>();
 
     // in order to be cross platform, support both / and \ folder seperators
     private readonly char _slash = Path.DirectorySeparatorChar;
@@ -31,8 +35,6 @@ public class BlobStorage : IBlobStorage
 
     public void UpdateLocalFiles()
     {
-        Console.WriteLine("Listing blobs...");
-
         // List all blobs in the container
         var containerClient = _blobServiceClient.GetBlobContainerClient("container1");
         var blobs = containerClient.GetBlobs();
@@ -45,40 +47,48 @@ public class BlobStorage : IBlobStorage
             // ...
             // 2023/04/05/0_3584554115e649f2ae93a9aa005702fe_1.json
 
-            _logger.LogInformation("Found blob {blobName}", blobItem.Name);
+            _logger.LogInformation("Found blob {BlobName}", blobItem.Name);
 
             var split = blobItem.Name.Split('/');
             var year = split[0];
             var month = split[1];
             var day = split[2];
             var filename = split[3];
-
             var currentDirectory = Directory.GetCurrentDirectory();
 
-            // TODO: check if file exist
-            var filePath = $"{currentDirectory}{_slash}Assets{_slash}BlobStorage{_slash}{year}{_slash}{month}{_slash}{day}{_slash}{filename}";
-            var exist = File.Exists(filePath);
+            // update list of available dates
+            _availableDates.Add(new DateTime(year: int.Parse(year), month: int.Parse(month), day: int.Parse(day)));
 
+            var fullFilePath = $"{currentDirectory}{_slash}BlobStorage{_slash}{year}{_slash}{month}{_slash}{day}{_slash}{filename}";
+
+            var exist = File.Exists(fullFilePath);
             if (exist)
             {
-                _logger.LogInformation($"Found file: {filePath}");
+                _logger.LogInformation("Found file: {FullFilePath}", fullFilePath);
             }
             else
             {
-                // TODO: download json
+                _logger.LogInformation("Downloading file: {FullFilePath}", fullFilePath);
+
+                // Create directory if it does not exist
+                var directory = Path.GetDirectoryName(fullFilePath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory!);
+                    _logger.LogInformation("Created directory: {Directory}", directory);
+                }
+
+                var blobClient = containerClient.GetBlobClient(blobItem.Name);
+                blobClient.DownloadTo(fullFilePath);
+
+                _logger.LogInformation($"Downloaded file: {fullFilePath}");
             }
-
-            // TODO: parse name into year month day
-            // TODO: check if file already exist
-            // TODO: if it does not exist, download it
         }
-
-        // throw new NotImplementedException();
     }
 
     // Go through all json files, and return a list of dates that have measurements
     public IEnumerable<DateTime> GetDatesWithMeasurments()
     {
-        throw new NotImplementedException();
+        return _availableDates;
     }
 }
