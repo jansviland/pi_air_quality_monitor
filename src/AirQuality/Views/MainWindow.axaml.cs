@@ -5,6 +5,8 @@ using AirQuality.DataLayer;
 using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using DynamicData;
 using Microsoft.Extensions.Logging;
 using ScottPlot.Avalonia;
 
@@ -47,6 +49,14 @@ public partial class MainWindow : Window
         _blobStorage.UpdateLocalFiles();
 
         _datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
+
+        // black out dates before the first date with measurements
+        AvailableDatesCalendar.IsTodayHighlighted = false;
+        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(DateTime.MinValue, _datesWithMeasurements[0] + TimeSpan.FromDays(-1)) });
+        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(_datesWithMeasurements[^1] + TimeSpan.FromDays(1), DateTime.MaxValue) });
+
+        // set selected date to the last date with measurements
+        AvailableDatesCalendar.SelectedDate = _datesWithMeasurements[^1];
 
         // TODO: show error if connection fails
         // TODO: show loading indicator
@@ -129,6 +139,8 @@ public partial class MainWindow : Window
         if (AvailableDatesCalendar.SelectedDate.HasValue)
         {
             SelectedDateTextBlock.Text = $"Selected Date: {AvailableDatesCalendar.SelectedDate.Value.ToShortDateString()}";
+
+            // TODO: update the graph with the measurements for the selected date
         }
         else
         {

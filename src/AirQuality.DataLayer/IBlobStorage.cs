@@ -35,7 +35,6 @@ public class BlobStorage : IBlobStorage
 
     public void UpdateLocalFiles()
     {
-        // List all blobs in the container
         var containerClient = _blobServiceClient.GetBlobContainerClient("container1");
         var blobs = containerClient.GetBlobs();
 
@@ -44,7 +43,7 @@ public class BlobStorage : IBlobStorage
             // 2023/02/07/0_bc65f685d896441690ac0d2d62198e46_1.json
             // 2023/02/08/0_af12b8d2580e46af83ded32118397f5b_1.json
             // 2023/02/09/0_debc5e11ae124ee68154ff0552a2845c_1.json
-            // ...
+            // (...)
             // 2023/04/05/0_3584554115e649f2ae93a9aa005702fe_1.json
 
             _logger.LogInformation("Found blob {BlobName}", blobItem.Name);
@@ -81,7 +80,7 @@ public class BlobStorage : IBlobStorage
                 var blobClient = containerClient.GetBlobClient(blobItem.Name);
                 blobClient.DownloadTo(fullFilePath);
 
-                _logger.LogInformation($"Downloaded file: {fullFilePath}");
+                _logger.LogInformation("Downloaded file: {FullFilePath}", fullFilePath);
             }
         }
     }
