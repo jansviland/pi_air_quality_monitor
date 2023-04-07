@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AirQuality.Models;
+﻿namespace AirQuality.Common.Models;
 
 public class Measurement
 {

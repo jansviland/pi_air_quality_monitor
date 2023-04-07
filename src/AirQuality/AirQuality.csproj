@@ -9,31 +9,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Models\"/>
-        <AvaloniaResource Include="Assets\avalonia-logo.ico"/>
+        <Folder Include="Models" />
+        <Folder Include="Models\" />
+        <AvaloniaResource Include="Assets\avalonia-logo.ico" />
         <!--        
         <AvaloniaResource Include="Assets\**" />
         -->
     </ItemGroup>
 
     <ItemGroup>
-        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent"/>
+        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.19"/>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.19"/>
+        <PackageReference Include="Avalonia" Version="0.10.19" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.19" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.19"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.19"/>
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1"/>
-        <PackageReference Include="ScottPlot.Avalonia" Version="4.1.62"/>
-        <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1"/>
-        <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0"/>
-        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0"/>
-        <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.19" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.19" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+        <PackageReference Include="ScottPlot.Avalonia" Version="4.1.62" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+        <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -43,5 +43,10 @@
         <None Update="Assets\BlobStorage\**">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AirQuality.Common\AirQuality.Common.csproj" />
+      <ProjectReference Include="..\AirQuality.DataLayer\AirQuality.DataLayer.csproj" />
     </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using AirQuality.DataLayer;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -18,6 +19,7 @@ public class App : Application
 
     public static void ConfigureServices(IServiceCollection services)
     {
+        services.AddTransient<IDatabase, Database>();
         services.AddSingleton<MainWindow>();
     }
 

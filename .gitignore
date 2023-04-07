@@ -45,3 +45,5 @@ coverage/
 
 # Serilog files
 **/Logs/
+
+src/AirQuality/appsettings.json
