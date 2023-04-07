@@ -40,9 +40,9 @@ public partial class MainWindow : Window
         listBox.SelectionChanged += MenuListBox_SelectionChanged;
 
         // TODO: get data locally from json files, to update, get data from Azure and store locally once. Then use the local data again.
-        _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
+        // _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
 
-        // _blobStorage.DownloadFiles();
+        _blobStorage.UpdateLocalFiles();
 
         // TODO: show error if connection fails
         // TODO: show loading indicator
