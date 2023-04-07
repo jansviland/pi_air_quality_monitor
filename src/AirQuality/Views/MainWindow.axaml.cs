@@ -14,6 +14,7 @@ public partial class MainWindow : Window
 {
     private readonly ILogger<MainWindow> _logger;
     private readonly IDatabase _database;
+    private readonly IBlobStorage _blobStorage;
 
     private readonly List<Measurement> _measurements = new();
 
@@ -21,10 +22,12 @@ public partial class MainWindow : Window
     {
     }
 
-    public MainWindow(ILogger<MainWindow> logger, IDatabase database)
+    public MainWindow(ILogger<MainWindow> logger, IDatabase database, IBlobStorage blobStorage)
     {
         _logger = logger;
         _database = database;
+        _blobStorage = blobStorage;
+
         InitializeComponent();
 
         DataContext = new MainWindowViewModel();
@@ -36,7 +39,10 @@ public partial class MainWindow : Window
         var listBox = this.FindControl<ListBox>("MenuListBox");
         listBox.SelectionChanged += MenuListBox_SelectionChanged;
 
+        // TODO: get data locally from json files, to update, get data from Azure and store locally once. Then use the local data again.
         _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
+
+        // _blobStorage.DownloadFiles();
 
         // TODO: show error if connection fails
         // TODO: show loading indicator

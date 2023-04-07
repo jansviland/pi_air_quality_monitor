@@ -20,6 +20,7 @@ public class App : Application
     public static void ConfigureServices(IServiceCollection services)
     {
         services.AddTransient<IDatabase, Database>();
+        services.AddTransient<IBlobStorage, BlobStorage>();
         services.AddSingleton<MainWindow>();
     }
 
