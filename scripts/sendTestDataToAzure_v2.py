@@ -32,10 +32,10 @@ async def main():
 
         print(f"Time: {currentTime}, Data point: pm25 = {pmtwofive}, pm10 = {pmten}, client_id = {CLIENT_ID}")
         json = JSON_PAYLOAD.format(pm2=pmtwofive, pm10=pmten, client_id=CLIENT_ID)
-        cvs = CSV_PAYLOAD.format(pm2=pmtwofive, pm10=pmten, client_id=CLIENT_ID)
+        cvs = CSV_PAYLOAD.format(pm2=pmtwofive, pm10=pmten, client_id=CLIENT_ID, time=currentTime)
 
         # Save data to file
-        save_data_to_file(currentTime.year, currentTime.month, currentTime.day, currentTime, cvs)
+        save_data_to_file(currentTime, cvs)
 
         # Send a message to the IoT hub
         print(f"Sending message: {json}")
@@ -49,8 +49,11 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
-def save_data_to_file(year, month, day, data):
-    base_path = f"{year}/{month}/{day}"
+def save_data_to_file(currentTime, data):
+
+    year, month, day = currentTime.year, currentTime.month, currentTime.day
+    base_path = f"{year}/{month:02d}/{day:02d}"
+
     os.makedirs(base_path, exist_ok=True)
     file_path = os.path.join(base_path, "measurements.csv")
 
