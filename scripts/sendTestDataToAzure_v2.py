@@ -12,6 +12,20 @@ CONNECTION_STRING = os.getenv("IOTHUB_DEVICE_CONNECTION_STRING")
 JSON_PAYLOAD = '{{"pm2": {pm2}, "pm10": {pm10}, "client_id": "{client_id}"}}'
 CSV_PAYLOAD = '{pm2},{pm10},{client_id},{time}'
 
+def save_data_to_file(currentTime, data):
+
+    year, month, day = currentTime.year, currentTime.month, currentTime.day
+    base_path = f"{year}/{month:02d}/{day:02d}"
+
+    os.makedirs(base_path, exist_ok=True)
+    file_path = os.path.join(base_path, "measurements.csv")
+
+    with open(file_path, "a") as f:
+        f.write(data)
+        f.write("\n")
+
+    print(f"Saved data to file: {file_path}")
+
 async def main():
 
     # Create instance of the device client using the authentication provider
@@ -49,16 +63,3 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
-def save_data_to_file(currentTime, data):
-
-    year, month, day = currentTime.year, currentTime.month, currentTime.day
-    base_path = f"{year}/{month:02d}/{day:02d}"
-
-    os.makedirs(base_path, exist_ok=True)
-    file_path = os.path.join(base_path, "measurements.csv")
-
-    with open(file_path, "a") as f:
-        f.write(data)
-        f.write("\n")
-
-    print(f"Saved data to file: {file_path}")
