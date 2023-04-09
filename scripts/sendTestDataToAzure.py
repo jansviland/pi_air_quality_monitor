@@ -4,6 +4,7 @@ import asyncio
 import time
 from azure.iot.device.aio import IoTHubDeviceClient
 import serial
+import portalocker
 
 ser = serial.Serial('/dev/ttyUSB0')
 
@@ -21,17 +22,25 @@ def save_data_to_file(currentTime, data):
     os.makedirs(base_path, exist_ok=True)
     file_path = os.path.join(base_path, "measurements.csv")
 
-    # Check if the file exists, and write the header if it doesn't
-    if not os.path.exists(file_path):
-        with open(file_path, "w") as f:
-            f.write(CSV_HEADER)
+    timeout = 20  # Timeout in seconds
+
+    try:
+        # Check if the file exists, and write the header if it doesn't
+        if not os.path.exists(file_path):
+            with portalocker.Lock(file_path, mode="w", timeout=timeout) as f:
+                f.write(CSV_HEADER)
+                f.write("\n")
+
+        # Append the data to the file
+        with portalocker.Lock(file_path, mode="a", timeout=timeout) as f:
+            f.write(data)
             f.write("\n")
 
-    with open(file_path, "a") as f:
-        f.write(data)
-        f.write("\n")
+        print(f"Saved data: \"{data}\" to file: \"{file_path}\"")
 
-    print(f"Saved data: \"{data}\" to file: \"{file_path}\"")
+    except portalocker.exceptions.LockTimeout:
+        print(f"Could not acquire lock on {file_path} within {timeout} seconds")
+
 
 async def main():
 

@@ -8,7 +8,7 @@ A simple air quality monitoring service for the Raspberry Pi.
 python -m pip install --upgrade pip
 pip install portalocker
 pip install azure-iot-device
-pip install serial
+pip install pyserial
 pip install asyncio
 
 ```

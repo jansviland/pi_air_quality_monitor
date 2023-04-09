@@ -14,4 +14,3 @@ while True:
 	currentTime = datetime.datetime.now()
 
 	print(f"Time: {currentTime}, Data point: pm25 = {pmtwofive}, pm10 = {pmten}")
-	time.sleep(10)
