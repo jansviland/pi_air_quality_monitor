@@ -7,7 +7,7 @@ namespace AirQuality.DataLayer;
 
 public interface IDatabase
 {
-    List<Measurement> GetMeasurements(int count);
+    public List<Measurement> GetLatestMeasurements(int count);
 }
 
 public class Database : IDatabase
@@ -21,7 +21,7 @@ public class Database : IDatabase
         _logger = logger;
     }
 
-    public List<Measurement> GetMeasurements(int count)
+    public List<Measurement> GetLatestMeasurements(int count)
     {
         List<Measurement> measurements = new();
         using (var con = new SqlConnection(_connectionString))
@@ -44,7 +44,7 @@ public class Database : IDatabase
 
                         // unixtime can be null in the database, added it later on, so in some earlier rows it will be null
                         UnixTime = reader.IsDBNull(6) ? null : reader.GetInt64(6),
-                        // ClientId = reader.GetString(7)
+                        ClientId = reader.GetString(7)
                     });
                 }
             }

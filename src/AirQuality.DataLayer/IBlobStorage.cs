@@ -101,11 +101,12 @@ public class BlobStorage : IBlobStorage
     {
         if (!_availableDates.Contains(dateTime))
         {
-            // _logger.LogError("No measurements found for date {DateTime}", dateTime);
-            // return new List<Measurement>();
-
+            // you can select a date with no measurements, and it will return an empty list
             _logger.LogError("No measurements found for date {DateTime}", dateTime);
-            throw new Exception($"No measurements found for date {dateTime}");
+            return new List<Measurement>();
+
+            // _logger.LogError("No measurements found for date {DateTime}", dateTime);
+            // throw new Exception($"No measurements found for date {dateTime}");
         }
 
         var year = dateTime.Year.ToString();

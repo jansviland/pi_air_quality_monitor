@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using AirQuality.Common.Models;
 using AirQuality.DataLayer;
 using AirQuality.Models;
@@ -7,6 +9,7 @@ using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Threading;
 using DynamicData;
 using Microsoft.Extensions.Logging;
 using ScottPlot.Avalonia;
@@ -20,7 +23,8 @@ public partial class MainWindow : Window
     private readonly IBlobStorage _blobStorage;
 
     // private readonly List<Measurement> _measurements = new();
-    private readonly List<DateTime> _datesWithMeasurements;
+
+    private DispatcherTimer _timer;
 
     public MainWindow()
     {
@@ -40,6 +44,11 @@ public partial class MainWindow : Window
         this.AttachDevTools();
 #endif
 
+        // timer for updating the graf every minute
+        _timer = new DispatcherTimer();
+        _timer.Interval = TimeSpan.FromMinutes(1);
+        _timer.Tick += GetLatestMeasurmentsTimerTick;
+
         var stationlistBox = this.FindControl<ListBox>("StationsMenuListBox");
         stationlistBox.SelectionChanged += StationsMenuListBox_SelectionChanged;
 
@@ -54,15 +63,15 @@ public partial class MainWindow : Window
         // TODO: trigger via settings page, don't do it automatically on startup
         _blobStorage.UpdateLocalFiles();
 
-        _datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
+        var datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
 
         // black out dates before the first date with measurements
         AvailableDatesCalendar.IsTodayHighlighted = false;
-        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(DateTime.MinValue, _datesWithMeasurements[0] + TimeSpan.FromDays(-1)) });
-        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(_datesWithMeasurements[^1] + TimeSpan.FromDays(1), DateTime.MaxValue) });
+        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(DateTime.MinValue, datesWithMeasurements[0] + TimeSpan.FromDays(-1)) });
+        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(datesWithMeasurements[^1] + TimeSpan.FromDays(1), DateTime.MaxValue) });
 
         // go through from date to the end date, and check if there are measurements for that date. If there are no measurements, then we should not be able to select that date
-        foreach (var dateTime in EachDay(_datesWithMeasurements[0], _datesWithMeasurements[^1]))
+        foreach (var dateTime in EachDay(datesWithMeasurements[0], datesWithMeasurements[^1]))
         {
             if (!_blobStorage.HasMeasurementsForDate(dateTime))
             {
@@ -71,7 +80,7 @@ public partial class MainWindow : Window
         }
 
         // set selected date to the last date with measurements
-        AvailableDatesCalendar.SelectedDate = _datesWithMeasurements[^1];
+        AvailableDatesCalendar.SelectedDate = datesWithMeasurements[^1];
 
         // TODO: show error if connection fails
         // TODO: show loading indicator
@@ -100,11 +109,27 @@ public partial class MainWindow : Window
         {
             _logger.LogInformation($"ViewOptionsMenuListBox_SelectionChanged: {menuItem.Name}");
 
-            // if animation is enabled, animate the graph by adding the new data points one by one
-            if (menuItem.ViewOption == ViewOptionsEnum.AnimatedView)
+            switch (menuItem.ViewOption)
             {
-                // TODO: UpdateGraph with animate = true
-                _logger.LogInformation("AnimatedView is not implemented yet");
+                case ViewOptionsEnum.StaticView:
+                    _timer.Stop();
+                    break;
+                case ViewOptionsEnum.AnimatedView:
+                    _timer.Stop();
+                    break;
+                case ViewOptionsEnum.LiveView:
+
+                    AvailableDatesCalendar.SelectedDate = DateTime.Now;
+
+                    // trigger the timer tick event, so that we can show the graph for the current date
+                    GetLatestMeasurmentsTimerTick(null, null);
+
+                    // every minute, get two hours of data from the SQL database, and then show the graph for that data
+                    _timer.Start();
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }
@@ -137,6 +162,8 @@ public partial class MainWindow : Window
 
     private void OnDisplayDateChanged(object sender, CalendarDateChangedEventArgs e)
     {
+        _timer.Stop();
+
         // Handle the DisplayDateChanged event here
     }
 
@@ -167,6 +194,7 @@ public partial class MainWindow : Window
 
         if (measurements.Count == 0)
         {
+            avaPlot.Render();
             return;
         }
 
@@ -199,6 +227,15 @@ public partial class MainWindow : Window
         avaPlot.Plot.XAxis.DateTimeFormat(true);
 
         avaPlot.Render();
+    }
+
+    private void GetLatestMeasurmentsTimerTick(object? sender, EventArgs e)
+    {
+        MessageTextBlock.Text = $"Status: Updated graph: {DateTime.Now}";
+
+        var measurements = _database.GetLatestMeasurements(240);
+
+        UpdateGraph(measurements);
     }
 
     private static IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
