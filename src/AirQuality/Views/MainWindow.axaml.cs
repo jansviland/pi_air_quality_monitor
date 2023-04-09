@@ -55,6 +55,15 @@ public partial class MainWindow : Window
         AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(DateTime.MinValue, _datesWithMeasurements[0] + TimeSpan.FromDays(-1)) });
         AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(_datesWithMeasurements[^1] + TimeSpan.FromDays(1), DateTime.MaxValue) });
 
+        // go through from date to the end date, and check if there are measurements for that date. If there are no measurements, then we should not be able to select that date
+        foreach (var dateTime in EachDay(_datesWithMeasurements[0], _datesWithMeasurements[^1]))
+        {
+            if (!_blobStorage.HasMeasurementsForDate(dateTime))
+            {
+                AvailableDatesCalendar.BlackoutDates.Add(new CalendarDateRange(dateTime, dateTime));
+            }
+        }
+
         // set selected date to the last date with measurements
         AvailableDatesCalendar.SelectedDate = _datesWithMeasurements[^1];
 
@@ -101,31 +110,7 @@ public partial class MainWindow : Window
 
         if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
         {
-            var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
-            avaPlot.Plot.Clear();
-            avaPlot.Plot.Title(menuItem.Name);
-
-            // convert the the measurements to arrays
-            var xs = new double[_measurements.Count];
-            var pm2 = new double[_measurements.Count];
-            var pm10 = new double[_measurements.Count];
-
-            for (var i = 0; i < _measurements.Count; i++)
-            {
-                xs[i] = _measurements[i].EventEnqueuedUtcTime.ToOADate();
-                pm2[i] = _measurements[i].Pm2;
-                pm10[i] = _measurements[i].Pm10;
-            }
-
-            // add the measurements to the plot
-            avaPlot.Plot.AddScatter(xs, pm2, label: "PM2.5");
-            avaPlot.Plot.AddScatter(xs, pm10, label: "PM10");
-            avaPlot.Plot.Legend();
-
-            // tell the axis to display tick labels using a time format
-            avaPlot.Plot.XAxis.DateTimeFormat(true);
-
-            avaPlot.Render();
+            UpdateGraph(_measurements);
         }
     }
 
@@ -140,11 +125,64 @@ public partial class MainWindow : Window
         {
             SelectedDateTextBlock.Text = $"Selected Date: {AvailableDatesCalendar.SelectedDate.Value.ToShortDateString()}";
 
+            var selectedDate = AvailableDatesCalendar.SelectedDate.Value;
+            var measurements = _blobStorage.GetMeasurementsForDate(selectedDate);
+
+            UpdateGraph(measurements);
+
             // TODO: update the graph with the measurements for the selected date
+            // TODO: get the 1440 measurements for the selected date, add one measurement at a time and update the graph for each measurement creating an animation effect
         }
         else
         {
             SelectedDateTextBlock.Text = "No date selected.";
         }
+    }
+
+    private void UpdateGraph(List<Measurement> measurements)
+    {
+        var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
+        avaPlot.Plot.Clear();
+
+        if (measurements.Count == 0)
+        {
+            return;
+        }
+
+        var startDate = measurements[0].EventEnqueuedUtcTime.ToLongTimeString();
+        var endDate = measurements[^1].EventEnqueuedUtcTime.ToLongTimeString();
+        var clientName = measurements[0].ClientId;
+
+        var title = $"{clientName}: {startDate} - {endDate}";
+
+        avaPlot.Plot.Title(title);
+
+        // convert the the measurements to arrays
+        var xs = new double[measurements.Count];
+        var pm2 = new double[measurements.Count];
+        var pm10 = new double[measurements.Count];
+
+        for (var i = 0; i < measurements.Count; i++)
+        {
+            xs[i] = measurements[i].EventEnqueuedUtcTime.ToOADate();
+            pm2[i] = measurements[i].Pm2;
+            pm10[i] = measurements[i].Pm10;
+        }
+
+        // add the measurements to the plot
+        avaPlot.Plot.AddScatter(xs, pm2, label: "PM2.5");
+        avaPlot.Plot.AddScatter(xs, pm10, label: "PM10");
+        avaPlot.Plot.Legend();
+
+        // tell the axis to display tick labels using a time format
+        avaPlot.Plot.XAxis.DateTimeFormat(true);
+
+        avaPlot.Render();
+    }
+
+    private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
+    {
+        for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
+            yield return day;
     }
 }

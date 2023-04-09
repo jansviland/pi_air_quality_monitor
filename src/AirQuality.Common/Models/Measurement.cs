@@ -1,4 +1,6 @@
-﻿namespace AirQuality.Common.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace AirQuality.Common.Models;
 
 public class Measurement
 {
@@ -6,8 +8,13 @@ public class Measurement
     public double Pm10 { get; set; }
     public DateTime? EventProcessedUtcTime { get; set; }
     public long? PartitionId { get; set; }
+
+    [JsonPropertyName("EventEnqueuedUtcTime")]
     public DateTime EventEnqueuedUtcTime { get; set; }
+
     public string? IoTHub { get; set; }
     public long? UnixTime { get; set; }
+
+    [JsonPropertyName("client_id")]
     public string? ClientId { get; set; }
 }

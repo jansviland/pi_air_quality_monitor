@@ -1,4 +1,8 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using AirQuality.Common.Models;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -13,6 +17,8 @@ public interface IBlobStorage
     public void UpdateLocalFiles();
 
     public List<DateTime> GetDatesWithMeasurments();
+    public List<Measurement> GetMeasurementsForDate(DateTime dateTime);
+    public bool HasMeasurementsForDate(DateTime dateTime);
 }
 
 public class BlobStorage : IBlobStorage
@@ -89,5 +95,85 @@ public class BlobStorage : IBlobStorage
     public List<DateTime> GetDatesWithMeasurments()
     {
         return _availableDates;
+    }
+
+    public List<Measurement> GetMeasurementsForDate(DateTime dateTime)
+    {
+        if (!_availableDates.Contains(dateTime))
+        {
+            // _logger.LogError("No measurements found for date {DateTime}", dateTime);
+            // return new List<Measurement>();
+
+            _logger.LogError("No measurements found for date {DateTime}", dateTime);
+            throw new Exception($"No measurements found for date {dateTime}");
+        }
+
+        var year = dateTime.Year.ToString();
+        var month = dateTime.Month.ToString("d2");
+        var day = dateTime.Day.ToString("d2");
+        var currentDirectory = Directory.GetCurrentDirectory();
+
+        var directory = $"{currentDirectory}{_slash}BlobStorage{_slash}{year}{_slash}{month}{_slash}{day}";
+
+        if (!Directory.Exists(directory))
+        {
+            _logger.LogError("Folder {Directory} does not exist", directory);
+            throw new Exception($"Folder {directory} does not exist");
+        }
+
+        var files = Directory.GetFiles(directory, "*.json");
+        if (files.Length == 0)
+        {
+            _logger.LogError("No files found in {Directory}", directory);
+            throw new Exception($"No files found in {directory}");
+        }
+
+        var json = File.ReadAllText(files.First());
+        var measurements = JsonSerializer.Deserialize<List<Measurement>>(json, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        });
+
+        if (measurements == null)
+        {
+            _logger.LogError("Could not deserialize json");
+            throw new Exception($"Could not deserialize json");
+        }
+
+        return measurements;
+    }
+
+    public bool HasMeasurementsForDate(DateTime dateTime)
+    {
+        var year = dateTime.Year.ToString();
+        var month = dateTime.Month.ToString("d2");
+        var day = dateTime.Day.ToString("d2");
+        var currentDirectory = Directory.GetCurrentDirectory();
+
+        var directory = $"{currentDirectory}{_slash}BlobStorage{_slash}{year}{_slash}{month}{_slash}{day}";
+
+        if (!Directory.Exists(directory))
+        {
+            return false;
+        }
+
+        var files = Directory.GetFiles(directory, "*.json");
+        if (files.Length == 0)
+        {
+            return false;
+        }
+
+        // var json = File.ReadAllText(files.First());
+        // var measurements = JsonSerializer.Deserialize<List<Measurement>>(json, new JsonSerializerOptions
+        // {
+        //     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        // });
+        //
+        // if (measurements == null)
+        // {
+        //     return false;
+        // }
+
+        return true;
     }
 }
