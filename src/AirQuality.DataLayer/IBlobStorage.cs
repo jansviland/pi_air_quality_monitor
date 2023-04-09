@@ -129,18 +129,31 @@ public class BlobStorage : IBlobStorage
         }
 
         var json = File.ReadAllText(files.First());
-        var measurements = JsonSerializer.Deserialize<List<Measurement>>(json, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        });
 
-        if (measurements == null)
+        try
         {
-            _logger.LogError("Could not deserialize json");
-            throw new Exception($"Could not deserialize json");
+            // TODO: measurements fail when trying to deserialize the last file, since it has not added a closing bracket yet. 
+            // this is added at the end of each day.
+            var measurements = JsonSerializer.Deserialize<List<Measurement>>(json, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            });
+
+            return measurements;
+        }
+        catch (Exception e)
+        {
+            // Console.WriteLine(e);
+            _logger.LogError(e, "Could not deserialize json");
+            // throw;
         }
 
-        return measurements;
+        // if (measurements == null)
+        // {
+        //     throw new Exception($"Could not deserialize json");
+        // }
+
+        return new List<Measurement>();
     }
 
     public bool HasMeasurementsForDate(DateTime dateTime)

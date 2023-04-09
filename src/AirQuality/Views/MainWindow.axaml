@@ -24,6 +24,8 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Open..." />
                 <Separator />
+                <MenuItem Header="Settings" />
+                <Separator />
                 <MenuItem Header="_Exit" />
             </MenuItem>
             <MenuItem Header="_Edit">
