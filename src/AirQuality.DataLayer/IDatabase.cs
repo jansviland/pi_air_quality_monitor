@@ -23,7 +23,9 @@ public class Database : IDatabase
 
     public List<Measurement> GetLatestMeasurements(int count)
     {
-        List<Measurement> measurements = new();
+        // use a stack to reverse the order of the measurements
+        Stack<Measurement> measurements = new();
+
         using (var con = new SqlConnection(_connectionString))
         {
             con.Open();
@@ -33,7 +35,7 @@ public class Database : IDatabase
                 var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    measurements.Add(new Measurement()
+                    measurements.Push(new Measurement()
                     {
                         Pm2 = reader.GetDouble(0),
                         Pm10 = reader.GetDouble(1),
@@ -50,6 +52,6 @@ public class Database : IDatabase
             }
         }
 
-        return measurements;
+        return measurements.ToList();
     }
 }
