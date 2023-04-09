@@ -18,7 +18,7 @@ public partial class MainWindow : Window
     private readonly IDatabase _database;
     private readonly IBlobStorage _blobStorage;
 
-    private readonly List<Measurement> _measurements = new();
+    // private readonly List<Measurement> _measurements = new();
     private readonly List<DateTime> _datesWithMeasurements;
 
     public MainWindow()
@@ -39,11 +39,11 @@ public partial class MainWindow : Window
         this.AttachDevTools();
 #endif
 
-        var listBox = this.FindControl<ListBox>("MenuListBox");
-        listBox.SelectionChanged += MenuListBox_SelectionChanged;
+        var listBox = this.FindControl<ListBox>("StationsMenuListBox");
+        listBox.SelectionChanged += StationsMenuListBox_SelectionChanged;
 
         // TODO: get data locally from json files, to update, get data from Azure and store locally once. Then use the local data again.
-        _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
+        // _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
 
         // TODO: this can take a while, so we should show a loading indicator, and show an error if it fails
         _blobStorage.UpdateLocalFiles();
@@ -88,7 +88,7 @@ public partial class MainWindow : Window
     // TODO: for even longer time frames, calculate the average value for each day, and then show that on the graph
     // TODO: store the values locally, so that you don't have to query the database every time you want to show the graph
 
-    private void MenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void StationsMenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         // TODO: get data from blob storage or database
 
@@ -103,15 +103,15 @@ public partial class MainWindow : Window
 
         // TODO: use brackets to show the range of the data, like [0, 100], for example if something happened in this period of time
 
-        if (_measurements.Count == 0)
-        {
-            return;
-        }
-
-        if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
-        {
-            UpdateGraph(_measurements);
-        }
+        // if (_measurements.Count == 0)
+        // {
+        //     return;
+        // }
+        //
+        // if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewModel menuItem)
+        // {
+        //     UpdateGraph(_measurements);
+        // }
     }
 
     private void OnDisplayDateChanged(object sender, CalendarDateChangedEventArgs e)
