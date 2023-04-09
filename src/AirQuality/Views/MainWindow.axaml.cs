@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AirQuality.Common.Models;
 using AirQuality.DataLayer;
+using AirQuality.Models;
 using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
@@ -39,13 +40,18 @@ public partial class MainWindow : Window
         this.AttachDevTools();
 #endif
 
-        var listBox = this.FindControl<ListBox>("StationsMenuListBox");
-        listBox.SelectionChanged += StationsMenuListBox_SelectionChanged;
+        var stationlistBox = this.FindControl<ListBox>("StationsMenuListBox");
+        stationlistBox.SelectionChanged += StationsMenuListBox_SelectionChanged;
+
+        var viewOptionsListBox = this.FindControl<ListBox>("ViewOptionsMenuListBox");
+        viewOptionsListBox.SelectionChanged += ViewOptionsMenuListBox_SelectionChanged;
+
 
         // TODO: get data locally from json files, to update, get data from Azure and store locally once. Then use the local data again.
         // _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
 
         // TODO: this can take a while, so we should show a loading indicator, and show an error if it fails
+        // TODO: trigger via settings page, don't do it automatically on startup
         _blobStorage.UpdateLocalFiles();
 
         _datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
@@ -87,6 +93,21 @@ public partial class MainWindow : Window
     // TODO: for longer time frames, calculate the average value for each hour, and then show that on the graph
     // TODO: for even longer time frames, calculate the average value for each day, and then show that on the graph
     // TODO: store the values locally, so that you don't have to query the database every time you want to show the graph
+
+    private void ViewOptionsMenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemViewOptionsModel menuItem)
+        {
+            _logger.LogInformation($"ViewOptionsMenuListBox_SelectionChanged: {menuItem.Name}");
+
+            // if animation is enabled, animate the graph by adding the new data points one by one
+            if (menuItem.ViewOption == ViewOptionsEnum.AnimatedView)
+            {
+                // TODO: UpdateGraph with animate = true
+                _logger.LogInformation("AnimatedView is not implemented yet");
+            }
+        }
+    }
 
     private void StationsMenuListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -153,7 +174,7 @@ public partial class MainWindow : Window
         var endDate = measurements[^1].EventEnqueuedUtcTime.ToLongTimeString();
         var clientName = measurements[0].ClientId;
 
-        var title = $"{clientName}: {startDate} - {endDate}";
+        var title = $"{clientName}: {startDate} - {endDate} ({measurements.Count} measurements)";
 
         avaPlot.Plot.Title(title);
 
@@ -180,9 +201,11 @@ public partial class MainWindow : Window
         avaPlot.Render();
     }
 
-    private IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
+    private static IEnumerable<DateTime> EachDay(DateTime from, DateTime thru)
     {
         for (var day = from.Date; day.Date <= thru.Date; day = day.AddDays(1))
+        {
             yield return day;
+        }
     }
 }

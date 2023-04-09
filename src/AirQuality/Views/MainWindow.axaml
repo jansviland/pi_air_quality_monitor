@@ -11,7 +11,7 @@
         Title="AirQuality"
 
         Width="1600"
-        Height="800">
+        Height="1000">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -44,6 +44,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Calendar Grid.Column="0" Grid.Row="0" x:Name="AvailableDatesCalendar" SelectionMode="SingleDate"
@@ -59,10 +60,26 @@
                 <ListBox Name="StationsMenuListBox"
                          Grid.Row="3"
                          Items="{Binding MenuItems}"
-                         SelectedItem="{Binding SelectedMenuItem}"
+                         SelectedItem="{Binding SelectedStationMenuItem}"
                          HorizontalAlignment="Stretch"
                          BorderThickness="0"
                          Margin="0, 10, 0, 0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"
+                                       FontWeight="Bold"
+                                       Margin="5" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                
+                <ListBox Name="ViewOptionsMenuListBox"
+                         Grid.Row="4"
+                         Items="{Binding ViewOptions}"
+                         SelectedItem="{Binding SelectedViewOptionMenuItem}"
+                         HorizontalAlignment="Stretch"
+                         BorderThickness="0"
+                         Margin="0, 30, 0, 0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}"

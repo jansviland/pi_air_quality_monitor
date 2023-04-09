@@ -1,6 +1,6 @@
 ﻿namespace AirQuality.ViewModels;
 
-public class MenuItemViewModel : ViewModelBase
+public class MenuItemStationSelectedModel : ViewModelBase
 {
     public string Name { get; set; } = null!;
 }
