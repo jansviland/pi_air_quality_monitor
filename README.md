@@ -1,9 +1,21 @@
 # Raspberry Pi Air Quality Monitor
 
-A simple air quality monitoring service for the Raspberry Pi.
+A simple air quality monitoring service for the Raspberry Pi. It uses a Nova PM Sensor (SDS011) to measure the air quality and sends the data to Azure IoT Hub.
+
+To set this up you need 
+
+- Raspberry Pi
+- Nova PM Sensor (SDS011)
+- Container to keep the sensor in
+
+Here is how it looks like:
+
+![image](wiki/air-quality-monitor.jpg)
 
 ## Install required packages for Raspberry Pi
 
+
+### Install Python packages (for sendTestDataToAzure.py)
 ```bash
 python -m pip install --upgrade pip
 pip install portalocker
@@ -13,9 +25,18 @@ pip install asyncio
 
 ```
 
+### Install .NET 6 (for AirQuality.Console)
+
+
+```bash
+wget -O - https://raw.githubusercontent.com/pjgpetecodes/dotnet6pi/master/install.sh | sudo bash
+```
+
 ## Setup
 
 Set access key for Azure IoT Hub:
+
+![image](wiki/azure-iot-hub-device-connection-string.png)
 
 ```bash
 export IOTHUB_DEVICE_CONNECTION_STRING='HostName=air-monitor-hub.azure-devices.net;DeviceId=measuring-device-id;SharedAccessKey=XXXXXXXXX_YOUR_ACCESS_KEY_XXXXXX

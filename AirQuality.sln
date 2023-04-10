@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirQuality.Console", "src\AirQuality.Console\AirQuality.Console.csproj", "{30D6A4FC-9C4B-4F09-B1E5-EA942843ACE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{84DA125F-CE38-4647-8435-D1EC0794232A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84DA125F-CE38-4647-8435-D1EC0794232A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84DA125F-CE38-4647-8435-D1EC0794232A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30D6A4FC-9C4B-4F09-B1E5-EA942843ACE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30D6A4FC-9C4B-4F09-B1E5-EA942843ACE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30D6A4FC-9C4B-4F09-B1E5-EA942843ACE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30D6A4FC-9C4B-4F09-B1E5-EA942843ACE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
