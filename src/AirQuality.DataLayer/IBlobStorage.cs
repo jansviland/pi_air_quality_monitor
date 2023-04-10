@@ -129,7 +129,12 @@ public class BlobStorage : IBlobStorage
             throw new Exception($"No files found in {directory}");
         }
 
-        var json = File.ReadAllText(files.First());
+        // order by last modified, sometimes we retieve the json file before it is fully written
+        // then it misses a closing bracket, and the deserialization fails. When we later retrieve the file, it is fully written.
+        // with the closing bracket. Make sure we always retrieve the file that is the latest modified.
+        files = files.OrderBy(f => new FileInfo(f).LastWriteTime).ToArray();
+
+        var json = File.ReadAllText(files.Last());
 
         try
         {
@@ -141,6 +146,11 @@ public class BlobStorage : IBlobStorage
             });
 
             return measurements;
+        }
+        catch (JsonException e)
+        {
+            _logger.LogError(e, "Could not deserialize json");
+            // throw;
         }
         catch (Exception e)
         {

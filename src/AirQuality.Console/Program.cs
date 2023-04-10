@@ -40,8 +40,8 @@ internal static class Program
             input = File.ReadAllLines(args[0]);
         }
 
-        var result = svc.Run(input);
-        Log.Logger.Information("result: {Result}", result);
+        svc.Run(input);
+        Log.Logger.Information("Data bulk inserted successfully!");
 
         stopWatch.Stop();
         Log.Logger.Information("Elapsed time: {Elapsed} ms", stopWatch.ElapsedMilliseconds);

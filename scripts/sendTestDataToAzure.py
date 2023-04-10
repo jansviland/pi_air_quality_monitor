@@ -59,7 +59,7 @@ async def main():
         # get the data from the sensor
         pmtwofive = int.from_bytes(b''.join(json[2:4]), byteorder='little') / 10
         pmten = int.from_bytes(b''.join(json[4:6]), byteorder='little') / 10
-        currentTime = datetime.datetime.now()
+        currentTime = datetime.datetime.utcnow()
 
         print(f"Time: {currentTime}, Data point: pm25 = {pmtwofive}, pm10 = {pmten}, client_id = {CLIENT_ID}")
 

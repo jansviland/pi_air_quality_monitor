@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		.gitignore = .gitignore
+		sql\create-tables.sql = sql\create-tables.sql
+		sql\example-queries.sql = sql\example-queries.sql
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirQuality.Console", "src\AirQuality.Console\AirQuality.Console.csproj", "{30D6A4FC-9C4B-4F09-B1E5-EA942843ACE1}"
