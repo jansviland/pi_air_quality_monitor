@@ -9,7 +9,7 @@ namespace AirQuality.Console;
 
 public interface IService
 {
-    public void Run(string[] input);
+    public void Run(string[] input, string? connectionString = null);
 }
 
 public class Service : IService
@@ -29,7 +29,7 @@ public class Service : IService
         }
     }
 
-    public void Run(string[] input)
+    public void Run(string[] input, string? connectionString = null)
     {
         _logger.LogInformation("Input contains {Input} values", input.Length);
 
@@ -46,20 +46,26 @@ public class Service : IService
             });
         }
 
-        BulkInsert(measurements);
+        BulkInsert(measurements, connectionString ?? _connectionString);
     }
 
-    private void BulkInsert(List<Measurement> measurements)
+    private void BulkInsert(List<Measurement> measurements, string connectionString)
     {
-        DataTable table = new DataTable();
-        table.TableName = "measurements";
+        using var connection = new SqlConnection(connectionString);
+        connection.Open();
 
-        table.Columns.Add("Pm2", typeof(double));
-        table.Columns.Add("Pm10", typeof(double));
-        table.Columns.Add("EventProcessedUtcTime", typeof(DateTime));
-        table.Columns.Add("PartitionId", typeof(long));
-        table.Columns.Add("EventEnqueuedUtcTime", typeof(DateTime));
-        table.Columns.Add("IoTHub", typeof(string));
+        DataTable table = new DataTable();
+        // table.TableName = "measurements";
+        table.TableName = "values";
+
+        table.Columns.Add("Guid", typeof(Guid));
+        table.Columns.Add("pm2", typeof(double));
+        table.Columns.Add("pm10", typeof(double));
+        // table.Columns.Add("EventProcessedUtcTime", typeof(DateTime));
+        // table.Columns.Add("PartitionId", typeof(long));
+        // table.Columns.Add("EventEnqueuedUtcTime", typeof(DateTime));
+        table.Columns.Add("UtcTime", typeof(DateTime));
+        // table.Columns.Add("IoTHub", typeof(string));
         table.Columns.Add("UnixTime", typeof(long));
         table.Columns.Add("ClientId", typeof(string));
 
@@ -67,12 +73,14 @@ public class Service : IService
         {
             var row = table.NewRow();
 
+            row["Guid"] = Guid.NewGuid();
             row[nameof(Measurement.Pm2)] = measurement.Pm2;
             row[nameof(Measurement.Pm10)] = measurement.Pm10;
-            row[nameof(Measurement.EventProcessedUtcTime)] = GetDBValue(measurement.EventProcessedUtcTime);
-            row[nameof(Measurement.PartitionId)] = GetDBValue(measurement.PartitionId);
-            row[nameof(Measurement.EventEnqueuedUtcTime)] = measurement.EventEnqueuedUtcTime;
-            row[nameof(Measurement.IoTHub)] = GetDBValue(measurement.IoTHub);
+            // row[nameof(Measurement.EventProcessedUtcTime)] = GetDBValue(measurement.EventProcessedUtcTime);
+            // row[nameof(Measurement.PartitionId)] = GetDBValue(measurement.PartitionId);
+            // row[nameof(Measurement.EventEnqueuedUtcTime)] = measurement.EventEnqueuedUtcTime;
+            row["UtcTime"] = measurement.EventEnqueuedUtcTime;
+            // row[nameof(Measurement.IoTHub)] = GetDBValue(measurement.IoTHub);
             row[nameof(Measurement.UnixTime)] = measurement.EventEnqueuedUtcTime.ToUnixTime();
             row[nameof(Measurement.ClientId)] = measurement.ClientId;
 
@@ -86,8 +94,8 @@ public class Service : IService
         }
     }
 
-    public static object GetDBValue(object? o)
-    {
-        return o ?? (object)DBNull.Value;
-    }
+    // private static object GetDBValue(object? o)
+    // {
+    //     return o ?? (object)DBNull.Value;
+    // }
 }

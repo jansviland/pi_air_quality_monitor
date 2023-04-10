@@ -154,9 +154,8 @@ public class BlobStorage : IBlobStorage
         }
         catch (Exception e)
         {
-            // Console.WriteLine(e);
-            _logger.LogError(e, "Could not deserialize json");
-            // throw;
+            _logger.LogError(e, e.Message);
+            throw;
         }
 
         // if (measurements == null)

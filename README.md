@@ -1,8 +1,9 @@
 # Raspberry Pi Air Quality Monitor
 
-A simple air quality monitoring service for the Raspberry Pi. It uses a Nova PM Sensor (SDS011) to measure the air quality and sends the data to Azure IoT Hub.
+A simple air quality monitoring service for the Raspberry Pi. It uses a Nova PM Sensor (SDS011) to measure the air
+quality and sends the data to Azure IoT Hub.
 
-To set this up you need 
+To set this up you need
 
 - Raspberry Pi
 - Nova PM Sensor (SDS011)
@@ -14,8 +15,8 @@ Here is how it looks like:
 
 ## Install required packages for Raspberry Pi
 
-
 ### Install Python packages (for sendTestDataToAzure.py)
+
 ```bash
 python -m pip install --upgrade pip
 pip install portalocker
@@ -26,7 +27,6 @@ pip install asyncio
 ```
 
 ### Install .NET 6 (for AirQuality.Console)
-
 
 ```bash
 wget -O - https://raw.githubusercontent.com/pjgpetecodes/dotnet6pi/master/install.sh | sudo bash
@@ -67,6 +67,18 @@ To run, use the run command:
 ```bash
 nohup python -u /home/pi/git/pi_air_quality_monitor/scripts/sendTestDataToAzure.py >> azurelog.log &
 ```
+
+## Cronjob to do a bulk insert every night at 04:00 to the Azure SQL Database
+
+    1. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
+    2. Add the following line to the file:
+
+```bash
+0 4 * * * /bin/bash -c '/home/pi/git/pi_air_quality_monitor/src/AirQuality.Console/dotnet run -f /$(date -d yesterday "+%Y/%m/%d")/measurements.csv -c "your_connection_string"'
+```
+
+    3. Save the file and exit the editor.
+    4. Remember to change the path to the measurements.csv file and the connection string to your Azure SQL Database.
 
 ## Stop script
 

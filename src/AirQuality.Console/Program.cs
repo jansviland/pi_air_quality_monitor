@@ -25,22 +25,56 @@ internal static class Program
             .UseSerilog()
             .Build();
 
-        Log.Logger.Information("args: {AllArguments}", string.Join(", ", args));
+        // Log.Logger.Information("args: {AllArguments}", string.Join(", ", args));
 
         var svc = ActivatorUtilities.CreateInstance<Service>(host.Services);
 
-        string[] input;
-        if (args.Length == 0)
-        {
-            // TODO: remove this, just for testing, should show a helper message if no file is provided
-            input = File.ReadAllLines("Assets/measurements.csv");
-        }
-        else
-        {
-            input = File.ReadAllLines(args[0]);
-        }
+        // arguments should be:
+        // -f <path to file> -c <connection string>
 
-        svc.Run(input);
+        // if (args.Length == 0)
+        // {
+        //     System.Console.WriteLine("No arguments provided");
+        //     System.Console.WriteLine("dotnet run -f <path to file> -c <connection string>");
+        //
+        //     return;
+        // }
+        // else if (args.Length != 4)
+        // {
+        //     System.Console.WriteLine("Invalid number of arguments provided");
+        //     System.Console.WriteLine("dotnet run -f <path to file> -c <connection string>");
+        //
+        //     return;
+        // }
+        // else if (args[0] != "-f" || args[2] != "-c")
+        // {
+        //     System.Console.WriteLine("Invalid arguments provided");
+        //     System.Console.WriteLine("dotnet run -f <path to file> -c <connection string>");
+        //
+        //     return;
+        // }
+        // else if (!File.Exists(args[1]))
+        // {
+        //     System.Console.WriteLine("File does not exist");
+        //     System.Console.WriteLine("dotnet run -f <path to file> -c <connection string>");
+        //
+        //     return;
+        // }
+        // else if (string.IsNullOrWhiteSpace(args[3]))
+        // {
+        //     System.Console.WriteLine("Connection string is empty");
+        //     System.Console.WriteLine("dotnet run -f <path to file> -c <connection string>");
+        //
+        //     return;
+        // }
+
+        // var input = File.ReadAllLines(args[1]);
+        // var connectionString = args[3];
+
+        var input = File.ReadAllLines("Assets/measurements.csv");
+        string? connectionString = null;
+
+        svc.Run(input, connectionString);
         Log.Logger.Information("Data bulk inserted successfully!");
 
         stopWatch.Stop();
@@ -51,7 +85,7 @@ internal static class Program
     {
         builder
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
             .AddEnvironmentVariables();
 
