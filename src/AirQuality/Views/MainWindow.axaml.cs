@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AirQuality.Common.Models;
@@ -28,6 +29,10 @@ public partial class MainWindow : Window
     // private readonly List<Measurement> _measurements = new();
 
     private DispatcherTimer _timer;
+
+    // for enabling and disabling the animation of the graph
+    private bool _animateGraph;
+    private CancellationTokenSource _cts;
 
     public MainWindow()
     {
@@ -116,11 +121,19 @@ public partial class MainWindow : Window
             {
                 case ViewOptionsEnum.StaticView:
                     _timer.Stop();
+                    _animateGraph = false;
                     break;
                 case ViewOptionsEnum.AnimatedView:
                     _timer.Stop();
+                    _animateGraph = true;
+
+                    // _cts = new CancellationTokenSource();
+                    // UpdateGraphAnimatedAsync(measurements, _cts.Token);
+
                     break;
                 case ViewOptionsEnum.LiveView:
+                    _timer.Stop();
+                    _animateGraph = false;
 
                     AvailableDatesCalendar.SelectedDate = DateTime.Now;
 
@@ -165,13 +178,15 @@ public partial class MainWindow : Window
 
     private void OnDisplayDateChanged(object sender, CalendarDateChangedEventArgs e)
     {
-        _timer.Stop();
-
+        // _timer.Stop();
         // Handle the DisplayDateChanged event here
     }
 
-    private void OnSelectedDatesChanged(object sender, SelectionChangedEventArgs e)
+    private async void OnSelectedDatesChanged(object sender, SelectionChangedEventArgs e)
     {
+        _timer.Stop();
+        _cts?.Cancel();
+
         if (AvailableDatesCalendar.SelectedDate.HasValue)
         {
             SelectedDateTextBlock.Text = $"Selected Date: {AvailableDatesCalendar.SelectedDate.Value.ToShortDateString()}";
@@ -179,10 +194,24 @@ public partial class MainWindow : Window
             var selectedDate = AvailableDatesCalendar.SelectedDate.Value;
             var measurements = _blobStorage.GetMeasurementsForDate(selectedDate);
 
-            UpdateGraph(measurements);
+            if (_animateGraph)
+            {
+                _cts = new CancellationTokenSource();
 
-            // TODO: update the graph with the measurements for the selected date
-            // TODO: get the 1440 measurements for the selected date, add one measurement at a time and update the graph for each measurement creating an animation effect
+                try
+                {
+                    await UpdateGraphAnimatedAsync(measurements, _cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    // This happens when the user clicks on a new graph before the previous one has finished animating, not a problem
+                    _logger.LogInformation("UpdateGraphAnimatedAsync was cancelled");
+                }
+            }
+            else
+            {
+                UpdateGraph(measurements);
+            }
         }
         else
         {
@@ -199,7 +228,6 @@ public partial class MainWindow : Window
 
         if (measurements.Count == 0)
         {
-            // avaPlot.Render();
             avaPlot.InvalidateVisual();
 
             return;
@@ -211,8 +239,9 @@ public partial class MainWindow : Window
 
         var title = $"{clientName}: {startDate} - {endDate} ({measurements.Count} measurements)";
 
-        // avaPlot.Plot.Title(title);
         avaPlot.Plot.Title.Label.Text = title;
+        // avaPlot.Plot.XAxis.Label.Text = "Horizonal Axis";
+        // avaPlot.Plot.YAxis.Label.Text = "Vertical Axis";
 
         // convert the the measurements to arrays
         var xs = new double[measurements.Count];
@@ -236,6 +265,7 @@ public partial class MainWindow : Window
         var pm10Scatter = avaPlot.Plot.Add.Scatter(xs, pm10);
         pm10Scatter.Label = "PM10";
 
+        // tell the axis to display tick labels using a time format
         avaPlot.Plot.Axes.DateTimeTicks(Edge.Bottom);
 
         // add the measurements to the plot
@@ -243,10 +273,65 @@ public partial class MainWindow : Window
         // avaPlot.Plot.AddScatter(xs, pm10, label: "PM10");
         // avaPlot.Plot.Legend();
 
-        // tell the axis to display tick labels using a time format
-        // avaPlot.Plot.XAxis.DateTimeFormat(true);
-
         avaPlot.InvalidateVisual();
+    }
+
+    private async Task UpdateGraphAnimatedAsync(List<Measurement> measurements, CancellationToken cancellationToken = default)
+    {
+        // https://www.scottplot.net/cookbook/5.0/
+
+        var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
+        avaPlot.Plot.Clear();
+
+        if (measurements.Count == 0)
+        {
+            avaPlot.InvalidateVisual();
+            return;
+        }
+
+        var startDate = measurements[0].EventEnqueuedUtcTime.ToLongTimeString();
+        var endDate = measurements[^1].EventEnqueuedUtcTime.ToLongTimeString();
+        var clientName = measurements[0].ClientId;
+
+        var title = $"{clientName}: {startDate} - {endDate} ({measurements.Count} measurements)";
+
+        avaPlot.Plot.Title.Label.Text = title;
+        // avaPlot.Plot.XAxis.Label.Text = "Horizonal Axis";
+        // avaPlot.Plot.YAxis.Label.Text = "Vertical Axis";
+
+        // convert the the measurements to arrays
+        var xs = new double[measurements.Count];
+        var pm2 = new double[measurements.Count];
+        var pm10 = new double[measurements.Count];
+
+        // Clear the data arrays
+        Array.Clear(xs, 0, xs.Length);
+        Array.Clear(pm2, 0, pm2.Length);
+        Array.Clear(pm10, 0, pm10.Length);
+
+        // Add values one at a time with a delay
+        for (var i = 0; i < measurements.Count && !cancellationToken.IsCancellationRequested; i++)
+        {
+            xs[i] = measurements[i].EventEnqueuedUtcTime.ToOADate();
+            pm2[i] = measurements[i].Pm2;
+            pm10[i] = measurements[i].Pm10;
+
+            avaPlot.Plot.Clear();
+
+            var pm2Scatter = avaPlot.Plot.Add.Scatter(xs.Take(i + 1).ToArray(), pm2.Take(i + 1).ToArray());
+            pm2Scatter.Label = "PM2.5";
+
+            var pm10Scatter = avaPlot.Plot.Add.Scatter(xs.Take(i + 1).ToArray(), pm10.Take(i + 1).ToArray());
+            pm10Scatter.Label = "PM10";
+
+            avaPlot.Plot.Axes.DateTimeTicks(Edge.Bottom);
+
+            // Trigger a re-render
+            avaPlot.InvalidateVisual();
+
+            // Add a delay between adding each data point
+            await Task.Delay(10, cancellationToken); // 100 ms delay, adjust as needed
+        }
     }
 
     private void GetLatestMeasurmentsTimerTick(object? sender, EventArgs e)
