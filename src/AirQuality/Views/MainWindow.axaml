@@ -36,9 +36,9 @@
 
         <Grid ColumnDefinitions="Auto,*" RowDefinitions="*, Auto">
 
-            <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch" 
+            <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch"
                   Margin="10, 30, 0 , 0">
-                
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -48,8 +48,12 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <Calendar Grid.Column="0" Grid.Row="0" x:Name="AvailableDatesCalendar" SelectionMode="SingleDate"
-                          DisplayDateChanged="OnDisplayDateChanged" SelectedDatesChanged="OnSelectedDatesChanged" />
+                <Calendar Grid.Column="0" Grid.Row="0" x:Name="AvailableDatesCalendar"
+                          SelectionMode="SingleDate"
+                          DisplayDateChanged="OnDisplayDateChanged"
+                          SelectedDatesChanged="OnSelectedDatesChanged" 
+                          
+                          />
 
                 <TextBlock Grid.Column="0" Grid.Row="1" x:Name="SelectedDateTextBlock"
                            Margin="1, 5, 0, 0" />
@@ -73,7 +77,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                
+
                 <ListBox Name="ViewOptionsMenuListBox"
                          Grid.Row="4"
                          Items="{Binding ViewOptions}"
@@ -89,12 +93,12 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                
-                <TextBlock Grid.Row="5" x:Name="MessageTextBlock" 
+
+                <TextBlock Grid.Row="5" x:Name="MessageTextBlock"
                            FontSize="12"
                            VerticalAlignment="Bottom"
                            Margin="0, 0, 0, 10">
-                    Status: 
+                    Status:
                 </TextBlock>
 
             </Grid>

@@ -9,7 +9,7 @@ namespace AirQuality.Console;
 
 public interface IService
 {
-    public void Run(string[] input, string? connectionString = null);
+    public void Run(string[] input);
 }
 
 public class Service : IService
@@ -23,13 +23,13 @@ public class Service : IService
 
         _connectionString = configuration.GetConnectionString("DefaultConnection")!;
 
-        if (string.IsNullOrWhiteSpace(_connectionString))
+        if (string.IsNullOrWhiteSpace(_connectionString) || _connectionString == "ChangeThis")
         {
-            throw new ArgumentException("Connection string is empty");
+            throw new ArgumentException("Missing connection string. Update appsettings.json");
         }
     }
 
-    public void Run(string[] input, string? connectionString = null)
+    public void Run(string[] input)
     {
         _logger.LogInformation("Input contains {Input} values", input.Length);
 
@@ -46,12 +46,12 @@ public class Service : IService
             });
         }
 
-        BulkInsert(measurements, connectionString ?? _connectionString);
+        BulkInsert(measurements);
     }
 
-    private void BulkInsert(List<Measurement> measurements, string connectionString)
+    private void BulkInsert(List<Measurement> measurements)
     {
-        using var connection = new SqlConnection(connectionString);
+        using var connection = new SqlConnection(_connectionString);
         connection.Open();
 
         DataTable table = new DataTable();
