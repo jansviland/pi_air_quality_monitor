@@ -92,20 +92,52 @@ kill -9 23338
 
 TODO: also need to change the appsettings.json file with connection string
 
-    1. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
-    2. Add the following line to the file:
+1. Build the project by running "dotnet build src/AirQuality.Console/AirQuality.Console.csproj" (make sure dotnet is installed)
 
-```bash
-0 4 * * * /bin/bash -c '/home/pi/git/pi_air_quality_monitor/src/AirQuality.Console/dotnet run -f /$(date -d yesterday "+%Y/%m/%d")/measurements.csv -c "your_connection_string"'
+Should look like this: 
 
-0 4 * * * /bin/bash -c 'cd /your/project/directory && /usr/bin/dotnet run -f ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv -c "your_connection_string"'
+```
+pi@pihole:~/git/pi_air_quality_monitor $ dotnet build src/AirQuality.Console/AirQuality.Console.csproj
+MSBuild version 17.3.2+561848881 for .NET
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  AirQuality.Common -> /home/pi/git/pi_air_quality_monitor/src/AirQuality.Common/bin/Debug/net6.0/AirQuality.Common.dll
+  AirQuality.Console -> /home/pi/git/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0/AirQuality.Console.dll
 
-0 4 * * * /bin/bash -c 'cd  ~/git/pi_air_quality_monitor/src/AirQuality.Console && dotnet run ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv'
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:11.39
 ```
 
-    3. Save the file and exit the editor.
-    4. This will navigate to /home/username/git/pi_air_quality_monitor/src/AirQuality.Console and run the dotnet project with the argument ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv. 
-    5. (date -d yesterday "+%Y/%m/%d") will get the date of yesterday and format it as YYYY/MM/DD. (same as the folder structure of the measurements.csv files)
-    6. The job will run every night at 04:00.
+
+2. Update appsettings.json with the connection string to your Azure SQL Database
+
+appsettings.json should look like this:
+
+```json
+{
+  "ConnectionStrings": {
+    "AirQualityDatabase": "Server=tcp:your-server.database.windows.net,1433;Initial Catalog=your-database;Persist Security Info=False;User ID=your-user;Password=your-password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  }
+}
+```
+
+    3. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
+    4. Add the following line to the file:
+
+```bash
+0 4 * * * /bin/bash -c 'cd ~/git/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 && dotnet AirQuality.Console.dll ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv'
+```
+
+3. Save the file and exit the editor.
+
+![image](wiki/crontab.PNG)
+
+4. This will navigate to /home/username/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 and run the dotnet project with the argument ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv. 
+5. (date -d yesterday "+%Y/%m/%d") will get the date of yesterday and format it as YYYY/MM/DD. (same as the folder structure of the measurements.csv files)
+6. The job will run every night at 04:00.
+7. Around 1440 measurements will be inserted into the database every night.
 
 
