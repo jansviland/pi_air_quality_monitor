@@ -294,7 +294,6 @@ public partial class MainWindow : Window
         var clientName = measurements[0].ClientId;
 
         var title = $"{clientName}: {startDate} - {endDate} ({measurements.Count} measurements)";
-
         avaPlot.Plot.Title.Label.Text = title;
         // avaPlot.Plot.XAxis.Label.Text = "Horizonal Axis";
         // avaPlot.Plot.YAxis.Label.Text = "Vertical Axis";
@@ -323,6 +322,12 @@ public partial class MainWindow : Window
 
             var pm10Scatter = avaPlot.Plot.Add.Scatter(xs.Take(i + 1).ToArray(), pm10.Take(i + 1).ToArray());
             pm10Scatter.Label = "PM10";
+
+            // Update the title with the latest endDate and count
+            var latestEndDate = measurements[i].EventEnqueuedUtcTime.ToLongTimeString();
+            var latestCount = i + 1;
+            var updatedTitle = $"{clientName}: {startDate} - {latestEndDate} ({latestCount} measurements)";
+            avaPlot.Plot.Title.Label.Text = updatedTitle;
 
             avaPlot.Plot.Axes.DateTimeTicks(Edge.Bottom);
 
