@@ -9,9 +9,12 @@ using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Media;
 using Avalonia.Threading;
 using DynamicData;
 using Microsoft.Extensions.Logging;
+using ReactiveUI;
+using ScottPlot;
 using ScottPlot.Avalonia;
 
 namespace AirQuality.Views;
@@ -189,12 +192,16 @@ public partial class MainWindow : Window
 
     private void UpdateGraph(List<Measurement> measurements)
     {
+        // https://www.scottplot.net/cookbook/5.0/
+
         var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
         avaPlot.Plot.Clear();
 
         if (measurements.Count == 0)
         {
-            avaPlot.Render();
+            // avaPlot.Render();
+            avaPlot.InvalidateVisual();
+
             return;
         }
 
@@ -204,7 +211,8 @@ public partial class MainWindow : Window
 
         var title = $"{clientName}: {startDate} - {endDate} ({measurements.Count} measurements)";
 
-        avaPlot.Plot.Title(title);
+        // avaPlot.Plot.Title(title);
+        avaPlot.Plot.Title.Label.Text = title;
 
         // convert the the measurements to arrays
         var xs = new double[measurements.Count];
@@ -218,15 +226,27 @@ public partial class MainWindow : Window
             pm10[i] = measurements[i].Pm10;
         }
 
+        var pm2Scatter = avaPlot.Plot.Add.Scatter(xs, pm2);
+        pm2Scatter.Label = "PM2.5";
+        // myScatter.LineStyle.Width = 5;
+        // myScatter.LineStyle.Color = Colors.Green;
+        // myScatter.MarkerStyle.Fill.Color = Colors.Magenta;
+        // myScatter.MarkerStyle.Size = 15;
+
+        var pm10Scatter = avaPlot.Plot.Add.Scatter(xs, pm10);
+        pm10Scatter.Label = "PM10";
+
+        avaPlot.Plot.Axes.DateTimeTicks(Edge.Bottom);
+
         // add the measurements to the plot
-        avaPlot.Plot.AddScatter(xs, pm2, label: "PM2.5");
-        avaPlot.Plot.AddScatter(xs, pm10, label: "PM10");
-        avaPlot.Plot.Legend();
+        // avaPlot.Plot.AddScatter(xs, pm2, label: "PM2.5");
+        // avaPlot.Plot.AddScatter(xs, pm10, label: "PM10");
+        // avaPlot.Plot.Legend();
 
         // tell the axis to display tick labels using a time format
-        avaPlot.Plot.XAxis.DateTimeFormat(true);
+        // avaPlot.Plot.XAxis.DateTimeFormat(true);
 
-        avaPlot.Render();
+        avaPlot.InvalidateVisual();
     }
 
     private void GetLatestMeasurmentsTimerTick(object? sender, EventArgs e)
