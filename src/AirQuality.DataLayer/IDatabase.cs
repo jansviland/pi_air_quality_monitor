@@ -7,6 +7,7 @@ namespace AirQuality.DataLayer;
 
 public interface IDatabase
 {
+    public List<Measurement> GetMeasurementsBetweenDates(DateTime from, DateTime to);
     public List<Measurement> GetLatestMeasurements(int count);
 }
 
@@ -19,6 +20,11 @@ public class Database : IDatabase
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
         _logger = logger;
+    }
+
+    public List<Measurement> GetMeasurementsBetweenDates(DateTime from, DateTime to)
+    {
+        throw new NotImplementedException();
     }
 
     public List<Measurement> GetLatestMeasurements(int count)

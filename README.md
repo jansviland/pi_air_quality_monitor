@@ -68,18 +68,6 @@ To run, use the run command:
 nohup python -u /home/pi/git/pi_air_quality_monitor/scripts/sendTestDataToAzure.py >> azurelog.log &
 ```
 
-## Cronjob to do a bulk insert every night at 04:00 to the Azure SQL Database
-
-    1. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
-    2. Add the following line to the file:
-
-```bash
-0 4 * * * /bin/bash -c '/home/pi/git/pi_air_quality_monitor/src/AirQuality.Console/dotnet run -f /$(date -d yesterday "+%Y/%m/%d")/measurements.csv -c "your_connection_string"'
-```
-
-    3. Save the file and exit the editor.
-    4. Remember to change the path to the measurements.csv file and the connection string to your Azure SQL Database.
-
 ## Stop script
 
 To kill you script, you can use ps -aux and kill commands.
@@ -100,5 +88,24 @@ Then you can kill the process like this:
 kill -9 23338
 ```
 
+## Cronjob to do a bulk insert all measurements from the .CSV file every night at 04:00 to the Azure SQL Database
+
+TODO: also need to change the appsettings.json file with connection string
+
+    1. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
+    2. Add the following line to the file:
+
+```bash
+0 4 * * * /bin/bash -c '/home/pi/git/pi_air_quality_monitor/src/AirQuality.Console/dotnet run -f /$(date -d yesterday "+%Y/%m/%d")/measurements.csv -c "your_connection_string"'
+
+0 4 * * * /bin/bash -c 'cd /your/project/directory && /usr/bin/dotnet run -f ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv -c "your_connection_string"'
+
+0 4 * * * /bin/bash -c 'cd  ~/git/pi_air_quality_monitor/src/AirQuality.Console && dotnet run ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv'
+```
+
+    3. Save the file and exit the editor.
+    4. This will navigate to /home/username/git/pi_air_quality_monitor/src/AirQuality.Console and run the dotnet project with the argument ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv. 
+    5. (date -d yesterday "+%Y/%m/%d") will get the date of yesterday and format it as YYYY/MM/DD. (same as the folder structure of the measurements.csv files)
+    6. The job will run every night at 04:00.
 
 

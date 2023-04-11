@@ -7,8 +7,8 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AirQuality.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="AirQuality"
+        Icon="/Assets/logo.ico"
+        Title="Air Quality Monitor"
 
         Width="1600"
         Height="1000">
