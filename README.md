@@ -90,13 +90,23 @@ kill -9 23338
 
 ## Cronjob to do a bulk insert all measurements from the .CSV file every night at 04:00 to the Azure SQL Database
 
-TODO: also need to change the appsettings.json file with connection string
+1. Update appsettings.json with the connection string to your Azure SQL Database
 
-1. Build the project by running "dotnet build src/AirQuality.Console/AirQuality.Console.csproj" (make sure dotnet is installed)
+appsettings.json should look like this:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=tcp:your-server.database.windows.net,1433;Initial Catalog=your-database;Persist Security Info=False;User ID=your-user;Password=your-password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  }
+}
+```
+
+2. Build the project by running "dotnet build src/AirQuality.Console/AirQuality.Console.csproj" (make sure dotnet is installed)
 
 Should look like this: 
 
-```
+```bash
 pi@pihole:~/git/pi_air_quality_monitor $ dotnet build src/AirQuality.Console/AirQuality.Console.csproj
 MSBuild version 17.3.2+561848881 for .NET
   Determining projects to restore...
@@ -111,21 +121,8 @@ Build succeeded.
 Time Elapsed 00:00:11.39
 ```
 
-
-2. Update appsettings.json with the connection string to your Azure SQL Database
-
-appsettings.json should look like this:
-
-```json
-{
-  "ConnectionStrings": {
-    "AirQualityDatabase": "Server=tcp:your-server.database.windows.net,1433;Initial Catalog=your-database;Persist Security Info=False;User ID=your-user;Password=your-password;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-  }
-}
-```
-
-    3. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
-    4. Add the following line to the file:
+3. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
+4. Add the following line to the file:
 
 ```bash
 0 4 * * * /bin/bash -c 'cd ~/git/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 && dotnet AirQuality.Console.dll ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv'
@@ -135,9 +132,9 @@ appsettings.json should look like this:
 
 ![image](wiki/crontab.PNG)
 
-4. This will navigate to /home/username/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 and run the dotnet project with the argument ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv. 
-5. (date -d yesterday "+%Y/%m/%d") will get the date of yesterday and format it as YYYY/MM/DD. (same as the folder structure of the measurements.csv files)
-6. The job will run every night at 04:00.
-7. Around 1440 measurements will be inserted into the database every night.
+5. This will navigate to /home/username/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 and run the dotnet project with the argument ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv. 
+6. (date -d yesterday "+%Y/%m/%d") will get the date of yesterday and format it as YYYY/MM/DD. (same as the folder structure of the measurements.csv files)
+7. The job will run every night at 04:00.
+8. Around 1440 measurements will be inserted into the database every night.
 
 
