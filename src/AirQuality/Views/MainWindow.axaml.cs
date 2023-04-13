@@ -187,6 +187,11 @@ public partial class MainWindow : Window
         _timer.Stop();
         _cts?.Cancel();
 
+        if (AvailableDatesCalendar.SelectedDates.Count > 1)
+        {
+            // TODO: show multiple dates on the graph
+        }
+
         if (AvailableDatesCalendar.SelectedDate.HasValue)
         {
             SelectedDateTextBlock.Text = $"Selected Date: {AvailableDatesCalendar.SelectedDate.Value.ToShortDateString()}";
@@ -202,11 +207,19 @@ public partial class MainWindow : Window
                 {
                     await UpdateGraphAnimatedAsync(measurements, _cts.Token);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
                     // This happens when the user clicks on a new graph before the previous one has finished animating, not a problem
-                    _logger.LogInformation("UpdateGraphAnimatedAsync was cancelled");
+                    _logger.LogInformation(ex, "UpdateGraphAnimatedAsync was cancelled");
                 }
+                // catch (KeyNotFoundException ex)
+                // {
+                //     _logger.LogError(ex, "KeyNotFoundException");
+                // }
+                // catch (Exception ex)
+                // {
+                //     _logger.LogError(ex, "Exception");
+                // }
             }
             else
             {
@@ -240,8 +253,7 @@ public partial class MainWindow : Window
         var title = $"{clientName}: {startDate} - {endDate} ({measurements.Count} measurements)";
 
         avaPlot.Plot.Title.Label.Text = title;
-        // avaPlot.Plot.XAxis.Label.Text = "Horizonal Axis";
-        // avaPlot.Plot.YAxis.Label.Text = "Vertical Axis";
+        avaPlot.Plot.YAxis.Label.Text = "µg/m³";
 
         // convert the the measurements to arrays
         var xs = new double[measurements.Count];

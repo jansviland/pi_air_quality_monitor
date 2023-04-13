@@ -55,17 +55,12 @@ public class Service : IService
         connection.Open();
 
         DataTable table = new DataTable();
-        // table.TableName = "measurements";
         table.TableName = "values";
 
         table.Columns.Add("Guid", typeof(Guid));
         table.Columns.Add("pm2", typeof(double));
         table.Columns.Add("pm10", typeof(double));
-        // table.Columns.Add("EventProcessedUtcTime", typeof(DateTime));
-        // table.Columns.Add("PartitionId", typeof(long));
-        // table.Columns.Add("EventEnqueuedUtcTime", typeof(DateTime));
         table.Columns.Add("UtcTime", typeof(DateTime));
-        // table.Columns.Add("IoTHub", typeof(string));
         table.Columns.Add("UnixTime", typeof(long));
         table.Columns.Add("ClientId", typeof(string));
 
@@ -76,11 +71,7 @@ public class Service : IService
             row["Guid"] = Guid.NewGuid();
             row[nameof(Measurement.Pm2)] = measurement.Pm2;
             row[nameof(Measurement.Pm10)] = measurement.Pm10;
-            // row[nameof(Measurement.EventProcessedUtcTime)] = GetDBValue(measurement.EventProcessedUtcTime);
-            // row[nameof(Measurement.PartitionId)] = GetDBValue(measurement.PartitionId);
-            // row[nameof(Measurement.EventEnqueuedUtcTime)] = measurement.EventEnqueuedUtcTime;
             row["UtcTime"] = measurement.EventEnqueuedUtcTime;
-            // row[nameof(Measurement.IoTHub)] = GetDBValue(measurement.IoTHub);
             row[nameof(Measurement.UnixTime)] = measurement.EventEnqueuedUtcTime.ToUnixTime();
             row[nameof(Measurement.ClientId)] = measurement.ClientId;
 

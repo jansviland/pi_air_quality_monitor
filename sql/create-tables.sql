@@ -9,10 +9,7 @@ CREATE TABLE [dbo].[values]
     [Guid]                  [uniqueidentifier]  NOT NULL DEFAULT NEWID(),
     [pm2]                   [float]             NOT NULL,
     [pm10]                  [float]             NOT NULL,
---  [EventProcessedUtcTime] [datetime2](7)      NULL,
---  [PartitionId]           [bigint]            NULL,
     [UtcTime]               [datetime2](7)      NOT NULL UNIQUE,
---  [IoTHub]                [nvarchar](4000)    NULL,
     [UnixTime]              [bigint]            NULL,
     [ClientId]              [varchar](255)      NOT NULL
 ) ON [PRIMARY]

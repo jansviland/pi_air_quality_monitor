@@ -23,7 +23,6 @@ pip install portalocker
 pip install azure-iot-device
 pip install pyserial
 pip install asyncio
-
 ```
 
 ### Install .NET 6 (for AirQuality.Console)
@@ -102,9 +101,10 @@ appsettings.json should look like this:
 }
 ```
 
-2. Build the project by running "dotnet build src/AirQuality.Console/AirQuality.Console.csproj" (make sure dotnet is installed)
+2. Build the project by running "dotnet build src/AirQuality.Console/AirQuality.Console.csproj" (make sure dotnet is
+   installed)
 
-Should look like this: 
+Should look like this:
 
 ```bash
 pi@pihole:~/git/pi_air_quality_monitor $ dotnet build src/AirQuality.Console/AirQuality.Console.csproj
@@ -121,20 +121,32 @@ Build succeeded.
 Time Elapsed 00:00:11.39
 ```
 
-3. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text editor.
-4. Add the following line to the file:
+3. Navigate to the scripts folder
+4. Make the run_air_quality_monitor.sh script executable
 
 ```bash
-0 4 * * * /bin/bash -c 'cd ~/git/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 && dotnet AirQuality.Console.dll ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv'
+chmod +x run_air_quality_monitor.sh
 ```
 
-3. Save the file and exit the editor.
+5. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text
+   editor.
+6. Add the following line to the file:
+
+```bash
+0 4 * * * ~/git/pi_air_quality_monitor/scripts/run_air_quality_monitor.sh
+```
+
+7. Make sure the path is correct. Save the file and exit the editor.
 
 ![image](wiki/crontab.PNG)
 
-5. This will navigate to /home/username/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 and run the dotnet project with the argument ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv. 
-6. (date -d yesterday "+%Y/%m/%d") will get the date of yesterday and format it as YYYY/MM/DD. (same as the folder structure of the measurements.csv files)
-7. The job will run every night at 04:00.
-8. Around 1440 measurements will be inserted into the database every night.
+This will navigate to /home/username/pi_air_quality_monitor/src/AirQuality.Console/bin/Debug/net6.0 and run the dotnet
+project with the argument ~/$(date -d yesterday "+%Y/%m/%d")/measurements.csv.
+
+(date -d yesterday "+%Y/%m/%d") will get the date of yesterday and format it as YYYY/MM/DD. (same as the folder
+structure of the measurements.csv files)
+The job will run every night at 04:00.
+
+Around 1440 measurements will be inserted into the database every night.
 
 

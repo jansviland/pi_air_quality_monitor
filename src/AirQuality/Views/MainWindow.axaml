@@ -49,10 +49,9 @@
                 </Grid.RowDefinitions>
 
                 <Calendar Grid.Column="0" Grid.Row="0" x:Name="AvailableDatesCalendar"
-                          SelectionMode="SingleDate"
+                          SelectionMode="MultipleRange"
                           DisplayDateChanged="OnDisplayDateChanged"
                           SelectedDatesChanged="OnSelectedDatesChanged" 
-                          
                           />
 
                 <TextBlock Grid.Column="0" Grid.Row="1" x:Name="SelectedDateTextBlock"

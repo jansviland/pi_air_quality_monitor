@@ -138,7 +138,7 @@ public class BlobStorage : IBlobStorage
 
         try
         {
-            // TODO: measurements fail when trying to deserialize the last file, since it has not added a closing bracket yet. 
+            // TODO: measurements fail when trying to deserialize the last file, since it has not added a closing bracket yet.
             // this is added at the end of each day.
             var measurements = JsonSerializer.Deserialize<List<Measurement>>(json, new JsonSerializerOptions
             {
