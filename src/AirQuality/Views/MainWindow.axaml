@@ -24,7 +24,7 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Open..." />
                 <Separator />
-                <MenuItem Header="Settings" />
+                <MenuItem Header="Settings" Click="MenuItem_Settings_OnClick" />
                 <Separator />
                 <MenuItem Header="_Exit" />
             </MenuItem>

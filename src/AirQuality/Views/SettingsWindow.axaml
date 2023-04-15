@@ -1,0 +1,29 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AirQuality.Views.SettingsWindow"
+        Icon="/Assets/logo.ico"
+        Title="Settings"
+        Width="800"
+        Height="600">
+
+    <Grid Margin="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ListBox x:Name="OptionsList" Grid.Column="0" Width="200" SelectedIndex="0">
+            <ListBoxItem Content="General" />
+            <ListBoxItem Content="Database" />
+            <ListBoxItem Content="Option 3" />
+        </ListBox>
+
+        <Border Grid.Column="1" Margin="10,0,0,0">
+            <ContentControl x:Name="MainView" />
+        </Border>
+    </Grid>
+
+</Window>

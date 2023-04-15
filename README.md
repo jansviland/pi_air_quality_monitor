@@ -11,7 +11,13 @@ To set this up you need
 
 Here is how it looks like:
 
+# Raspberry Pi
+
 ![image](wiki/air-quality-monitor.jpg)
+
+# UI
+
+![gif](wiki/interface.gif)
 
 ## Install required packages for Raspberry Pi
 
@@ -122,21 +128,22 @@ Time Elapsed 00:00:11.39
 ```
 
 3. Navigate to the scripts folder
-4. Make the run_air_quality_monitor.sh script executable
+4. Update the run_air_quality_monitor.sh script with the correct path to the AirQuality.Console project
+5. Make the run_air_quality_monitor.sh script executable
 
 ```bash
 chmod +x run_air_quality_monitor.sh
 ```
 
-5. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text
+6. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text
    editor.
-6. Add the following line to the file:
+7. Add the following line to the file:
 
 ```bash
 0 4 * * * ~/git/pi_air_quality_monitor/scripts/run_air_quality_monitor.sh
 ```
 
-7. Make sure the path is correct. Save the file and exit the editor.
+8. Make sure the path is correct. Save the file and exit the editor.
 
 ![image](wiki/crontab.PNG)
 

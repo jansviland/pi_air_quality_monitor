@@ -10,6 +10,7 @@ using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using DynamicData;
@@ -236,6 +237,8 @@ public partial class MainWindow : Window
     {
         // https://www.scottplot.net/cookbook/5.0/
 
+        // TODO: restrict y axis to -5 to 25
+
         var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
         avaPlot.Plot.Clear();
 
@@ -269,10 +272,6 @@ public partial class MainWindow : Window
 
         var pm2Scatter = avaPlot.Plot.Add.Scatter(xs, pm2);
         pm2Scatter.Label = "PM2.5";
-        // myScatter.LineStyle.Width = 5;
-        // myScatter.LineStyle.Color = Colors.Green;
-        // myScatter.MarkerStyle.Fill.Color = Colors.Magenta;
-        // myScatter.MarkerStyle.Size = 15;
 
         var pm10Scatter = avaPlot.Plot.Add.Scatter(xs, pm10);
         pm10Scatter.Label = "PM10";
@@ -280,17 +279,14 @@ public partial class MainWindow : Window
         // tell the axis to display tick labels using a time format
         avaPlot.Plot.Axes.DateTimeTicks(Edge.Bottom);
 
-        // add the measurements to the plot
-        // avaPlot.Plot.AddScatter(xs, pm2, label: "PM2.5");
-        // avaPlot.Plot.AddScatter(xs, pm10, label: "PM10");
-        // avaPlot.Plot.Legend();
-
         avaPlot.InvalidateVisual();
     }
 
     private async Task UpdateGraphAnimatedAsync(List<Measurement> measurements, CancellationToken cancellationToken = default)
     {
         // https://www.scottplot.net/cookbook/5.0/
+
+        // TODO: restrict y axis to -5 to 25
 
         var avaPlot = this.FindControl<AvaPlot>("AvaPlot1");
         avaPlot.Plot.Clear();
@@ -347,7 +343,7 @@ public partial class MainWindow : Window
             avaPlot.InvalidateVisual();
 
             // Add a delay between adding each data point
-            await Task.Delay(10, cancellationToken); // 100 ms delay, adjust as needed
+            await Task.Delay(10, cancellationToken); // 10 ms delay, adjust as needed
         }
     }
 
@@ -366,5 +362,11 @@ public partial class MainWindow : Window
         {
             yield return day;
         }
+    }
+
+    private void MenuItem_Settings_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var settingsWindow = new SettingsWindow();
+        settingsWindow.Show(); // Use ShowDialog() if you want to open the settings window as a modal dialog
     }
 }
