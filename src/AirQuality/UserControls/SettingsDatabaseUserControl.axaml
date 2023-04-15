@@ -1,0 +1,32 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:userControls="clr-namespace:AirQuality.UserControls"
+             xmlns:viewModels="clr-namespace:AirQuality.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SettingsDatabaseViewModel"
+             x:Class="AirQuality.UserControls.SettingsDatabaseUserControl">
+             
+
+    <UserControl.DataContext>
+        <viewModels:SettingsDatabaseViewModel />
+    </UserControl.DataContext>
+
+    <StackPanel Margin="0, 0, 20, 0">
+        <TextBlock Text="Database Connection String:" />
+        <TextBox Text="{Binding DatabaseConnectionString, Mode=TwoWay}" Margin="0, 20, 0, 0" />
+        <!-- <TextBlock Text="Database Name:" /> -->
+        <!-- <TextBox Text="{Binding DatabaseName, Mode=TwoWay}" /> -->
+        <!-- <TextBlock Text="Database User:" /> -->
+        <!-- <TextBox Text="{Binding DatabaseUser, Mode=TwoWay}" /> -->
+        <!-- <TextBlock Text="Database Password:" /> -->
+        <!-- <TextBox Text="{Binding DatabasePassword, Mode=TwoWay}" /> -->
+        <!-- <TextBlock Text="Database Port:" /> -->
+        <!-- <TextBox Text="{Binding DatabasePort, Mode=TwoWay}" /> -->
+        <!-- <TextBlock Text="Database Type:" /> -->
+        <!-- <ComboBox Items="{Binding DatabaseTypes}" SelectedItem="{Binding SelectedDatabaseType, Mode=TwoWay}" /> -->
+        
+        <Button Content="Save" Command="{Binding SaveDatabaseSettingsCommand}" HorizontalAlignment="Right" Margin="0, 20, 0, 0" />
+    </StackPanel>
+</UserControl>

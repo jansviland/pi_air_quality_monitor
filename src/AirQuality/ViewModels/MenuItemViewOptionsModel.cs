@@ -5,5 +5,5 @@ namespace AirQuality.ViewModels;
 public class MenuItemViewOptionsModel : ViewModelBase
 {
     public string Name { get; set; } = null!;
-    public ViewOptionsEnum ViewOption { get; set; }
+    public GraphViewOptionsEnum GraphViewOption { get; set; }
 }

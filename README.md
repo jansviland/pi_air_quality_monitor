@@ -11,17 +11,17 @@ To set this up you need
 
 Here is how it looks like:
 
-# Raspberry Pi
+# Final Result
 
 ![image](wiki/air-quality-monitor.jpg)
 
-# UI
+# Avalonia UI
 
 ![gif](wiki/interface.gif)
 
 ## Install required packages for Raspberry Pi
 
-### Install Python packages (for sendTestDataToAzure.py)
+1.  Install Python packages (for sendTestDataToAzure.py)
 
 ```bash
 python -m pip install --upgrade pip
@@ -31,7 +31,7 @@ pip install pyserial
 pip install asyncio
 ```
 
-### Install .NET 6 (for AirQuality.Console)
+2.  Install .NET 6 (for AirQuality.Console)
 
 ```bash
 wget -O - https://raw.githubusercontent.com/pjgpetecodes/dotnet6pi/master/install.sh | sudo bash
@@ -128,14 +128,14 @@ Time Elapsed 00:00:11.39
 ```
 
 3. Navigate to the scripts folder
-4. Update the run_air_quality_monitor.sh script with the correct path to the AirQuality.Console project
-5. Make the run_air_quality_monitor.sh script executable
+4. Update the **run_air_quality_monitor.sh** script with the correct path to the AirQuality.Console project
+5. Make the **run_air_quality_monitor.sh** script executable
 
 ```bash
 chmod +x run_air_quality_monitor.sh
 ```
 
-6. Open the terminal and type crontab -e. This command opens the cron table for the current user in the default text
+6. Open the terminal and type **crontab -e**. This command opens the cron table for the current user in the default text
    editor.
 7. Add the following line to the file:
 

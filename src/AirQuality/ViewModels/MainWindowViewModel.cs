@@ -25,9 +25,9 @@ public class MainWindowViewModel : ViewModelBase
 
         ViewOptions = new ObservableCollection<MenuItemViewOptionsModel>
         {
-            new() { Name = "Static View", ViewOption = ViewOptionsEnum.StaticView },
-            new() { Name = "Animated View", ViewOption = ViewOptionsEnum.AnimatedView },
-            new() { Name = "Live View", ViewOption = ViewOptionsEnum.LiveView }
+            new() { Name = "Static View", GraphViewOption = GraphViewOptionsEnum.StaticView },
+            new() { Name = "Animated View", GraphViewOption = GraphViewOptionsEnum.AnimatedView },
+            new() { Name = "Live View", GraphViewOption = GraphViewOptionsEnum.LiveView }
         };
 
         SelectedViewOptionMenuItem = ViewOptions[0];

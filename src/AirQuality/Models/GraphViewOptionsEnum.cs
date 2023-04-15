@@ -1,6 +1,6 @@
 ﻿namespace AirQuality.Models;
 
-public enum ViewOptionsEnum
+public enum GraphViewOptionsEnum
 {
     StaticView,
     AnimatedView,

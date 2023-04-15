@@ -1,8 +1,6 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Markup.Xaml;
 
-namespace AirQuality.UserControl;
+namespace AirQuality.UserControls;
 
 public partial class SettingsGeneralUserControl : Avalonia.Controls.UserControl
 {

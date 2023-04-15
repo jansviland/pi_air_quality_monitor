@@ -118,13 +118,13 @@ public partial class MainWindow : Window
         {
             _logger.LogInformation($"ViewOptionsMenuListBox_SelectionChanged: {menuItem.Name}");
 
-            switch (menuItem.ViewOption)
+            switch (menuItem.GraphViewOption)
             {
-                case ViewOptionsEnum.StaticView:
+                case GraphViewOptionsEnum.StaticView:
                     _timer.Stop();
                     _animateGraph = false;
                     break;
-                case ViewOptionsEnum.AnimatedView:
+                case GraphViewOptionsEnum.AnimatedView:
                     _timer.Stop();
                     _animateGraph = true;
 
@@ -132,7 +132,7 @@ public partial class MainWindow : Window
                     // UpdateGraphAnimatedAsync(measurements, _cts.Token);
 
                     break;
-                case ViewOptionsEnum.LiveView:
+                case GraphViewOptionsEnum.LiveView:
                     _timer.Stop();
                     _animateGraph = false;
 

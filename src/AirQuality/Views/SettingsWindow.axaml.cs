@@ -1,4 +1,4 @@
-﻿using AirQuality.UserControl;
+﻿using AirQuality.UserControls;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;

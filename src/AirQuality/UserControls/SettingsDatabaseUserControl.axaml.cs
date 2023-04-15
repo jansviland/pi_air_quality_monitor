@@ -1,14 +1,14 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using AirQuality.ViewModels;
 using Avalonia.Markup.Xaml;
 
-namespace AirQuality.UserControl;
+namespace AirQuality.UserControls;
 
 public partial class SettingsDatabaseUserControl : Avalonia.Controls.UserControl
 {
     public SettingsDatabaseUserControl()
     {
         InitializeComponent();
+        DataContext = new SettingsDatabaseViewModel();
     }
 
     private void InitializeComponent()
