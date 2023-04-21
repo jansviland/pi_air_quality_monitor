@@ -16,8 +16,13 @@ public interface IBlobStorage
     /// </summary>
     public void UpdateLocalFiles();
 
+    // TODO: move this method to a seperate interface, ILocalJsonStorage or something, this is not blob storage specific, it is just a local file storage
     public List<DateTime> GetDatesWithMeasurments();
+
+    // TODO: move this method to a seperate interface, ILocalJsonStorage or something, this is not blob storage specific, it is just a local file storage
     public List<Measurement> GetMeasurementsForDate(DateTime dateTime);
+
+    // TODO: move this method to a seperate interface, ILocalJsonStorage or something, this is not blob storage specific, it is just a local file storage
     public bool HasMeasurementsForDate(DateTime dateTime);
 }
 
@@ -64,6 +69,7 @@ public class BlobStorage : IBlobStorage
             // update list of available dates
             _availableDates.Add(new DateTime(year: int.Parse(year), month: int.Parse(month), day: int.Parse(day)));
 
+            // TODO: change folder name to "BlobStorage" to "LocalFiles"
             var fullFilePath = $"{currentDirectory}{_slash}BlobStorage{_slash}{year}{_slash}{month}{_slash}{day}{_slash}{filename}";
 
             var exist = File.Exists(fullFilePath);

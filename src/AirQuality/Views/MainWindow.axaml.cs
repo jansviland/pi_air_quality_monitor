@@ -82,6 +82,7 @@ public partial class MainWindow : Window
         // go through from date to the end date, and check if there are measurements for that date. If there are no measurements, then we should not be able to select that date
         foreach (var dateTime in EachDay(datesWithMeasurements[0], datesWithMeasurements[^1]))
         {
+            // TODO: also check if there are measurements in the SQL Database, then this should not be blacked out
             if (!_blobStorage.HasMeasurementsForDate(dateTime))
             {
                 AvailableDatesCalendar.BlackoutDates.Add(new CalendarDateRange(dateTime, dateTime));
@@ -198,6 +199,11 @@ public partial class MainWindow : Window
             SelectedDateTextBlock.Text = $"Selected Date: {AvailableDatesCalendar.SelectedDate.Value.ToShortDateString()}";
 
             var selectedDate = AvailableDatesCalendar.SelectedDate.Value;
+
+            // TODO: first check local json files, if there are no measurements for that date, then check the SQL database
+            // if we find data in the SQL database, download this, and save it as json (same as we do with blob storage)
+            // then next time this is selected, we can get the data from blob storage, instead of the SQL database
+
             var measurements = _blobStorage.GetMeasurementsForDate(selectedDate);
 
             if (_animateGraph)
