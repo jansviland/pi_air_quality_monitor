@@ -28,5 +28,10 @@
         <!-- <ComboBox Items="{Binding DatabaseTypes}" SelectedItem="{Binding SelectedDatabaseType, Mode=TwoWay}" /> -->
         
         <Button Content="Save" Command="{Binding SaveDatabaseSettingsCommand}" HorizontalAlignment="Right" Margin="0, 20, 0, 0" />
+        
+        <Button Content="Download" Command="{Binding SaveDatabaseSettingsCommand}" HorizontalAlignment="Right" Margin="0, 20, 0, 0" />
+     
+        <!-- TODO: show loading indicator and status while downloading data, and saving json locally -->
+        
     </StackPanel>
 </UserControl>

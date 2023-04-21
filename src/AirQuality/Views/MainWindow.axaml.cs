@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     private readonly ILogger<MainWindow> _logger;
     private readonly IDatabase _database;
     private readonly IBlobStorage _blobStorage;
+    private readonly ILocalStorage _localStorage;
 
     // private readonly List<Measurement> _measurements = new();
 
@@ -39,11 +40,12 @@ public partial class MainWindow : Window
     {
     }
 
-    public MainWindow(ILogger<MainWindow> logger, IDatabase database, IBlobStorage blobStorage)
+    public MainWindow(ILogger<MainWindow> logger, IDatabase database, IBlobStorage blobStorage, ILocalStorage localStorage)
     {
         _logger = logger;
         _database = database;
         _blobStorage = blobStorage;
+        _localStorage = localStorage;
 
         InitializeComponent();
 
@@ -72,7 +74,8 @@ public partial class MainWindow : Window
         // TODO: trigger via settings page, don't do it automatically on startup
         _blobStorage.UpdateLocalFiles();
 
-        var datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
+        // var datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
+        var datesWithMeasurements = _localStorage.GetDatesWithMeasurments();
 
         // black out dates before the first date with measurements
         AvailableDatesCalendar.IsTodayHighlighted = false;
@@ -83,7 +86,7 @@ public partial class MainWindow : Window
         foreach (var dateTime in EachDay(datesWithMeasurements[0], datesWithMeasurements[^1]))
         {
             // TODO: also check if there are measurements in the SQL Database, then this should not be blacked out
-            if (!_blobStorage.HasMeasurementsForDate(dateTime))
+            if (!_localStorage.HasMeasurementsForDate(dateTime))
             {
                 AvailableDatesCalendar.BlackoutDates.Add(new CalendarDateRange(dateTime, dateTime));
             }
@@ -204,7 +207,8 @@ public partial class MainWindow : Window
             // if we find data in the SQL database, download this, and save it as json (same as we do with blob storage)
             // then next time this is selected, we can get the data from blob storage, instead of the SQL database
 
-            var measurements = _blobStorage.GetMeasurementsForDate(selectedDate);
+            // var measurements = _blobStorage.GetMeasurementsForDate(selectedDate);
+            var measurements = _localStorage.GetMeasurementsForDate(selectedDate);
 
             if (_animateGraph)
             {
