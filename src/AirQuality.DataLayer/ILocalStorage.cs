@@ -68,13 +68,8 @@ public class LocalStorage : ILocalStorage
     {
         if (!_availableDates.Contains(dateTime))
         {
-            // you can select a date with no measurements, and it will return an empty list
             _logger.LogError("No measurements found for date {DateTime}", dateTime);
-            // return new List<Measurement>();
             return null;
-
-            // _logger.LogError("No measurements found for date {DateTime}", dateTime);
-            // throw new Exception($"No measurements found for date {dateTime}");
         }
 
         var year = dateTime.Year.ToString();
@@ -87,7 +82,6 @@ public class LocalStorage : ILocalStorage
         if (!Directory.Exists(directory))
         {
             _logger.LogInformation("Folder {Directory} does not exist", directory);
-            // throw new Exception($"Folder {directory} does not exist");
             return null;
         }
 
@@ -95,7 +89,6 @@ public class LocalStorage : ILocalStorage
         if (files.Length == 0)
         {
             _logger.LogInformation("No files found in {Directory}", directory);
-            // throw new Exception($"No files found in {directory}");
             return null;
         }
 
@@ -157,13 +150,22 @@ public class LocalStorage : ILocalStorage
         }
 
         // var json = File.ReadAllText(files.First());
-        // var measurements = JsonSerializer.Deserialize<List<Measurement>>(json, new JsonSerializerOptions
-        // {
-        //     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        // });
         //
-        // if (measurements == null)
+        // try
         // {
+        //     var measurements = JsonSerializer.Deserialize<List<Measurement>>(json, new JsonSerializerOptions
+        //     {
+        //         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        //     });
+        //
+        //     if (measurements == null)
+        //     {
+        //         return false;
+        //     }
+        // }
+        // catch (Exception e)
+        // {
+        //     _logger.LogError(e, $"Could not deserialize json for {dateTime}");
         //     return false;
         // }
 

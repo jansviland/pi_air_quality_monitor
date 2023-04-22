@@ -66,26 +66,27 @@ public partial class MainWindow : Window
         var viewOptionsListBox = this.FindControl<ListBox>("ViewOptionsMenuListBox");
         viewOptionsListBox.SelectionChanged += ViewOptionsMenuListBox_SelectionChanged;
 
-
         // TODO: get data locally from json files, to update, get data from Azure and store locally once. Then use the local data again.
         // _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
 
         // TODO: this can take a while, so we should show a loading indicator, and show an error if it fails
         // TODO: trigger via settings page, don't do it automatically on startup
-        _blobStorage.UpdateLocalFiles();
+        // _blobStorage.UpdateLocalFiles();
 
-        // var datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
         var datesWithMeasurements = _localStorage.GetDatesWithMeasurments();
         datesWithMeasurements.Add(_database.GetDatesWithMeasurments());
         datesWithMeasurements.Sort();
 
+        // remove duplicates
+        var uniqueDatesWithMeasurements = datesWithMeasurements.Distinct().ToList();
+
         // black out dates before the first date with measurements
         AvailableDatesCalendar.IsTodayHighlighted = false;
-        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(DateTime.MinValue, datesWithMeasurements[0] + TimeSpan.FromDays(-1)) });
-        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(datesWithMeasurements[^1] + TimeSpan.FromDays(1), DateTime.MaxValue) });
+        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(DateTime.MinValue, uniqueDatesWithMeasurements[0] + TimeSpan.FromDays(-1)) });
+        AvailableDatesCalendar.BlackoutDates.AddRange(new[] { new CalendarDateRange(uniqueDatesWithMeasurements[^1] + TimeSpan.FromDays(1), DateTime.MaxValue) });
 
         // go through from date to the end date, and check if there are measurements for that date. If there are no measurements, then we should not be able to select that date
-        foreach (var dateTime in EachDay(datesWithMeasurements[0], datesWithMeasurements[^1]))
+        foreach (var dateTime in EachDay(uniqueDatesWithMeasurements[0], uniqueDatesWithMeasurements[^1]))
         {
             // TODO: also check if there are measurements in the SQL Database, then this should not be blacked out
             if (!_localStorage.HasMeasurementsForDate(dateTime) && !_database.HasMeasurementsForDate(dateTime))
@@ -95,7 +96,7 @@ public partial class MainWindow : Window
         }
 
         // set selected date to the last date with measurements
-        // AvailableDatesCalendar.SelectedDate = datesWithMeasurements[^1];
+        AvailableDatesCalendar.SelectedDate = uniqueDatesWithMeasurements[^1];
 
         // TODO: show error if connection fails
         // TODO: show loading indicator

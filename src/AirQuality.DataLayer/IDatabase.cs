@@ -31,9 +31,7 @@ public class Database : IDatabase
     {
         var datesWithMeasurements = new List<DateTime>();
 
-        // sql query, group by day, get all unique dates
         const string sql = "SELECT DISTINCT CAST(UtcTime as date) as date FROM [dbo].[values] order by date";
-
         using (var con = new SqlConnection(_connectionString))
         {
             con.Open();
@@ -49,7 +47,6 @@ public class Database : IDatabase
         }
 
         _availableDates = datesWithMeasurements;
-
         return _availableDates;
     }
 
@@ -92,7 +89,7 @@ public class Database : IDatabase
             GetDatesWithMeasurments();
         }
 
-        return _availableDates.Contains(dateTime);
+        return _availableDates!.Contains(dateTime);
     }
 
     public List<Measurement> GetMeasurementsBetweenDates(DateTime from, DateTime to)
