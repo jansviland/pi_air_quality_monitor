@@ -1,5 +1,4 @@
 using System.Data;
-using System.Diagnostics.Metrics;
 using System.Globalization;
 using AirQuality.Common.Extensions;
 using AirQuality.Common.Models;

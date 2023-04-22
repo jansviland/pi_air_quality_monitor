@@ -9,13 +9,10 @@ using AirQuality.Models;
 using AirQuality.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Threading;
 using DynamicData;
 using Microsoft.Extensions.Logging;
-using ReactiveUI;
 using ScottPlot;
 using ScottPlot.Avalonia;
 

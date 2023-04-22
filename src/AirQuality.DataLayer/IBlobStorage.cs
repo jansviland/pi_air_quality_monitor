@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using AirQuality.Common.Models;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -22,7 +18,6 @@ public class BlobStorage : IBlobStorage
     private readonly ILogger<BlobStorage> _logger;
     private readonly BlobServiceClient _blobServiceClient;
 
-    private readonly List<DateTime> _availableDates = new List<DateTime>();
     private readonly string _folderName = "storage";
 
     // in order to be cross platform, support both / and \ folder seperators
@@ -57,9 +52,6 @@ public class BlobStorage : IBlobStorage
             var day = split[2];
             var filename = split[3];
             var currentDirectory = Directory.GetCurrentDirectory();
-
-            // update list of available dates
-            _availableDates.Add(new DateTime(year: int.Parse(year), month: int.Parse(month), day: int.Parse(day)));
 
             var fullFilePath = $"{currentDirectory}{_slash}{_folderName}{_slash}{year}{_slash}{month}{_slash}{day}{_slash}{filename}";
 
