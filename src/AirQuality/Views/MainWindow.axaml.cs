@@ -76,6 +76,8 @@ public partial class MainWindow : Window
 
         // var datesWithMeasurements = _blobStorage.GetDatesWithMeasurments();
         var datesWithMeasurements = _localStorage.GetDatesWithMeasurments();
+        datesWithMeasurements.Add(_database.GetDatesWithMeasurments());
+        datesWithMeasurements.Sort();
 
         // black out dates before the first date with measurements
         AvailableDatesCalendar.IsTodayHighlighted = false;
@@ -86,14 +88,14 @@ public partial class MainWindow : Window
         foreach (var dateTime in EachDay(datesWithMeasurements[0], datesWithMeasurements[^1]))
         {
             // TODO: also check if there are measurements in the SQL Database, then this should not be blacked out
-            if (!_localStorage.HasMeasurementsForDate(dateTime))
+            if (!_localStorage.HasMeasurementsForDate(dateTime) && !_database.HasMeasurementsForDate(dateTime))
             {
                 AvailableDatesCalendar.BlackoutDates.Add(new CalendarDateRange(dateTime, dateTime));
             }
         }
 
         // set selected date to the last date with measurements
-        AvailableDatesCalendar.SelectedDate = datesWithMeasurements[^1];
+        // AvailableDatesCalendar.SelectedDate = datesWithMeasurements[^1];
 
         // TODO: show error if connection fails
         // TODO: show loading indicator
@@ -207,8 +209,13 @@ public partial class MainWindow : Window
             // if we find data in the SQL database, download this, and save it as json (same as we do with blob storage)
             // then next time this is selected, we can get the data from blob storage, instead of the SQL database
 
-            // var measurements = _blobStorage.GetMeasurementsForDate(selectedDate);
             var measurements = _localStorage.GetMeasurementsForDate(selectedDate);
+
+            if (measurements == null)
+            {
+                // TODO: if there are no measurements for that date, then check the SQL database, and then download the data from the SQL database and store as local json
+                measurements = _database.GetMeasurementsForDate(selectedDate);
+            }
 
             if (_animateGraph)
             {

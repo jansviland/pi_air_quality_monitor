@@ -7,8 +7,11 @@ namespace AirQuality.DataLayer;
 
 public interface IDatabase
 {
+    public List<DateTime> GetDatesWithMeasurments();
     public List<Measurement> GetMeasurementsBetweenDates(DateTime from, DateTime to);
     public List<Measurement> GetLatestMeasurements(int count);
+    public List<Measurement>? GetMeasurementsForDate(DateTime dateTime);
+    public bool HasMeasurementsForDate(DateTime dateTime);
 }
 
 public class Database : IDatabase
@@ -16,10 +19,53 @@ public class Database : IDatabase
     private readonly ILogger<Database> _logger;
     private readonly string? _connectionString;
 
+    private List<DateTime>? _availableDates;
+
     public Database(IConfiguration configuration, ILogger<Database> logger)
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
         _logger = logger;
+    }
+
+    public List<DateTime> GetDatesWithMeasurments()
+    {
+        var datesWithMeasurements = new List<DateTime>();
+
+        // sql query, group by day, get all unique dates
+        const string sql = "SELECT DISTINCT CAST(UtcTime as date) as date FROM [dbo].[values] order by date";
+
+        using (var con = new SqlConnection(_connectionString))
+        {
+            con.Open();
+
+            using (var command = new SqlCommand(sql, con))
+            {
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    datesWithMeasurements.Add(reader.GetDateTime(0));
+                }
+            }
+        }
+
+        _availableDates = datesWithMeasurements;
+
+        return _availableDates;
+    }
+
+    public List<Measurement>? GetMeasurementsForDate(DateTime dateTime)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasMeasurementsForDate(DateTime dateTime)
+    {
+        if (_availableDates == null)
+        {
+            GetDatesWithMeasurments();
+        }
+
+        return _availableDates.Contains(dateTime);
     }
 
     public List<Measurement> GetMeasurementsBetweenDates(DateTime from, DateTime to)
@@ -36,7 +82,10 @@ public class Database : IDatabase
         {
             con.Open();
 
-            using (var command = new SqlCommand($"SELECT top({count}) * FROM measurements order by unixtime desc", con))
+            var sql = $"SELECT top({count}) * FROM measurements order by unixtime desc";
+            // var sql = $"SELECT top({count}) * FROM [values] order by unixtime desc";
+
+            using (var command = new SqlCommand(sql, con))
             {
                 var reader = command.ExecuteReader();
                 while (reader.Read())

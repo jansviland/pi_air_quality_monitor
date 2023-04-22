@@ -7,7 +7,7 @@ namespace AirQuality.DataLayer;
 public interface ILocalStorage
 {
     public List<DateTime> GetDatesWithMeasurments();
-    public List<Measurement> GetMeasurementsForDate(DateTime dateTime);
+    public List<Measurement>? GetMeasurementsForDate(DateTime dateTime);
     public bool HasMeasurementsForDate(DateTime dateTime);
 }
 
@@ -19,7 +19,7 @@ public class LocalStorage : ILocalStorage
     private readonly char _slash = Path.DirectorySeparatorChar;
     private readonly string _folderName = "BlobStorage";
 
-    private List<DateTime> _availableDates;
+    private List<DateTime>? _availableDates;
 
     public LocalStorage(ILogger<LocalStorage> logger)
     {
@@ -64,13 +64,14 @@ public class LocalStorage : ILocalStorage
         return _availableDates;
     }
 
-    public List<Measurement> GetMeasurementsForDate(DateTime dateTime)
+    public List<Measurement>? GetMeasurementsForDate(DateTime dateTime)
     {
         if (!_availableDates.Contains(dateTime))
         {
             // you can select a date with no measurements, and it will return an empty list
             _logger.LogError("No measurements found for date {DateTime}", dateTime);
-            return new List<Measurement>();
+            // return new List<Measurement>();
+            return null;
 
             // _logger.LogError("No measurements found for date {DateTime}", dateTime);
             // throw new Exception($"No measurements found for date {dateTime}");
@@ -85,15 +86,17 @@ public class LocalStorage : ILocalStorage
 
         if (!Directory.Exists(directory))
         {
-            _logger.LogError("Folder {Directory} does not exist", directory);
-            throw new Exception($"Folder {directory} does not exist");
+            _logger.LogInformation("Folder {Directory} does not exist", directory);
+            // throw new Exception($"Folder {directory} does not exist");
+            return null;
         }
 
         var files = Directory.GetFiles(directory, "*.json");
         if (files.Length == 0)
         {
-            _logger.LogError("No files found in {Directory}", directory);
-            throw new Exception($"No files found in {directory}");
+            _logger.LogInformation("No files found in {Directory}", directory);
+            // throw new Exception($"No files found in {directory}");
+            return null;
         }
 
         // order by last modified, sometimes we retieve the json file before it is fully written
