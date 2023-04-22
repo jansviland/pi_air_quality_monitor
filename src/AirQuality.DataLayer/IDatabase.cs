@@ -55,7 +55,34 @@ public class Database : IDatabase
 
     public List<Measurement>? GetMeasurementsForDate(DateTime dateTime)
     {
-        throw new NotImplementedException();
+        var measurements = new List<Measurement>();
+
+        using (var con = new SqlConnection(_connectionString))
+        {
+            con.Open();
+
+            var sql = $"SELECT pm2, pm10, UtcTime, UnixTime, ClientId FROM [dbo].[values] where CAST(UtcTime as date) = '{dateTime:yyyy-MM-dd}'";
+
+            using (var command = new SqlCommand(sql, con))
+            {
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    measurements.Add(new Measurement()
+                    {
+                        Pm2 = reader.GetDouble(0),
+                        Pm10 = reader.GetDouble(1),
+                        EventEnqueuedUtcTime = reader.GetDateTime(2),
+                        UnixTime = reader.GetInt64(3),
+                        ClientId = reader.GetString(4)
+                    });
+                }
+            }
+        }
+
+        _logger.LogInformation($"Found {measurements.Count} measurements for date {dateTime:yyyy-MM-dd} in the database.");
+
+        return measurements;
     }
 
     public bool HasMeasurementsForDate(DateTime dateTime)

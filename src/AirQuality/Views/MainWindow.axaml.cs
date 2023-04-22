@@ -211,10 +211,17 @@ public partial class MainWindow : Window
 
             var measurements = _localStorage.GetMeasurementsForDate(selectedDate);
 
+            // can not find data locally, so we need to get it from the SQL database
             if (measurements == null)
             {
-                // TODO: if there are no measurements for that date, then check the SQL database, and then download the data from the SQL database and store as local json
                 measurements = _database.GetMeasurementsForDate(selectedDate);
+                MessageTextBlock.Text = $"Found {measurements.Count} measurements for {selectedDate.ToShortDateString()} in the SQL database.";
+
+                // TODO: download the measurements from the SQL database, and save them as json files locally
+            }
+            else
+            {
+                MessageTextBlock.Text = $"Found {measurements.Count} measurements for {selectedDate.ToShortDateString()} in local storage.";
             }
 
             if (_animateGraph)
