@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using AirQuality.Common.Extensions;
 using AirQuality.Common.Models;
@@ -42,7 +43,7 @@ public class Service : IService
                 Pm2 = Convert.ToDouble(split[0], CultureInfo.InvariantCulture),
                 Pm10 = Convert.ToDouble(split[1], CultureInfo.InvariantCulture),
                 ClientId = split[2],
-                EventEnqueuedUtcTime = DateTime.ParseExact(split[3], "yyyy-MM-dd HH:mm:ss.ffffff", CultureInfo.InvariantCulture)
+                UtcTime = DateTime.ParseExact(split[3], "yyyy-MM-dd HH:mm:ss.ffffff", CultureInfo.InvariantCulture)
             });
         }
 
@@ -71,8 +72,8 @@ public class Service : IService
             row["Guid"] = Guid.NewGuid();
             row[nameof(Measurement.Pm2)] = measurement.Pm2;
             row[nameof(Measurement.Pm10)] = measurement.Pm10;
-            row["UtcTime"] = measurement.EventEnqueuedUtcTime;
-            row[nameof(Measurement.UnixTime)] = measurement.EventEnqueuedUtcTime.ToUnixTime();
+            row[nameof(Measurement.UtcTime)] = measurement.UtcTime;
+            row[nameof(Measurement.UnixTime)] = measurement.UtcTime.ToUnixTime();
             row[nameof(Measurement.ClientId)] = measurement.ClientId;
 
             table.Rows.Add(row);

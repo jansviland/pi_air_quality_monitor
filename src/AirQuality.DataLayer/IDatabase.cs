@@ -69,7 +69,7 @@ public class Database : IDatabase
                     {
                         Pm2 = reader.GetDouble(0),
                         Pm10 = reader.GetDouble(1),
-                        EventEnqueuedUtcTime = reader.GetDateTime(2),
+                        UtcTime = reader.GetDateTime(2),
                         UnixTime = reader.GetInt64(3),
                         ClientId = reader.GetString(4)
                     });
@@ -120,7 +120,7 @@ public class Database : IDatabase
                         Pm10 = reader.GetDouble(1),
                         // EventProcessedUtcTime = reader.GetDateTime(2),
                         // PartitionId = reader.GetInt64(3),
-                        EventEnqueuedUtcTime = reader.GetDateTime(4),
+                        UtcTime = reader.GetDateTime(4),
                         // IoTHub = reader.GetString(5),
 
                         // unixtime can be null in the database, added it later on, so in some earlier rows it will be null
