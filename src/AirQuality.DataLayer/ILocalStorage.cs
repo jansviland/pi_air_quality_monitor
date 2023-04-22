@@ -9,6 +9,7 @@ public interface ILocalStorage
     public List<DateTime> GetDatesWithMeasurments();
     public List<Measurement>? GetMeasurementsForDate(DateTime dateTime);
     public bool HasMeasurementsForDate(DateTime dateTime);
+    public void SaveMeasurementsForDate(DateTime dateTime, List<Measurement> measurements);
 }
 
 public class LocalStorage : ILocalStorage
@@ -17,27 +18,33 @@ public class LocalStorage : ILocalStorage
 
     // in order to be cross platform, support both / and \ folder seperators
     private readonly char _slash = Path.DirectorySeparatorChar;
-    private readonly string _folderName = "BlobStorage";
+    private readonly string _folderName = "storage";
 
-    private List<DateTime>? _availableDates;
+    private List<DateTime>? _availableDates = new List<DateTime>();
 
     public LocalStorage(ILogger<LocalStorage> logger)
     {
         _logger = logger;
     }
 
+    // go through all files in the local storage folder, check year, month, day folders, and check if file exist in that folder
     public List<DateTime> GetDatesWithMeasurments()
     {
-        // TODO: go through all files in the local storage folder, check year, month, day folders, and check if file exist in that folder
-
         var datesWithMeasurements = new List<DateTime>();
         var currentDirectory = Directory.GetCurrentDirectory();
 
-        // var directory = $"{currentDirectory}{_slash}{_folderName}{_slash}{year}{_slash}{month}{_slash}{day}";
-        var rootDirectoryPath = $"{currentDirectory}{_slash}{_folderName}";
+        if (!Directory.Exists($"{currentDirectory}{_slash}{_folderName}"))
+        {
+            _logger.LogInformation("No local storage folder found, creating new one");
+            Directory.CreateDirectory($"{currentDirectory}{_slash}{_folderName}");
 
+            return datesWithMeasurements;
+        }
+
+        var rootDirectoryPath = $"{currentDirectory}{_slash}{_folderName}";
         var folder = new DirectoryInfo(rootDirectoryPath);
         var subFoldersYears = folder.GetDirectories();
+
         foreach (var foldersYear in subFoldersYears)
         {
             var subFoldersMonths = foldersYear.GetDirectories();
@@ -136,7 +143,7 @@ public class LocalStorage : ILocalStorage
         var day = dateTime.Day.ToString("d2");
         var currentDirectory = Directory.GetCurrentDirectory();
 
-        var directory = $"{currentDirectory}{_slash}BlobStorage{_slash}{year}{_slash}{month}{_slash}{day}";
+        var directory = $"{currentDirectory}{_slash}{_folderName}{_slash}{year}{_slash}{month}{_slash}{day}";
 
         if (!Directory.Exists(directory))
         {
@@ -170,5 +177,32 @@ public class LocalStorage : ILocalStorage
         // }
 
         return true;
+    }
+
+    public void SaveMeasurementsForDate(DateTime dateTime, List<Measurement> measurements)
+    {
+        var year = dateTime.Year.ToString();
+        var month = dateTime.Month.ToString("d2");
+        var day = dateTime.Day.ToString("d2");
+
+        var currentDirectory = Directory.GetCurrentDirectory();
+        var directory = $"{currentDirectory}{_slash}{_folderName}{_slash}{year}{_slash}{month}{_slash}{day}";
+
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        // save json
+        var json = JsonSerializer.Serialize(measurements, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+        });
+
+        var fileName = $"{dateTime:yyyy-MM-dd}-minute-interval.json";
+        var filePath = $"{directory}{_slash}{fileName}";
+
+        File.WriteAllText(filePath, json);
     }
 }

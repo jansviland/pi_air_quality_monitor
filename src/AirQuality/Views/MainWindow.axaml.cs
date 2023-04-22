@@ -218,7 +218,8 @@ public partial class MainWindow : Window
                 measurements = _database.GetMeasurementsForDate(selectedDate);
                 MessageTextBlock.Text = $"Found {measurements.Count} measurements for {selectedDate.ToShortDateString()} in the SQL database.";
 
-                // TODO: download the measurements from the SQL database, and save them as json files locally
+                // save them as json files locally
+                _localStorage.SaveMeasurementsForDate(selectedDate, measurements);
             }
             else
             {

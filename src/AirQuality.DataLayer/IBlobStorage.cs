@@ -23,6 +23,7 @@ public class BlobStorage : IBlobStorage
     private readonly BlobServiceClient _blobServiceClient;
 
     private readonly List<DateTime> _availableDates = new List<DateTime>();
+    private readonly string _folderName = "storage";
 
     // in order to be cross platform, support both / and \ folder seperators
     private readonly char _slash = Path.DirectorySeparatorChar;
@@ -60,8 +61,7 @@ public class BlobStorage : IBlobStorage
             // update list of available dates
             _availableDates.Add(new DateTime(year: int.Parse(year), month: int.Parse(month), day: int.Parse(day)));
 
-            // TODO: change folder name to "BlobStorage" to "LocalFiles"
-            var fullFilePath = $"{currentDirectory}{_slash}BlobStorage{_slash}{year}{_slash}{month}{_slash}{day}{_slash}{filename}";
+            var fullFilePath = $"{currentDirectory}{_slash}{_folderName}{_slash}{year}{_slash}{month}{_slash}{day}{_slash}{filename}";
 
             var exist = File.Exists(fullFilePath);
             if (exist)
@@ -87,7 +87,4 @@ public class BlobStorage : IBlobStorage
             }
         }
     }
-
-    // Go through all json files, and return a list of dates that have measurements
-  
 }
