@@ -54,7 +54,7 @@ public class Service : IService
         using var connection = new SqlConnection(_connectionString);
         connection.Open();
 
-        DataTable table = new DataTable();
+        var table = new DataTable();
         table.TableName = "values";
 
         table.Columns.Add("Guid", typeof(Guid));
@@ -84,9 +84,4 @@ public class Service : IService
             bulkInsert.WriteToServer(table);
         }
     }
-
-    // private static object GetDBValue(object? o)
-    // {
-    //     return o ?? (object)DBNull.Value;
-    // }
 }

@@ -44,6 +44,8 @@ internal static class Program
         svc.Run(input);
         Log.Logger.Information("Data bulk inserted successfully!");
 
+        // TODO: upload csv file to blob storage
+
         stopWatch.Stop();
         Log.Logger.Information("Elapsed time: {Elapsed} ms", stopWatch.ElapsedMilliseconds);
     }

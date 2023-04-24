@@ -187,73 +187,72 @@ public partial class MainWindow : Window
         // Handle the DisplayDateChanged event here
     }
 
+    private List<Measurement> GetMeasurementsForDate(DateTime date)
+    {
+        var measurements = _localStorage.GetMeasurementsForDate(date);
+
+        // can not find data locally, so we need to get it from the SQL database
+        if (measurements == null)
+        {
+            measurements = _database.GetMeasurementsForDate(date);
+            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()} in the SQL database.";
+
+            // save them as json files locally
+            _localStorage.SaveMeasurementsForDate(date, measurements);
+        }
+        else
+        {
+            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()} in local storage.";
+        }
+
+        return measurements;
+    }
+
     private async void OnSelectedDatesChanged(object sender, SelectionChangedEventArgs e)
     {
         _timer.Stop();
         _cts?.Cancel();
 
-        if (AvailableDatesCalendar.SelectedDates.Count > 1)
+
+        var measurements = new List<Measurement>();
+
+        var selectedDates = AvailableDatesCalendar.SelectedDates.ToList();
+
+        foreach (var date in selectedDates)
         {
-            // TODO: show multiple dates on the graph
+            measurements.AddRange(GetMeasurementsForDate(date));
         }
 
-        if (AvailableDatesCalendar.SelectedDate.HasValue)
+        if (_animateGraph)
         {
-            SelectedDateTextBlock.Text = $"Selected Date: {AvailableDatesCalendar.SelectedDate.Value.ToShortDateString()}";
+            _cts = new CancellationTokenSource();
 
-            var selectedDate = AvailableDatesCalendar.SelectedDate.Value;
-
-            // TODO: first check local json files, if there are no measurements for that date, then check the SQL database
-            // if we find data in the SQL database, download this, and save it as json (same as we do with blob storage)
-            // then next time this is selected, we can get the data from blob storage, instead of the SQL database
-
-            var measurements = _localStorage.GetMeasurementsForDate(selectedDate);
-
-            // can not find data locally, so we need to get it from the SQL database
-            if (measurements == null)
+            try
             {
-                measurements = _database.GetMeasurementsForDate(selectedDate);
-                MessageTextBlock.Text = $"Found {measurements.Count} measurements for {selectedDate.ToShortDateString()} in the SQL database.";
-
-                // save them as json files locally
-                _localStorage.SaveMeasurementsForDate(selectedDate, measurements);
+                await UpdateGraphAnimatedAsync(measurements, _cts.Token);
             }
-            else
+            catch (OperationCanceledException ex)
             {
-                MessageTextBlock.Text = $"Found {measurements.Count} measurements for {selectedDate.ToShortDateString()} in local storage.";
+                // This happens when the user clicks on a new graph before the previous one has finished animating, not a problem
+                _logger.LogInformation(ex, "UpdateGraphAnimatedAsync was cancelled");
             }
-
-            if (_animateGraph)
-            {
-                _cts = new CancellationTokenSource();
-
-                try
-                {
-                    await UpdateGraphAnimatedAsync(measurements, _cts.Token);
-                }
-                catch (OperationCanceledException ex)
-                {
-                    // This happens when the user clicks on a new graph before the previous one has finished animating, not a problem
-                    _logger.LogInformation(ex, "UpdateGraphAnimatedAsync was cancelled");
-                }
-                // catch (KeyNotFoundException ex)
-                // {
-                //     _logger.LogError(ex, "KeyNotFoundException");
-                // }
-                // catch (Exception ex)
-                // {
-                //     _logger.LogError(ex, "Exception");
-                // }
-            }
-            else
-            {
-                UpdateGraph(measurements);
-            }
+            // catch (KeyNotFoundException ex)
+            // {
+            //     _logger.LogError(ex, "KeyNotFoundException");
+            // }
+            // catch (Exception ex)
+            // {
+            //     _logger.LogError(ex, "Exception");
+            // }
         }
         else
         {
-            SelectedDateTextBlock.Text = "No date selected.";
+            UpdateGraph(measurements);
         }
+        // else
+        // {
+        //     SelectedDateTextBlock.Text = "No date selected.";
+        // }
     }
 
     private void UpdateGraph(List<Measurement> measurements)

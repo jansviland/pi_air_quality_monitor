@@ -118,10 +118,7 @@ public class Database : IDatabase
                     {
                         Pm2 = reader.GetDouble(0),
                         Pm10 = reader.GetDouble(1),
-                        // EventProcessedUtcTime = reader.GetDateTime(2),
-                        // PartitionId = reader.GetInt64(3),
                         UtcTime = reader.GetDateTime(4),
-                        // IoTHub = reader.GetString(5),
 
                         // unixtime can be null in the database, added it later on, so in some earlier rows it will be null
                         UnixTime = reader.IsDBNull(6) ? null : reader.GetInt64(6),
