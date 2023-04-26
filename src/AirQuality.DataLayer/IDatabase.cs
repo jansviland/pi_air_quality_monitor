@@ -7,10 +7,16 @@ namespace AirQuality.DataLayer;
 
 public interface IDatabase
 {
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public List<DateTime> GetDatesWithMeasurments();
-    public List<Measurement> GetMeasurementsBetweenDates(DateTime from, DateTime to);
+
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public List<Measurement> GetLatestMeasurements(int count);
+
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public List<Measurement>? GetMeasurementsForDate(DateTime dateTime);
+
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public bool HasMeasurementsForDate(DateTime dateTime);
 }
 
@@ -90,11 +96,6 @@ public class Database : IDatabase
         }
 
         return _availableDates!.Contains(dateTime);
-    }
-
-    public List<Measurement> GetMeasurementsBetweenDates(DateTime from, DateTime to)
-    {
-        throw new NotImplementedException();
     }
 
     public List<Measurement> GetLatestMeasurements(int count)

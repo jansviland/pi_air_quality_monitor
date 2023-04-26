@@ -6,9 +6,16 @@ namespace AirQuality.DataLayer;
 
 public interface ILocalStorage
 {
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public List<DateTime> GetDatesWithMeasurments();
+
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public List<Measurement>? GetMeasurementsForDate(DateTime dateTime);
+
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public bool HasMeasurementsForDate(DateTime dateTime);
+
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
     public void SaveMeasurementsForDate(DateTime dateTime, List<Measurement> measurements);
 }
 
