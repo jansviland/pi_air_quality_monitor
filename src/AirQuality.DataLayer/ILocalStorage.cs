@@ -52,6 +52,8 @@ public class LocalStorage : ILocalStorage
         var folder = new DirectoryInfo(rootDirectoryPath);
         var subFoldersYears = folder.GetDirectories();
 
+        // TODO: start with a folder that has the name of the station, ex. "raspberry-pi-jan", then year
+
         foreach (var foldersYear in subFoldersYears)
         {
             var subFoldersMonths = foldersYear.GetDirectories();
@@ -188,6 +190,8 @@ public class LocalStorage : ILocalStorage
 
     public void SaveMeasurementsForDate(DateTime dateTime, List<Measurement> measurements)
     {
+        // TODO: start with a folder that has the name of the station, ex. "raspberry-pi-jan", then year
+
         var year = dateTime.Year.ToString();
         var month = dateTime.Month.ToString("d2");
         var day = dateTime.Day.ToString("d2");
