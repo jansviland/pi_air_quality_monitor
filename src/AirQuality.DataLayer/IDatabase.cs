@@ -7,17 +7,18 @@ namespace AirQuality.DataLayer;
 
 public interface IDatabase
 {
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public List<DateTime> GetDatesWithMeasurments();
 
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public List<Measurement> GetLatestMeasurements(int count);
 
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public List<Measurement>? GetMeasurementsForDate(DateTime dateTime);
 
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public bool HasMeasurementsForDate(DateTime dateTime);
+    // public bool HasMeasurementsForDate(DateTime dateTime, List<string> clientIds);
 }
 
 public class Database : IDatabase

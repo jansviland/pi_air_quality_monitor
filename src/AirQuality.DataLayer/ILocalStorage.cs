@@ -6,16 +6,16 @@ namespace AirQuality.DataLayer;
 
 public interface ILocalStorage
 {
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public List<DateTime> GetDatesWithMeasurments();
 
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public List<Measurement>? GetMeasurementsForDate(DateTime dateTime);
 
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public bool HasMeasurementsForDate(DateTime dateTime);
 
-    // TODO: get measurements for specific client ex. "raspberry-pi-jan"
+    // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public void SaveMeasurementsForDate(DateTime dateTime, List<Measurement> measurements);
 }
 
@@ -190,8 +190,6 @@ public class LocalStorage : ILocalStorage
 
     public void SaveMeasurementsForDate(DateTime dateTime, List<Measurement> measurements)
     {
-        // TODO: start with a folder that has the name of the station, ex. "raspberry-pi-jan", then year
-
         var year = dateTime.Year.ToString();
         var month = dateTime.Month.ToString("d2");
         var day = dateTime.Day.ToString("d2");
@@ -210,6 +208,8 @@ public class LocalStorage : ILocalStorage
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
         });
+
+        // TODO: start with a folder that has the name of the station, ex. "raspberry-pi-jan" or add the station name to the file name
 
         var fileName = $"{dateTime:yyyy-MM-dd}-minute-interval.json";
         var filePath = $"{directory}{_slash}{fileName}";
