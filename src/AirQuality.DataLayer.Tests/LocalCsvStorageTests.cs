@@ -2,8 +2,6 @@ using Microsoft.Extensions.Logging;
 
 namespace AirQuality.DataLayer.Tests;
 
-using FakeItEasy;
-
 public class LocalCsvStorageTests
 {
     private readonly ILocalCsvStorage _localCsvStorage;
@@ -38,5 +36,6 @@ public class LocalCsvStorageTests
 
         Assert.NotNull(result);
         Assert.NotEmpty(result);
+        Assert.Equal(12, result.Count);
     }
 }
