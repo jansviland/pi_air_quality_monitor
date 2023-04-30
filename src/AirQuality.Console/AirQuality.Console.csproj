@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AirQuality.Common\AirQuality.Common.csproj" />
+      <ProjectReference Include="..\AirQuality.DataLayer\AirQuality.DataLayer.csproj" />
     </ItemGroup>
 
 </Project>

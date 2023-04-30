@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AirQuality.DataLayer;
 
-public interface ILocalStorage
+public interface ILocalJsonStorage
 {
     // TODO: get measurements for specific client ex. "raspberry-pi-jan", or list of clients
     public List<DateTime> GetDatesWithMeasurments();
@@ -19,9 +19,9 @@ public interface ILocalStorage
     public void SaveMeasurementsForDate(DateTime dateTime, List<Measurement> measurements);
 }
 
-public class LocalStorage : ILocalStorage
+public class LocalJsonStorage : ILocalJsonStorage
 {
-    private readonly ILogger<LocalStorage> _logger;
+    private readonly ILogger<LocalJsonStorage> _logger;
 
     // in order to be cross platform, support both / and \ folder seperators
     private readonly char _slash = Path.DirectorySeparatorChar;
@@ -29,7 +29,7 @@ public class LocalStorage : ILocalStorage
 
     private List<DateTime>? _availableDates = new List<DateTime>();
 
-    public LocalStorage(ILogger<LocalStorage> logger)
+    public LocalJsonStorage(ILogger<LocalJsonStorage> logger)
     {
         _logger = logger;
     }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using AirQuality.DataLayer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,7 +22,11 @@ internal static class Program
             .CreateLogger();
 
         var host = Host.CreateDefaultBuilder(args)
-            .ConfigureServices(((_, collection) => { collection.AddTransient<IService, Service>(); }))
+            .ConfigureServices(((_, collection) =>
+            {
+                collection.AddTransient<ILocalCsvStorage, LocalCsvStorage>();
+                collection.AddTransient<IService, Service>();
+            }))
             .UseSerilog()
             .Build();
 

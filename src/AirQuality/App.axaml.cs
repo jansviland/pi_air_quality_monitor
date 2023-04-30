@@ -21,7 +21,7 @@ public class App : Application
     {
         services.AddTransient<IDatabase, Database>();
         services.AddTransient<IBlobStorage, BlobStorage>();
-        services.AddTransient<ILocalStorage, LocalStorage>();
+        services.AddTransient<ILocalJsonStorage, LocalJsonStorage>();
         services.AddSingleton<MainWindow>();
     }
 

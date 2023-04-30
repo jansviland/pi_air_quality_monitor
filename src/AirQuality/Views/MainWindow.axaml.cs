@@ -23,7 +23,7 @@ public partial class MainWindow : Window
     private readonly ILogger<MainWindow> _logger;
     private readonly IDatabase _database;
     private readonly IBlobStorage _blobStorage;
-    private readonly ILocalStorage _localStorage;
+    private readonly ILocalJsonStorage _localJsonStorage;
 
     // private readonly List<Measurement> _measurements = new();
 
@@ -37,12 +37,12 @@ public partial class MainWindow : Window
     {
     }
 
-    public MainWindow(ILogger<MainWindow> logger, IDatabase database, IBlobStorage blobStorage, ILocalStorage localStorage)
+    public MainWindow(ILogger<MainWindow> logger, IDatabase database, IBlobStorage blobStorage, ILocalJsonStorage localJsonStorage)
     {
         _logger = logger;
         _database = database;
         _blobStorage = blobStorage;
-        _localStorage = localStorage;
+        _localJsonStorage = localJsonStorage;
 
         InitializeComponent();
 
@@ -70,7 +70,7 @@ public partial class MainWindow : Window
         // TODO: trigger via settings page, don't do it automatically on startup
         // _blobStorage.UpdateLocalFiles();
 
-        var datesWithMeasurements = _localStorage.GetDatesWithMeasurments();
+        var datesWithMeasurements = _localJsonStorage.GetDatesWithMeasurments();
         datesWithMeasurements.Add(_database.GetDatesWithMeasurments());
         datesWithMeasurements.Sort();
 
@@ -86,7 +86,7 @@ public partial class MainWindow : Window
         foreach (var dateTime in EachDay(uniqueDatesWithMeasurements[0], uniqueDatesWithMeasurements[^1]))
         {
             // TODO: also check if there are measurements in the SQL Database, then this should not be blacked out
-            if (!_localStorage.HasMeasurementsForDate(dateTime) && !_database.HasMeasurementsForDate(dateTime))
+            if (!_localJsonStorage.HasMeasurementsForDate(dateTime) && !_database.HasMeasurementsForDate(dateTime))
             {
                 AvailableDatesCalendar.BlackoutDates.Add(new CalendarDateRange(dateTime, dateTime));
             }
@@ -189,7 +189,7 @@ public partial class MainWindow : Window
 
     private List<Measurement> GetMeasurementsForDate(DateTime date)
     {
-        var measurements = _localStorage.GetMeasurementsForDate(date);
+        var measurements = _localJsonStorage.GetMeasurementsForDate(date);
 
         // can not find data locally, so we need to get it from the SQL database
         if (measurements == null)
@@ -198,7 +198,7 @@ public partial class MainWindow : Window
             MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()} in the SQL database.";
 
             // save them as json files locally
-            _localStorage.SaveMeasurementsForDate(date, measurements);
+            _localJsonStorage.SaveMeasurementsForDate(date, measurements);
         }
         else
         {
