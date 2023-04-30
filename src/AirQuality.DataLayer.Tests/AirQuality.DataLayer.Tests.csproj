@@ -26,4 +26,10 @@
       <ProjectReference Include="..\AirQuality.DataLayer\AirQuality.DataLayer.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Data\measurements.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

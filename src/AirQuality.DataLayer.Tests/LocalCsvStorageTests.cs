@@ -8,6 +8,7 @@ public class LocalCsvStorageTests
 
     private readonly string[] _input = new[]
     {
+        "pm2,pm10,client_id,time",
         "1.0,2.1,raspberry-pi-jan,2023-04-28 19:22:30.164742",
         "1.2,1.8,raspberry-pi-jan,2023-04-28 19:23:30.624643",
         "1.1,1.8,raspberry-pi-jan,2023-04-28 19:24:31.081609",
@@ -37,5 +38,17 @@ public class LocalCsvStorageTests
         Assert.NotNull(result);
         Assert.NotEmpty(result);
         Assert.Equal(12, result.Count);
+    }
+
+    [Fact]
+    public void TestRealCsvContent()
+    {
+        var csvContent = File.ReadAllLines("./Data/measurements.csv");
+
+        var result = _localCsvStorage.ParseCsvContent(csvContent);
+
+        Assert.NotNull(result);
+        Assert.NotEmpty(result);
+        Assert.Equal(1429, result.Count);
     }
 }

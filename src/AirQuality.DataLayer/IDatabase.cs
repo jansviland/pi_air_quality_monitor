@@ -57,7 +57,7 @@ public class Database : IDatabase
         return _availableDates;
     }
 
-    public List<Measurement>? GetMeasurementsForDate(DateTime dateTime)
+    public List<Measurement> GetMeasurementsForDate(DateTime dateTime)
     {
         var measurements = new List<Measurement>();
 
