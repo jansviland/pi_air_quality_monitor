@@ -6,22 +6,23 @@ namespace AirQuality.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private MenuItemStationSelectedModel _selectedStationMenuItem;
+    private MenuItemSelectedModel _selectedStationStationMenuItem;
+    private MenuItemSelectedModel _selectedAggregateMenuItem;
     private MenuItemViewOptionsModel _selectedViewOptionMenuItem;
 
-    public ObservableCollection<MenuItemStationSelectedModel> MenuItems { get; }
+    public ObservableCollection<MenuItemSelectedModel> StationsMenuItems { get; }
+    public ObservableCollection<MenuItemSelectedModel> AggregateMenuItems { get; }
     public ObservableCollection<MenuItemViewOptionsModel> ViewOptions { get; }
 
     public MainWindowViewModel()
     {
-        MenuItems = new ObservableCollection<MenuItemStationSelectedModel>
+        StationsMenuItems = new ObservableCollection<MenuItemSelectedModel>
         {
             new() { Name = "raspberry-pi-jan" },
             new() { Name = "Målestasjon 2" },
-            new() { Name = "Målestasjon 3" }
         };
 
-        SelectedStationMenuItem = MenuItems[0];
+        SelectedStationMenuItem = StationsMenuItems[0];
 
         ViewOptions = new ObservableCollection<MenuItemViewOptionsModel>
         {
@@ -31,6 +32,23 @@ public class MainWindowViewModel : ViewModelBase
         };
 
         SelectedViewOptionMenuItem = ViewOptions[0];
+
+        AggregateMenuItems = new ObservableCollection<MenuItemSelectedModel>
+        {
+            new() { Name = "1 min" },
+            new() { Name = "5 min" },
+            new() { Name = "10 min" },
+            new() { Name = "30 min" },
+            new() { Name = "1 hour" },
+            new() { Name = "6 hours" },
+            new() { Name = "12 hours" },
+            new() { Name = "24 hours" },
+            // new() { Name = "1 week" },
+            // new() { Name = "1 month" },
+            // new() { Name = "1 year" }
+        };
+
+        SelectedAggregateMenuItem = AggregateMenuItems[0];
     }
 
     public MenuItemViewOptionsModel SelectedViewOptionMenuItem
@@ -39,9 +57,15 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedViewOptionMenuItem, value);
     }
 
-    public MenuItemStationSelectedModel SelectedStationMenuItem
+    public MenuItemSelectedModel SelectedStationMenuItem
     {
-        get => _selectedStationMenuItem;
-        set => this.RaiseAndSetIfChanged(ref _selectedStationMenuItem, value);
+        get => _selectedStationStationMenuItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedStationStationMenuItem, value);
+    }
+
+    public MenuItemSelectedModel SelectedAggregateMenuItem
+    {
+        get => _selectedAggregateMenuItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedAggregateMenuItem, value);
     }
 }
