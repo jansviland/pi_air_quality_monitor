@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AirQuality.Common.Helpers;
 using AirQuality.Common.Models;
 using AirQuality.DataLayer;
 using AirQuality.Models;
@@ -25,7 +26,7 @@ public partial class MainWindow : Window
     private readonly IBlobStorage _blobStorage;
     private readonly ILocalJsonStorage _localJsonStorage;
 
-    // private readonly List<Measurement> _measurements = new();
+    private List<Measurement> _measurements = new();
 
     private DispatcherTimer _timer;
 
@@ -63,6 +64,9 @@ public partial class MainWindow : Window
         var viewOptionsListBox = this.FindControl<ListBox>("ViewOptionsMenuListBox");
         viewOptionsListBox.SelectionChanged += ViewOptionsMenuListBox_SelectionChanged;
 
+        var aggregateListBox = this.FindControl<ListBox>("AggregationMenuListBox");
+        aggregateListBox.SelectionChanged += AggregateListBoxOnSelectionChanged;
+
         // TODO: get data locally from json files, to update, get data from Azure and store locally once. Then use the local data again.
         // _measurements = _database.GetMeasurements(60); // last 60 measurements (1 hour)
 
@@ -97,6 +101,25 @@ public partial class MainWindow : Window
 
         // TODO: show error if connection fails
         // TODO: show loading indicator
+    }
+
+    private void AggregateListBoxOnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemAggregateModel menuItem)
+        {
+            _logger.LogInformation($"AggregateListBoxOnSelectionChanged: {menuItem.Name}");
+
+            // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
+            if (menuItem.Window == TimeSpan.FromMinutes(1))
+            {
+                return;
+            }
+
+            var interval = TimeSpan.FromMinutes(1);
+
+            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_measurements, menuItem.Window, interval).ToList();
+            UpdateGraph(_measurements);
+        }
     }
 
     // TODO: add a feature, where you can select a data point, and then you should be able to change this value in the database
@@ -213,14 +236,12 @@ public partial class MainWindow : Window
         _timer.Stop();
         _cts?.Cancel();
 
-
-        var measurements = new List<Measurement>();
-
         var selectedDates = AvailableDatesCalendar.SelectedDates.ToList();
 
+        _measurements.Clear();
         foreach (var date in selectedDates)
         {
-            measurements.AddRange(GetMeasurementsForDate(date));
+            _measurements.AddRange(GetMeasurementsForDate(date));
         }
 
         if (_animateGraph)
@@ -229,7 +250,7 @@ public partial class MainWindow : Window
 
             try
             {
-                await UpdateGraphAnimatedAsync(measurements, _cts.Token);
+                await UpdateGraphAnimatedAsync(_measurements, _cts.Token);
             }
             catch (OperationCanceledException ex)
             {
@@ -247,7 +268,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            UpdateGraph(measurements);
+            UpdateGraph(_measurements);
         }
         // else
         // {

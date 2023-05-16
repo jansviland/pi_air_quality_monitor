@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using AirQuality.Models;
 using ReactiveUI;
 
@@ -7,11 +8,11 @@ namespace AirQuality.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private MenuItemSelectedModel _selectedStationStationMenuItem;
-    private MenuItemSelectedModel _selectedAggregateMenuItem;
+    private MenuItemAggregateModel _selectedAggregateMenuItem;
     private MenuItemViewOptionsModel _selectedViewOptionMenuItem;
 
     public ObservableCollection<MenuItemSelectedModel> StationsMenuItems { get; }
-    public ObservableCollection<MenuItemSelectedModel> AggregateMenuItems { get; }
+    public ObservableCollection<MenuItemAggregateModel> AggregateMenuItems { get; }
     public ObservableCollection<MenuItemViewOptionsModel> ViewOptions { get; }
 
     public MainWindowViewModel()
@@ -33,19 +34,18 @@ public class MainWindowViewModel : ViewModelBase
 
         SelectedViewOptionMenuItem = ViewOptions[0];
 
-        AggregateMenuItems = new ObservableCollection<MenuItemSelectedModel>
+        AggregateMenuItems = new ObservableCollection<MenuItemAggregateModel>
         {
-            new() { Name = "1 min" },
-            new() { Name = "5 min" },
-            new() { Name = "10 min" },
-            new() { Name = "30 min" },
-            new() { Name = "1 hour" },
-            new() { Name = "6 hours" },
-            new() { Name = "12 hours" },
-            new() { Name = "24 hours" },
-            // new() { Name = "1 week" },
-            // new() { Name = "1 month" },
-            // new() { Name = "1 year" }
+            new() { Name = "1 min", Window = TimeSpan.FromMinutes(1)},
+            new() { Name = "5 min", Window = TimeSpan.FromMinutes(5) },
+            new() { Name = "10 min", Window = TimeSpan.FromMinutes(10)},
+            new() { Name = "30 min", Window = TimeSpan.FromMinutes(30)},
+            new() { Name = "1 hour", Window = TimeSpan.FromHours(1)},
+            new() { Name = "6 hours", Window = TimeSpan.FromHours(6)},
+            new() { Name = "12 hours", Window = TimeSpan.FromHours(12)},
+            new() { Name = "24 hours", Window = TimeSpan.FromHours(24)},
+            new() { Name = "1 week", Window = TimeSpan.FromDays(7)},
+            new() { Name = "1 month", Window = TimeSpan.FromDays(30)},
         };
 
         SelectedAggregateMenuItem = AggregateMenuItems[0];
@@ -63,7 +63,7 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedStationStationMenuItem, value);
     }
 
-    public MenuItemSelectedModel SelectedAggregateMenuItem
+    public MenuItemAggregateModel SelectedAggregateMenuItem
     {
         get => _selectedAggregateMenuItem;
         set => this.RaiseAndSetIfChanged(ref _selectedAggregateMenuItem, value);
