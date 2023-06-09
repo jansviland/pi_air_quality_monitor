@@ -46,46 +46,35 @@ public static class AggregateHelper
         var result = new List<Measurement>();
 
         // loop through all values
-        double sum = 0;
+        double sumPm2 = 0;
+        double sumPm10 = 0;
         foreach (var point in orderedValues)
         {
             queue.Enqueue(point);
-
-            // TODO: add pm10
-            sum += point.Pm2;
+            sumPm2 += point.Pm2;
+            sumPm10 += point.Pm10;
 
             // While points are in the queue that are outside the moving average window
-            while (queue.Count > 0 && point.UtcTime - queue.Peek().UtcTime >= window)
+            while (queue.Count > windowSize)
             {
-                // TODO: add pm10
-                sum -= queue.Dequeue().Pm2;
+                var temp = queue.Dequeue();
+
+                sumPm2 -= temp.Pm2;
+                sumPm10 -= temp.Pm10;
             }
 
-            // when we have enough points in the window, calculate the average and add it to the result
-            // if we are at the last point, we also add the average to the result (even if we don't have enough points in the window)
-            if (queue.Count >= windowSize || point == orderedValues.Last())
+            var averagePm2 = sumPm2 / queue.Count;
+            var averagePm10 = sumPm10 / queue.Count;
+            var coverage = (double)queue.Count / windowSize * 100;
+
+            result.Add(new Measurement
             {
-                // TODO: add pm10
-                double average = sum / queue.Count;
-
-                // var coverage = (double)queue.Count / windowSize * 100;
-
-                result.Add(new Measurement
-                {
-                    UtcTime = point.UtcTime,
-                    Pm2 = average,
-
-                    // TODO:
-                    Pm10 = point.Pm10
-
-                    // Count = queue.Count,
-                    // Coverage = coverage
-                });
-
-                // Reset for the next window
-                queue.Clear();
-                sum = 0;
-            }
+                UtcTime = queue.Last().UtcTime,
+                UnixTime = queue.Last().UnixTime,
+                ClientId = queue.Last().ClientId,
+                Pm2 = averagePm2,
+                Pm10 = averagePm10,
+            });
         }
 
         return result;
