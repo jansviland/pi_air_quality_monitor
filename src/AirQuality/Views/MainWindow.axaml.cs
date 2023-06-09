@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     private readonly IBlobStorage _blobStorage;
     private readonly ILocalJsonStorage _localJsonStorage;
 
+    private readonly List<Measurement> _minuteMeasurements = new();
     private List<Measurement> _measurements = new();
 
     private DispatcherTimer _timer;
@@ -112,12 +113,12 @@ public partial class MainWindow : Window
             // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
             if (menuItem.Window == TimeSpan.FromMinutes(1))
             {
-                return;
+                _measurements = _minuteMeasurements;
             }
 
             var interval = TimeSpan.FromMinutes(1);
 
-            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_measurements, menuItem.Window, interval).ToList();
+            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, menuItem.Window, interval).ToList();
             UpdateGraph(_measurements);
         }
     }
@@ -239,9 +240,12 @@ public partial class MainWindow : Window
         var selectedDates = AvailableDatesCalendar.SelectedDates.ToList();
 
         _measurements.Clear();
+        _minuteMeasurements.Clear();
+
         foreach (var date in selectedDates)
         {
             _measurements.AddRange(GetMeasurementsForDate(date));
+            _minuteMeasurements.Add(_measurements);
         }
 
         if (_animateGraph)

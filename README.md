@@ -19,6 +19,10 @@ Here is how it looks like:
 
 ![gif](wiki/interface.gif)
 
+# Aggregated data
+
+![gif](wiki/moving-avg.gif)
+
 ## Install required packages for Raspberry Pi
 
 1.  Install Python packages (for sendTestDataToAzure.py)
