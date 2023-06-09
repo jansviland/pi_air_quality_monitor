@@ -1,3 +1,8 @@
+# Medium Article (Norwegian)
+
+https://medium.com/systek/bygg-ditt-eget-luftkvalitetssystem-med-raspberry-pi-og-azure-b354da54582b
+
+
 # Raspberry Pi Air Quality Monitor
 
 A simple air quality monitoring service for the Raspberry Pi. It uses a Nova PM Sensor (SDS011) to measure the air
