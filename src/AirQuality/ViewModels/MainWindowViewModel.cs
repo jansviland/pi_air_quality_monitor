@@ -36,18 +36,20 @@ public class MainWindowViewModel : ViewModelBase
 
         AggregateMenuItems = new ObservableCollection<MenuItemAggregateModel>
         {
-            new() { Name = "1 min", Window = TimeSpan.FromMinutes(1)},
-            new() { Name = "5 min", Window = TimeSpan.FromMinutes(5) },
-            new() { Name = "10 min", Window = TimeSpan.FromMinutes(10)},
-            new() { Name = "30 min", Window = TimeSpan.FromMinutes(30)},
-            new() { Name = "1 hour", Window = TimeSpan.FromHours(1)},
-            new() { Name = "3 hours", Window = TimeSpan.FromHours(3)},
-            new() { Name = "6 hours", Window = TimeSpan.FromHours(6)},
-            new() { Name = "12 hours", Window = TimeSpan.FromHours(12)},
-            new() { Name = "24 hours", Window = TimeSpan.FromHours(24)},
-            new() { Name = "48 hours", Window = TimeSpan.FromHours(48)},
-            new() { Name = "1 week", Window = TimeSpan.FromDays(7)},
-            new() { Name = "1 month", Window = TimeSpan.FromDays(30)},
+            // group by minute, hour, day, week, month
+            new() { Name = "Minute", Window = null, MeanType = MeanType.Minute },
+            new() { Name = "Hour", Window = null, MeanType = MeanType.Hour },
+            new() { Name = "Day", Window = null, MeanType = MeanType.Day },
+            new() { Name = "Week", Window = null, MeanType = MeanType.Week },
+            new() { Name = "Month", Window = null, MeanType = MeanType.Month },
+
+            // calculate simple moving average
+            new() { Name = "10 min (SMA)", Window = TimeSpan.FromMinutes(10), MeanType = MeanType.SimpleMovingAverage },
+            new() { Name = "30 min (SMA)", Window = TimeSpan.FromMinutes(30), MeanType = MeanType.SimpleMovingAverage },
+            new() { Name = "1 hour (SMA)", Window = TimeSpan.FromHours(1), MeanType = MeanType.SimpleMovingAverage },
+            new() { Name = "3 hours (SMA)", Window = TimeSpan.FromHours(3), MeanType = MeanType.SimpleMovingAverage },
+            new() { Name = "6 hours (SMA)", Window = TimeSpan.FromHours(6), MeanType = MeanType.SimpleMovingAverage },
+            new() { Name = "12 hours (SMA)", Window = TimeSpan.FromHours(12), MeanType = MeanType.SimpleMovingAverage },
         };
 
         SelectedAggregateMenuItem = AggregateMenuItems[0];

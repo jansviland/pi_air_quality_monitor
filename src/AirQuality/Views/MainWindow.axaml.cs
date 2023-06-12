@@ -33,6 +33,7 @@ public partial class MainWindow : Window
 
     // set the default aggregation window to 1 minute
     private TimeSpan _aggregateWindow = TimeSpan.FromMinutes(1);
+    private MeanType _meanType = MeanType.Minute;
 
     // for enabling and disabling the animation of the graph
     private bool _animateGraph;
@@ -145,19 +146,28 @@ public partial class MainWindow : Window
 
         _logger.LogInformation($"AggregateListBoxOnSelectionChanged: {menuItem.Name}");
 
-        _aggregateWindow = menuItem.Window;
+        _meanType = menuItem.MeanType;
+
+        if (menuItem.MeanType == MeanType.SimpleMovingAverage)
+        {
+            _aggregateWindow = menuItem.Window!.Value;
+        }
 
         // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
         // TODO: after aggregation, we should save the aggregated measurements to a json file ex. "2023-06-10-minute-interval-to-2-hour-moving-avg.json", so we don't have to aggregate them again
 
-        if (menuItem.Window == _aggregateWindow)
+        if (_meanType == MeanType.Minute)
         {
             _measurements = _minuteMeasurements;
         }
 
-        var interval = TimeSpan.FromMinutes(1);
+        // TODO: MeanType.Hour, MeanType.Day, MeanType.Week, MeanType.Month, MeanType.Year
 
-        _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+        else if (_meanType == MeanType.SimpleMovingAverage)
+        {
+            var interval = TimeSpan.FromMinutes(1);
+            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+        }
 
         Update();
     }
@@ -256,14 +266,14 @@ public partial class MainWindow : Window
         if (measurements == null)
         {
             measurements = _database.GetMeasurementsForDate(date);
-            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()} in the SQL database.";
+            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()}\n using SQL database.";
 
             // save them as json files locally
             _localJsonStorage.SaveMeasurementsForDate(date, measurements);
         }
         else
         {
-            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()} in local storage.";
+            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()}\n using local storage.";
         }
 
         return measurements;
@@ -289,6 +299,9 @@ public partial class MainWindow : Window
         // aggregate the measurements
         if (_aggregateWindow != TimeSpan.FromMinutes(1))
         {
+            // save them as json files locally
+            // _localJsonStorage.SaveMeasurementsForDate(date, measurements);
+
             var interval = TimeSpan.FromMinutes(1);
             _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
         }
