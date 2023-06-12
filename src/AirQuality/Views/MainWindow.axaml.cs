@@ -156,17 +156,27 @@ public partial class MainWindow : Window
         // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
         // TODO: after aggregation, we should save the aggregated measurements to a json file ex. "2023-06-10-minute-interval-to-2-hour-moving-avg.json", so we don't have to aggregate them again
 
-        if (_meanType == MeanType.Minute)
+        switch (_meanType)
         {
-            _measurements = _minuteMeasurements;
-        }
-
-        // TODO: MeanType.Hour, MeanType.Day, MeanType.Week, MeanType.Month, MeanType.Year
-
-        else if (_meanType == MeanType.SimpleMovingAverage)
-        {
-            var interval = TimeSpan.FromMinutes(1);
-            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+            case MeanType.Minute:
+                _measurements = _minuteMeasurements;
+                break;
+            case MeanType.Hour:
+                _measurements = AggregateHelper.GetHourAggregate(_minuteMeasurements).ToList();
+                break;
+            case MeanType.Day:
+                _measurements = AggregateHelper.GetDayAggregate(_minuteMeasurements).ToList();
+                break;
+            case MeanType.Week:
+                break;
+            case MeanType.Month:
+                break;
+            case MeanType.SimpleMovingAverage:
+            {
+                var interval = TimeSpan.FromMinutes(1);
+                _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+                break;
+            }
         }
 
         Update();
@@ -401,16 +411,21 @@ public partial class MainWindow : Window
 
             avaPlot.Plot.Clear();
 
-            var pm2Scatter = avaPlot.Plot.Add.Scatter(xs.Take(i + 1).ToArray(), pm2.Take(i + 1).ToArray());
+            // show max two days of data (24 hours / 1440 minutes)
+            var skip = Math.Max(0, i - 1440);
+            var take = Math.Min(i + 1, 1440);
+
+            var pm2Scatter = avaPlot.Plot.Add.Scatter(xs.Skip(skip).Take(take).ToArray(), pm2.Skip(skip).Take(take).ToArray());
             pm2Scatter.Label = "PM2.5";
 
-            var pm10Scatter = avaPlot.Plot.Add.Scatter(xs.Take(i + 1).ToArray(), pm10.Take(i + 1).ToArray());
+            var pm10Scatter = avaPlot.Plot.Add.Scatter(xs.Skip(skip).Take(take).ToArray(), pm10.Skip(skip).Take(take).ToArray());
             pm10Scatter.Label = "PM10";
 
             // Update the title with the latest endDate and count
+            var firstStartDate = measurements[skip].UtcTime.ToLongTimeString();
             var latestEndDate = measurements[i].UtcTime.ToLongTimeString();
-            var latestCount = i + 1;
-            var updatedTitle = $"{clientName}: {startDate} - {latestEndDate} ({latestCount} measurements)";
+            var latestCount = take;
+            var updatedTitle = $"{clientName}: {firstStartDate} - {latestEndDate} ({latestCount} measurements)";
             avaPlot.Plot.Title.Label.Text = updatedTitle;
 
             avaPlot.Plot.Axes.DateTimeTicks(Edge.Bottom);

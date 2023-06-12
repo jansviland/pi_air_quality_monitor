@@ -1,4 +1,5 @@
-﻿using AirQuality.Common.Models;
+﻿using AirQuality.Common.Extensions;
+using AirQuality.Common.Models;
 
 namespace AirQuality.Common.Helpers;
 
@@ -155,7 +156,7 @@ public static class AggregateHelper
         if (queue.Count > 0)
         {
             var average = sum / queue.Count;
-            var coverage = (double)queue.Count / windowSize * 100;
+            // var coverage = (double)queue.Count / windowSize * 100;
 
             result.Add(new Measurement
             {
@@ -171,5 +172,122 @@ public static class AggregateHelper
         }
 
         return result;
+    }
+
+    // public static IEnumerable<Measurement> GetYearAggregate(IEnumerable<Measurement> values, int timeStep = 3600)
+    // {
+    //     var groupedByYear = values.GroupBy(x => x.DateTime.Year);
+    //     return groupedByYear.Select((x, _) =>
+    //     {
+    //         var year = x.Key;
+    //         var secondsInAYear = DateTime.IsLeapYear(year) ? 31622400 : 31536000;
+    //         var stepsInAYear = secondsInAYear / timeStep;
+    //
+    //         return new Measurement()
+    //         {
+    //             Value = x.Average(y => y.Value),
+    //             DateTime = new DateTime(year, 1, 1),
+    //             Count = x.Count(),
+    //             Coverage = Math.Round((double)x.Count() / stepsInAYear * 100, 2)
+    //         };
+    //     }).OrderBy(x => x.DateTime);
+    // }
+    //
+    // public static IEnumerable<Measurement> GetMonthAggregate(IEnumerable<Measurement> values, int timeStep = 3600)
+    // {
+    //     var result = new List<Measurement>();
+    //
+    //     var groupedByYear = values.GroupBy(x => x.DateTime.Year);
+    //     foreach (var year in groupedByYear)
+    //     {
+    //         var groupedByMonth = year.GroupBy(x => x.DateTime.Month);
+    //         foreach (var month in groupedByMonth)
+    //         {
+    //             var secondsInAMonth = DateTime.DaysInMonth(year.Key, month.Key) * 86400;
+    //             var stepsInAMonth = secondsInAMonth / timeStep;
+    //
+    //             result.Add(new Measurement()
+    //             {
+    //                 Value = month.Average(y => y.Value),
+    //                 DateTime = new DateTime(year.Key, month.Key, 1),
+    //                 Count = month.Count(),
+    //                 Coverage = Math.Round((double)month.Count() / stepsInAMonth * 100, 2)
+    //             });
+    //         }
+    //     }
+    //
+    //     return result.OrderBy(x => x.DateTime);
+    // }
+
+    public static IEnumerable<Measurement> GetHourAggregate(IEnumerable<Measurement> values)
+    {
+        var result = new List<Measurement>();
+
+        var groupedByYear = values.GroupBy(x => x.UtcTime.Year);
+        foreach (var year in groupedByYear)
+        {
+            var groupedByMonth = year.GroupBy(x => x.UtcTime.Month);
+            foreach (var month in groupedByMonth)
+            {
+                var groupedByDay = month.GroupBy(x => x.UtcTime.Date);
+                foreach (var day in groupedByDay)
+                {
+                    var groupedByHour = day.GroupBy(x => x.UtcTime.Hour);
+                    foreach (var hour in groupedByHour)
+                    {
+                        // const int secondsInDay = 86400;
+                        // var stepsInADay = secondsInDay / timeStep;
+
+                        var date = new DateTime(day.Key.Year, day.Key.Month, day.Key.Day, hour.Key, 0, 0, DateTimeKind.Utc);
+
+                        result.Add(new Measurement
+                        {
+                            Pm2 = hour.Average(x => x.Pm2),
+                            Pm10 = hour.Average(x => x.Pm10),
+                            UtcTime = date,
+                            UnixTime = date.ToUnixTime(),
+                            ClientId = hour.First().ClientId
+                            // Count = day.Count(),
+                            // Coverage = timeStep == secondsInDay ? 100 : Math.Round((double)day.Count() / stepsInADay * 100, 2),
+                        });
+                    }
+                }
+            }
+        }
+
+        return result.OrderBy(x => x.UtcTime);
+    }
+
+    public static IEnumerable<Measurement> GetDayAggregate(IEnumerable<Measurement> values)
+    {
+        var result = new List<Measurement>();
+
+        var groupedByYear = values.GroupBy(x => x.UtcTime.Year);
+        foreach (var year in groupedByYear)
+        {
+            var groupedByMonth = year.GroupBy(x => x.UtcTime.Month);
+            foreach (var month in groupedByMonth)
+            {
+                var groupedByDay = month.GroupBy(x => x.UtcTime.Date);
+                foreach (var day in groupedByDay)
+                {
+                    // const int secondsInDay = 86400;
+                    // var stepsInADay = secondsInDay / timeStep;
+
+                    result.Add(new Measurement
+                    {
+                        Pm2 = day.Average(x => x.Pm2),
+                        Pm10 = day.Average(x => x.Pm10),
+                        UtcTime = day.Key,
+                        UnixTime = day.Key.ToUnixTime(),
+                        ClientId = day.First().ClientId
+                        // Count = day.Count(),
+                        // Coverage = timeStep == secondsInDay ? 100 : Math.Round((double)day.Count() / stepsInADay * 100, 2),
+                    });
+                }
+            }
+        }
+
+        return result.OrderBy(x => x.UtcTime);
     }
 }
