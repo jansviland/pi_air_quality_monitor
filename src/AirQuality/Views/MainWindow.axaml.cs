@@ -104,21 +104,47 @@ public partial class MainWindow : Window
         // TODO: show loading indicator
     }
 
-    private void AggregateListBoxOnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private async void AggregateListBoxOnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (e.AddedItems.Count > 0 && e.AddedItems[0] is MenuItemAggregateModel menuItem)
+        if (e.AddedItems.Count <= 0 || e.AddedItems[0] is not MenuItemAggregateModel menuItem) return;
+
+        _logger.LogInformation($"AggregateListBoxOnSelectionChanged: {menuItem.Name}");
+
+        // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
+        if (menuItem.Window == TimeSpan.FromMinutes(1))
         {
-            _logger.LogInformation($"AggregateListBoxOnSelectionChanged: {menuItem.Name}");
+            _measurements = _minuteMeasurements;
+        }
 
-            // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
-            if (menuItem.Window == TimeSpan.FromMinutes(1))
+        var interval = TimeSpan.FromMinutes(1);
+
+        _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, menuItem.Window, interval).ToList();
+
+        if (_animateGraph)
+        {
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
+
+            try
             {
-                _measurements = _minuteMeasurements;
+                await UpdateGraphAnimatedAsync(_measurements, _cts.Token);
             }
-
-            var interval = TimeSpan.FromMinutes(1);
-
-            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, menuItem.Window, interval).ToList();
+            catch (OperationCanceledException ex)
+            {
+                // This happens when the user clicks on a new graph before the previous one has finished animating, not a problem
+                _logger.LogInformation(ex, "UpdateGraphAnimatedAsync was cancelled");
+            }
+            // catch (KeyNotFoundException ex)
+            // {
+            //     _logger.LogError(ex, "KeyNotFoundException");
+            // }
+            // catch (Exception ex)
+            // {
+            //     _logger.LogError(ex, "Exception");
+            // }
+        }
+        else
+        {
             UpdateGraph(_measurements);
         }
     }
@@ -274,10 +300,6 @@ public partial class MainWindow : Window
         {
             UpdateGraph(_measurements);
         }
-        // else
-        // {
-        //     SelectedDateTextBlock.Text = "No date selected.";
-        // }
     }
 
     private void UpdateGraph(List<Measurement> measurements)

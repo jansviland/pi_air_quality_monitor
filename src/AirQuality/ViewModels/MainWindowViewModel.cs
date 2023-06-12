@@ -41,9 +41,11 @@ public class MainWindowViewModel : ViewModelBase
             new() { Name = "10 min", Window = TimeSpan.FromMinutes(10)},
             new() { Name = "30 min", Window = TimeSpan.FromMinutes(30)},
             new() { Name = "1 hour", Window = TimeSpan.FromHours(1)},
+            new() { Name = "3 hours", Window = TimeSpan.FromHours(3)},
             new() { Name = "6 hours", Window = TimeSpan.FromHours(6)},
             new() { Name = "12 hours", Window = TimeSpan.FromHours(12)},
             new() { Name = "24 hours", Window = TimeSpan.FromHours(24)},
+            new() { Name = "48 hours", Window = TimeSpan.FromHours(48)},
             new() { Name = "1 week", Window = TimeSpan.FromDays(7)},
             new() { Name = "1 month", Window = TimeSpan.FromDays(30)},
         };
