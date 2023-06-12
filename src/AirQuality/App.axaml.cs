@@ -57,6 +57,8 @@ public class App : Application
 
     private static IConfiguration BuildConfiguration(IConfigurationBuilder builder)
     {
+        // BUG: on mac it looks for appsettings.json in the user folder instead of where the app is built
+
         builder
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
