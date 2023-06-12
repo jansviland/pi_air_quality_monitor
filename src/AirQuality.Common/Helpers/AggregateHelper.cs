@@ -65,7 +65,7 @@ public static class AggregateHelper
 
             var averagePm2 = sumPm2 / queue.Count;
             var averagePm10 = sumPm10 / queue.Count;
-            var coverage = (double)queue.Count / windowSize * 100;
+            // var coverage = (double)queue.Count / windowSize * 100;
 
             result.Add(new Measurement
             {

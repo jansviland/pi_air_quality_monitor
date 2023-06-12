@@ -31,6 +31,9 @@ public partial class MainWindow : Window
 
     private DispatcherTimer _timer;
 
+    // set the default aggregation window to 1 minute
+    private TimeSpan _aggregateWindow = TimeSpan.FromMinutes(1);
+
     // for enabling and disabling the animation of the graph
     private bool _animateGraph;
     private CancellationTokenSource _cts;
@@ -104,25 +107,12 @@ public partial class MainWindow : Window
         // TODO: show loading indicator
     }
 
-    private async void AggregateListBoxOnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private async void Update()
     {
-        if (e.AddedItems.Count <= 0 || e.AddedItems[0] is not MenuItemAggregateModel menuItem) return;
-
-        _logger.LogInformation($"AggregateListBoxOnSelectionChanged: {menuItem.Name}");
-
-        // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
-        if (menuItem.Window == TimeSpan.FromMinutes(1))
-        {
-            _measurements = _minuteMeasurements;
-        }
-
-        var interval = TimeSpan.FromMinutes(1);
-
-        _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, menuItem.Window, interval).ToList();
+        _cts?.Cancel();
 
         if (_animateGraph)
         {
-            _cts?.Cancel();
             _cts = new CancellationTokenSource();
 
             try
@@ -147,6 +137,29 @@ public partial class MainWindow : Window
         {
             UpdateGraph(_measurements);
         }
+    }
+
+    private async void AggregateListBoxOnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (e.AddedItems.Count <= 0 || e.AddedItems[0] is not MenuItemAggregateModel menuItem) return;
+
+        _logger.LogInformation($"AggregateListBoxOnSelectionChanged: {menuItem.Name}");
+
+        _aggregateWindow = menuItem.Window;
+
+        // TODO: check if the measurements are already aggregated, if they are, then we should not aggregate them again
+        // TODO: after aggregation, we should save the aggregated measurements to a json file ex. "2023-06-10-minute-interval-to-2-hour-moving-avg.json", so we don't have to aggregate them again
+
+        if (menuItem.Window == _aggregateWindow)
+        {
+            _measurements = _minuteMeasurements;
+        }
+
+        var interval = TimeSpan.FromMinutes(1);
+
+        _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+
+        Update();
     }
 
     // TODO: add a feature, where you can select a data point, and then you should be able to change this value in the database
@@ -177,14 +190,12 @@ public partial class MainWindow : Window
                 case GraphViewOptionsEnum.StaticView:
                     _timer.Stop();
                     _animateGraph = false;
+                    Update();
                     break;
                 case GraphViewOptionsEnum.AnimatedView:
                     _timer.Stop();
                     _animateGraph = true;
-
-                    // _cts = new CancellationTokenSource();
-                    // UpdateGraphAnimatedAsync(measurements, _cts.Token);
-
+                    Update();
                     break;
                 case GraphViewOptionsEnum.LiveView:
                     _timer.Stop();
@@ -261,7 +272,6 @@ public partial class MainWindow : Window
     private async void OnSelectedDatesChanged(object sender, SelectionChangedEventArgs e)
     {
         _timer.Stop();
-        _cts?.Cancel();
 
         var selectedDates = AvailableDatesCalendar.SelectedDates.ToList();
 
@@ -270,36 +280,20 @@ public partial class MainWindow : Window
 
         foreach (var date in selectedDates)
         {
-            _measurements.AddRange(GetMeasurementsForDate(date));
-            _minuteMeasurements.Add(_measurements);
+            var measurementsForSpesificDate = GetMeasurementsForDate(date);
+
+            _measurements.AddRange(measurementsForSpesificDate);
+            _minuteMeasurements.Add(measurementsForSpesificDate);
         }
 
-        if (_animateGraph)
+        // aggregate the measurements
+        if (_aggregateWindow != TimeSpan.FromMinutes(1))
         {
-            _cts = new CancellationTokenSource();
+            var interval = TimeSpan.FromMinutes(1);
+            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+        }
 
-            try
-            {
-                await UpdateGraphAnimatedAsync(_measurements, _cts.Token);
-            }
-            catch (OperationCanceledException ex)
-            {
-                // This happens when the user clicks on a new graph before the previous one has finished animating, not a problem
-                _logger.LogInformation(ex, "UpdateGraphAnimatedAsync was cancelled");
-            }
-            // catch (KeyNotFoundException ex)
-            // {
-            //     _logger.LogError(ex, "KeyNotFoundException");
-            // }
-            // catch (Exception ex)
-            // {
-            //     _logger.LogError(ex, "Exception");
-            // }
-        }
-        else
-        {
-            UpdateGraph(_measurements);
-        }
+        Update();
     }
 
     private void UpdateGraph(List<Measurement> measurements)
