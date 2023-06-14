@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AirQuality.Common.Extensions;
 using AirQuality.Common.Helpers;
 using AirQuality.Common.Models;
 using AirQuality.DataLayer;
@@ -335,8 +336,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        var startDate = measurements[0].UtcTime.ToLongTimeString();
-        var endDate = measurements[^1].UtcTime.ToLongTimeString();
+        var startDate = measurements[0].UtcTime.ToNorwegianDateTimeString();
+        var endDate = measurements[^1].UtcTime.ToNorwegianDateTimeString();
         var clientName = measurements[0].ClientId;
 
         var title = $"{clientName}: {startDate} - {endDate} ({measurements.Count} measurements)";
@@ -422,8 +423,8 @@ public partial class MainWindow : Window
             pm10Scatter.Label = "PM10";
 
             // Update the title with the latest endDate and count
-            var firstStartDate = measurements[skip].UtcTime.ToLongTimeString();
-            var latestEndDate = measurements[i].UtcTime.ToLongTimeString();
+            var firstStartDate = measurements[skip].UtcTime.ToNorwegianDateTimeString();
+            var latestEndDate = measurements[i].UtcTime.ToNorwegianDateTimeString();
             var latestCount = take;
             var updatedTitle = $"{clientName}: {firstStartDate} - {latestEndDate} ({latestCount} measurements)";
             avaPlot.Plot.Title.Label.Text = updatedTitle;

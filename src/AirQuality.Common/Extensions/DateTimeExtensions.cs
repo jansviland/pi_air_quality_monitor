@@ -6,4 +6,9 @@ public static class DateTimeExtensions
     {
         return (long)(dateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
     }
+
+    public static string ToNorwegianDateTimeString(this DateTime dateTime)
+    {
+        return dateTime.ToString("dd.MM.yyyy HH:mm:ss");
+    }
 }

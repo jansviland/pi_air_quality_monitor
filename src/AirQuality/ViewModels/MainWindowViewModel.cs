@@ -50,6 +50,7 @@ public class MainWindowViewModel : ViewModelBase
             new() { Name = "3 hours (SMA)", Window = TimeSpan.FromHours(3), MeanType = MeanType.SimpleMovingAverage },
             new() { Name = "6 hours (SMA)", Window = TimeSpan.FromHours(6), MeanType = MeanType.SimpleMovingAverage },
             new() { Name = "12 hours (SMA)", Window = TimeSpan.FromHours(12), MeanType = MeanType.SimpleMovingAverage },
+            new() { Name = "24 hours (SMA)", Window = TimeSpan.FromHours(24), MeanType = MeanType.SimpleMovingAverage },
         };
 
         SelectedAggregateMenuItem = AggregateMenuItems[0];
