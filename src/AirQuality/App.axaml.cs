@@ -6,6 +6,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using AirQuality.ViewModels;
 using AirQuality.Views;
+using Avalonia.Controls;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,6 +16,8 @@ namespace AirQuality;
 
 public class App : Application
 {
+    public Window MainWindow { get; set; }
+
     private static IHost Host { get; set; } = null!;
 
     public static void ConfigureServices(IServiceCollection services)
@@ -50,6 +53,7 @@ public class App : Application
         {
             desktop.MainWindow = Host.Services.GetRequiredService<MainWindow>();
             desktop.MainWindow.DataContext = new MainWindowViewModel();
+            this.MainWindow = desktop.MainWindow; // Store the reference to the main window.
         }
 
         base.OnFrameworkInitializationCompleted();
