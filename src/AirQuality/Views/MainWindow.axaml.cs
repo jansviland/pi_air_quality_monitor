@@ -14,6 +14,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using DynamicData;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using ScottPlot;
 using ScottPlot.Avalonia;
@@ -81,8 +82,23 @@ public partial class MainWindow : Window
         // _blobStorage.UpdateLocalFiles();
 
         var datesWithMeasurements = _localJsonStorage.GetDatesWithMeasurments();
-        datesWithMeasurements.Add(_database.GetDatesWithMeasurments());
-        datesWithMeasurements.Sort();
+
+        // This will test DB connection, if it fails show error message
+        try
+        {
+            datesWithMeasurements.Add(_database.GetDatesWithMeasurments());
+            datesWithMeasurements.Sort();
+        }
+        catch (SqlException e)
+        {
+            MessageTextBlock.Text = e.Message;
+
+            // show popup error message
+            // var errorWindow = new ErrorMessageWindow("Your error message");
+            // errorWindow.ShowDialog(((App)Application.Current).MainWindow);
+
+            return;
+        }
 
         // remove duplicates
         var uniqueDatesWithMeasurements = datesWithMeasurements.Distinct().ToList();

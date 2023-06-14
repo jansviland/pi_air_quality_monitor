@@ -11,7 +11,7 @@
         Title="Air Quality Monitor"
 
         Width="1600"
-        Height="1000">
+        Height="900">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -34,15 +34,14 @@
             </MenuItem>
         </Menu>
 
-        <Grid ColumnDefinitions="Auto,*" RowDefinitions="*, Auto">
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="*, Auto" DockPanel.Dock="Top">
 
-            <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" 
+            <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
                   HorizontalAlignment="Stretch"
                   MaxWidth="297"
                   Margin="10, 30, 0 , 0">
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -54,11 +53,7 @@
                 <Calendar Grid.Column="0" Grid.Row="0" x:Name="AvailableDatesCalendar"
                           SelectionMode="MultipleRange"
                           DisplayDateChanged="OnDisplayDateChanged"
-                          SelectedDatesChanged="OnSelectedDatesChanged" 
-                          />
-
-                <!-- <TextBlock Grid.Column="0" Grid.Row="1" x:Name="SelectedDateTextBlock" -->
-                <!--            Margin="1, 5, 0, 0" /> -->
+                          SelectedDatesChanged="OnSelectedDatesChanged" />
 
                 <ListBox Name="StationsMenuListBox"
                          Grid.Row="3"
@@ -67,14 +62,13 @@
                          HorizontalAlignment="Stretch"
                          BorderThickness="0"
                          Margin="0, 10, 0, 0">
-                    
+
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}"
                                        FontWeight="Bold"
                                        FontSize="12"
-                                       Margin="4"
-                                       />
+                                       Margin="4" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -91,12 +85,11 @@
                             <TextBlock Text="{Binding Name}"
                                        FontWeight="Bold"
                                        FontSize="12"
-                                       Margin="4"
-                            />
+                                       Margin="4" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                
+
                 <ListBox Name="AggregationMenuListBox"
                          Grid.Row="5"
                          Items="{Binding AggregateMenuItems}"
@@ -109,24 +102,24 @@
                             <TextBlock Text="{Binding Name}"
                                        FontWeight="Bold"
                                        FontSize="12"
-                                       Margin="4"
-                            />
+                                       Margin="4" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-                </ListBox>                
-                
-                <TextBlock Grid.Row="6" x:Name="MessageTextBlock"
-                           FontSize="12"
-                           VerticalAlignment="Bottom"
-                           Margin="0, 0, 0, 10">
-                    Status:
-                </TextBlock>
+                </ListBox>
 
             </Grid>
 
             <scottPlot:AvaPlot Grid.Column="1" Grid.Row="0" Name="AvaPlot1" />
 
         </Grid>
+
+        <TextBlock x:Name="MessageTextBlock" DockPanel.Dock="Bottom"
+                   FontSize="12"
+                   VerticalAlignment="Bottom"
+                   TextWrapping="Wrap"
+                   Margin="10, 0, 0, 10">
+            Status:
+        </TextBlock>
 
     </DockPanel>
 
