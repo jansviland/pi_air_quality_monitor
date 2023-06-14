@@ -293,14 +293,14 @@ public partial class MainWindow : Window
         if (measurements == null)
         {
             measurements = _database.GetMeasurementsForDate(date);
-            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()}\n using SQL database.";
+            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()} using SQL database.";
 
             // save them as json files locally
             _localJsonStorage.SaveMeasurementsForDate(date, measurements);
         }
         else
         {
-            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()}\n using local storage.";
+            MessageTextBlock.Text = $"Found {measurements.Count} measurements for {date.ToShortDateString()} using local storage.";
         }
 
         return measurements;
@@ -323,14 +323,27 @@ public partial class MainWindow : Window
             _minuteMeasurements.Add(measurementsForSpesificDate);
         }
 
-        // aggregate the measurements
-        if (_aggregateWindow != TimeSpan.FromMinutes(1))
+        switch (_meanType)
         {
-            // save them as json files locally
-            // _localJsonStorage.SaveMeasurementsForDate(date, measurements);
-
-            var interval = TimeSpan.FromMinutes(1);
-            _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+            case MeanType.Minute:
+                _measurements = _minuteMeasurements;
+                break;
+            case MeanType.Hour:
+                _measurements = AggregateHelper.GetHourAggregate(_minuteMeasurements).ToList();
+                break;
+            case MeanType.Day:
+                _measurements = AggregateHelper.GetDayAggregate(_minuteMeasurements).ToList();
+                break;
+            case MeanType.Week:
+                break;
+            case MeanType.Month:
+                break;
+            case MeanType.SimpleMovingAverage:
+            {
+                var interval = TimeSpan.FromMinutes(1);
+                _measurements = AggregateHelper.CalculateSimpleMovingAverage(_minuteMeasurements, _aggregateWindow, interval).ToList();
+                break;
+            }
         }
 
         Update();
@@ -348,7 +361,6 @@ public partial class MainWindow : Window
         if (measurements.Count == 0)
         {
             avaPlot.InvalidateVisual();
-
             return;
         }
 
