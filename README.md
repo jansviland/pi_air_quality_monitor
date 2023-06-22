@@ -145,16 +145,19 @@ chmod +x run_air_quality_monitor.sh
 ```
 
 6. Open the terminal and type **crontab -e**. This command opens the cron table for the current user in the default text
-   editor.
+   editor. (note, this is crontab -e for the current user, not sudo crontab -e.)
 7. Add the following line to the file:
 
 ```bash
 0 4 * * * ~/git/pi_air_quality_monitor/scripts/run_air_quality_monitor.sh
 
-@reboot nohup python -u ~/git/pi_air_quality_monitor/scripts/saveMeasurementsToFileContinuesly.py >> pi_air_quality_monitor.log &
+@reboot nohup python -u ~/git/pi_air_quality_monitor/scripts/saveMeasurementsToFileContinuesly.py >> ~/pi_air_quality_monitor.log &
 ```
+8. This will run the run_air_quality_monitor.sh script every night at 04:00. This will upload all measurements from the
+   .CSV file to the SQL Database (for the previous day). Second, it will run the saveMeasurementsToFileContinuesly.py script on reboot. 
+   This will run continuously and save measurements to a .CSV file every minute.
 
-8. Make sure the path is correct. Save the file and exit the editor.
+9. Make sure the path is correct. Save the file and exit the editor.
 
 ![image](wiki/crontab.PNG)
 
