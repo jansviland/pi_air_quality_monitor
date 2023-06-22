@@ -133,8 +133,12 @@ public partial class MainWindow : Window
         {
             _cts = new CancellationTokenSource();
 
+
             try
             {
+                // order the measurements by date
+                _measurements = _measurements.OrderBy(m => m.UtcTime).ToList();
+
                 await UpdateGraphAnimatedAsync(_measurements, _cts.Token);
             }
             catch (OperationCanceledException ex)

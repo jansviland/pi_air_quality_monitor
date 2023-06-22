@@ -150,6 +150,8 @@ chmod +x run_air_quality_monitor.sh
 
 ```bash
 0 4 * * * ~/git/pi_air_quality_monitor/scripts/run_air_quality_monitor.sh
+
+@reboot nohup python -u ~/git/pi_air_quality_monitor/scripts/saveMeasurementsToFileContinuesly.py >> pi_air_quality_monitor.log &
 ```
 
 8. Make sure the path is correct. Save the file and exit the editor.
