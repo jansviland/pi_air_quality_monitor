@@ -29,11 +29,12 @@ class RawValueRequest:
         def default(o):
             if isinstance(o, datetime):
                 return o.isoformat()  # Convert datetime to ISO format string
-            if hasattr(o, '__dict__'):
+            elif hasattr(o, '__dict__'):
                 return o.__dict__
-            return o
+            else:
+                return str(o)  # Fallback for other types
 
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        return json.dumps(self, default=(lambda o: default(o)), indent=4) # Pretty print JSON
 
 
 while True:
