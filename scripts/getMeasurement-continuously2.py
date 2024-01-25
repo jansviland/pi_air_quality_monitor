@@ -26,6 +26,13 @@ class RawValueRequest:
         self.time_values = time_values
 
     def to_json(self):
+        def default(o):
+            if isinstance(o, datetime):
+                return o.isoformat()  # Convert datetime to ISO format string
+            if hasattr(o, '__dict__'):
+                return o.__dict__
+            return o
+
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
@@ -46,14 +53,12 @@ while True:
 
 	print(f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}")
 
-	# if list has less than 5 items, add the data to the list
-	if (pm10_time_values.__len__() < 5):
+	pm10_time_values.append(TimeValue(fromTime, toTime, pmten))
+	pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive))
 
-		# Add the data to the lists, when the lists contain 5 items (5 minutes), send the data to the API
-		pm10_time_values.append(TimeValue(fromTime, toTime, pmten))
-		pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive))
+	# when the lists contains x items, send the data to the API
+	if (pm10_time_values.__len__() >= 2):
 
-	else:
 		# Create the JSON payload
 		pm10_request = RawValueRequest("123", "PM10", "raspberry-pi-jan", pm10_time_values)
 		pm25_request = RawValueRequest("123", "PM2.5", "raspberry-pi-jan", pm25_time_values)
