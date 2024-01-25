@@ -46,7 +46,8 @@ while True:
 
 	print(f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}")
 
-	if (pm10_time_values.count() < 5):
+	# if list has less than 5 items, add the data to the list
+	if (pm10_time_values.__len__() < 5):
 
 		# Add the data to the lists, when the lists contain 5 items (5 minutes), send the data to the API
 		pm10_time_values.append(TimeValue(fromTime, toTime, pmten))
