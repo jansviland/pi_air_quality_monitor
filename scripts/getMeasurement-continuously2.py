@@ -26,8 +26,12 @@ class RawValueRequest:
         self.equipment_serial_number = equipment_serial_number
         self.time_values = time_values
 
-def pretty_print(self):
-		pprint.pprint(self.__dict__)
+def pretty_print(obj):
+    if isinstance(obj, list):
+        for item in obj:
+            pprint.pprint(item.__dict__)
+    else:
+        pprint.pprint(obj.__dict__)
 
 while True:
 
@@ -58,12 +62,10 @@ while True:
 
 		# print the JSON payload, pretty
 		print(f"PM10 request:")
-		# pm10_request.pretty_print()
-
 		pretty_print(pm10_request)
 
-		# print(f"PM2.5 request:")
-		# pm25_request.pretty_print()
+		print(f"PM2.5 request:")
+		pretty_print(pm25_request)
 
 		# TODO: Send the JSON payload to the API
 
