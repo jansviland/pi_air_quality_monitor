@@ -27,6 +27,7 @@ class RawValueRequest:
 
     def to_json(self):
         def default(o):
+            # Ensure 'datetime' is correctly referenced
             if isinstance(o, datetime):
                 return o.isoformat()  # Convert datetime to ISO format string
             elif hasattr(o, '__dict__'):
@@ -34,7 +35,7 @@ class RawValueRequest:
             else:
                 return str(o)  # Fallback for other types
 
-        return json.dumps(self, default=(lambda o: default(o)), indent=4) # Pretty print JSON
+        return json.dumps(self, default=default, indent=4) # Pretty print JSON
 
 
 while True:
