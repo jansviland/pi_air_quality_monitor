@@ -1,6 +1,6 @@
-import serial, time
+import pprint
+import serial, time, datetime
 import requests
-from datetime import datetime  # Ensure this import is correct
 import json
 
 ser = serial.Serial('/dev/ttyUSB0')
@@ -26,18 +26,8 @@ class RawValueRequest:
         self.equipment_serial_number = equipment_serial_number
         self.time_values = time_values
 
-    def to_json(self):
-        def default(o):
-            # Ensure 'datetime' is correctly referenced
-            if isinstance(o, datetime):
-                return o.isoformat()  # Convert datetime to ISO format string
-            elif hasattr(o, '__dict__'):
-                return o.__dict__
-            else:
-                return str(o)  # Fallback for other types
-
-        return json.dumps(self, default=default, indent=4) # Pretty print JSON
-
+def pretty_print(self):
+		pprint.pprint(self.__dict__)
 
 while True:
 
@@ -67,8 +57,13 @@ while True:
 		pm25_request = RawValueRequest("123", "PM2.5", "raspberry-pi-jan", pm25_time_values)
 
 		# print the JSON payload, pretty
-		print(pm10_request.to_json())
-		print(pm25_request.to_json())
+		print(f"PM10 request:")
+		# pm10_request.pretty_print()
+
+		pretty_print(pm10_request)
+
+		# print(f"PM2.5 request:")
+		# pm25_request.pretty_print()
 
 		# TODO: Send the JSON payload to the API
 
