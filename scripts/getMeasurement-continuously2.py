@@ -1,5 +1,6 @@
-import serial, time, datetime
+import serial, time
 import requests
+from datetime import datetime  # Ensure this import is correct
 import json
 
 ser = serial.Serial('/dev/ttyUSB0')
