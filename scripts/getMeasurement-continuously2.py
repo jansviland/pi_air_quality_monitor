@@ -18,6 +18,12 @@ class TimeValue:
         self.validity = validity if validity is not None else -9900
         self.instrument_flag = instrument_flag
 
+    def __str__(self):
+        return f"TimeValue(from_time={self.from_time}, to_time={self.to_time}, value={self.value}, validity={self.validity}, instrument_flag={self.instrument_flag})"
+
+    def __repr__(self):
+        return self.__str__()
+
 # Equivalent of your C# RawValueRequest class
 class RawValueRequest:
     def __init__(self, time_series_id, component, equipment_serial_number, time_values):
