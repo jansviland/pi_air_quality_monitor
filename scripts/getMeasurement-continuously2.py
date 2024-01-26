@@ -33,11 +33,11 @@ class TimeValue:
 
     def to_dict(self):
         return {
-            "from_time": self.from_time.isoformat(),
-            "to_time": self.to_time.isoformat(),
+            "fromTime": self.from_time.isoformat(),
+            "toTime": self.to_time.isoformat(),
             "value": self.value,
             "validity": self.validity,
-            "instrument_flag": self.instrument_flag
+            "instrumentFlag": self.instrument_flag
         }
 
 # Equivalent of your C# RawValueRequest class
@@ -50,10 +50,10 @@ class RawValueRequest:
 
     def to_dict(self):
         return {
-            "time_series_id": self.time_series_id,
+            "timeSeriesId": self.time_series_id,
             "component": self.component,
-            "equipment_serial_number": self.equipment_serial_number,
-            "time_values": [tv.to_dict() for tv in self.time_values]
+            "equipmentSerialNumber": self.equipment_serial_number,
+            "timeValues": [tv.to_dict() for tv in self.time_values]
         }
 
 def pretty_print(obj):
@@ -141,8 +141,16 @@ while True:
 
 		combined_dict = [pm10_request_dict, pm25_request_dict]
 
-		response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement',
+		try:
+			response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement',
                            headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
+
+			print(f"Response status code: {response.status_code}")
+			print(f"Response content: {response.content}")
+
+		except Exception as e:
+			print(f"Exception: {e}")
+
 
 		# Clear the lists
 		pm10_time_values.clear()
