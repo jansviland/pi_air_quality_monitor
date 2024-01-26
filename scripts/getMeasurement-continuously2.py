@@ -19,7 +19,8 @@ class TimeValue:
         self.instrument_flag = instrument_flag
 
     def __str__(self):
-        return f"TimeValue(from_time={self.from_time}, to_time={self.to_time}, value={self.value}, validity={self.validity}, instrument_flag={self.instrument_flag})"
+        # return f"TimeValue(from_time={self.from_time}, to_time={self.to_time}, value={self.value}, validity={self.validity}, instrument_flag={self.instrument_flag})"
+        return f'{"from_time": self.from_time, "to_time": self.to_time, "value": self.value, "validity": self.validity, "instrument_flag": self.instrument_flag}'
 
     def __repr__(self):
         return self.__str__()
@@ -60,16 +61,18 @@ while True:
 	pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive))
 
 	# when the lists contains x items, send the data to the API
-	if (pm10_time_values.__len__() >= 2):
+	if (pm10_time_values.__len__() >= 5):
 
 		# Create the JSON payload
-		pm10_request = RawValueRequest("123", "PM10", "raspberry-pi-jan", pm10_time_values)
-		pm25_request = RawValueRequest("123", "PM2.5", "raspberry-pi-jan", pm25_time_values)
+		pm10_request = RawValueRequest("123", "PM10", "raspberry-pi-jan", pm10_time_values, 100)
+		pm25_request = RawValueRequest("123", "PM2.5", "raspberry-pi-jan", pm25_time_values, 100)
 
 		# print the JSON payload, pretty
+		print("")
 		print(f"PM10 request:")
 		pretty_print(pm10_request)
 
+		print("")
 		print(f"PM2.5 request:")
 		pretty_print(pm25_request)
 
