@@ -70,18 +70,24 @@ while True:
 
 		# Create the JSON payload
 		pm10_request = RawValueRequest("123", "PM10", "raspberry-pi-jan", pm10_time_values)
-		pm25_request = RawValueRequest("123", "PM2.5", "raspberry-pi-jan", pm25_time_values)
+		pm25_request = RawValueRequest("456", "PM2.5", "raspberry-pi-jan", pm25_time_values)
+
+		combined = [pm10_request, pm25_request]
 
 		# print the JSON payload, pretty
-		print("")
-		print(f"PM10 request:")
-		pretty_print(pm10_request)
+		# print("")
+		# print(f"PM10 request:")
+		# pretty_print(pm10_request)
+
+		# print("")
+		# print(f"PM2.5 request:")
+		# pretty_print(pm25_request)
 
 		print("")
-		print(f"PM2.5 request:")
-		pretty_print(pm25_request)
-
+		print(f"request:")
+		pretty_print(combined)
 		print("")
+
 		# TODO: Send the JSON payload to the API
 
 		# Clear the lists
