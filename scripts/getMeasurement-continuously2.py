@@ -28,6 +28,15 @@ class TimeValue:
     def __repr__(self):
         return self.__str__()
 
+    def to_dict(self):
+        return {
+            "from_time": self.from_time.isoformat(),
+            "to_time": self.to_time.isoformat(),
+            "value": self.value,
+            "validity": self.validity,
+            "instrument_flag": self.instrument_flag
+        }
+
 # Equivalent of your C# RawValueRequest class
 class RawValueRequest:
     def __init__(self, time_series_id, component, equipment_serial_number, time_values):
@@ -35,6 +44,14 @@ class RawValueRequest:
         self.component = component
         self.equipment_serial_number = equipment_serial_number
         self.time_values = time_values
+
+    def to_dict(self):
+        return {
+            "time_series_id": self.time_series_id,
+            "component": self.component,
+            "equipment_serial_number": self.equipment_serial_number,
+            "time_values": [tv.to_dict() for tv in self.time_values]
+        }
 
 def pretty_print(obj):
     if isinstance(obj, list):
@@ -115,8 +132,10 @@ while True:
 #   }
 # ]'
 
+		combined_dict = [pm10_request_dict, pm25_request_dict]
+
 		response = requests.post('https://localhost:7061/poc/stations/1179/measurement',
-                           headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined, verify=False)
+                           headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
 
 		# Clear the lists
 		pm10_time_values.clear()
