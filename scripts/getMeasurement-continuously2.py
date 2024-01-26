@@ -132,6 +132,10 @@ while True:
 #   }
 # ]'
 
+		# Convert your requests to dictionaries
+		pm10_request_dict = pm10_request.to_dict()
+		pm25_request_dict = pm25_request.to_dict()
+
 		combined_dict = [pm10_request_dict, pm25_request_dict]
 
 		response = requests.post('https://localhost:7061/poc/stations/1179/measurement',
