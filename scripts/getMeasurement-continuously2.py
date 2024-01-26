@@ -1,9 +1,13 @@
+import os
 import pprint
 import serial, time, datetime
 import requests
 import json
 
 ser = serial.Serial('/dev/ttyUSB0')
+
+APIKEY = os.getenv("XAPIKEY")
+# use command export XAPIKEY=asdyoukeyhere to set the environment variable
 
 # Create TimeValue objects
 pm25_time_values = []
@@ -69,8 +73,8 @@ while True:
 	if (pm10_time_values.__len__() >= 5):
 
 		# Create the JSON payload
-		pm10_request = RawValueRequest("123", "PM10", "raspberry-pi-jan", pm10_time_values)
-		pm25_request = RawValueRequest("456", "PM2.5", "raspberry-pi-jan", pm25_time_values)
+		pm10_request = RawValueRequest("4375", "PM10", "raspberry-pi-jan", pm10_time_values)
+		pm25_request = RawValueRequest("4376", "PM2.5", "raspberry-pi-jan", pm25_time_values)
 
 		combined = [pm10_request, pm25_request]
 
@@ -89,6 +93,30 @@ while True:
 		print("")
 
 		# TODO: Send the JSON payload to the API
+#   curl -X 'POST' \
+#   'https://localhost:7061/poc/stations/1179/measurement' \
+#   -H 'accept: */*' \
+#   -H 'X-API-Key: abc' \
+#   -H 'Content-Type: application/json' \
+#   -d '[
+#   {
+#     "timeSeriesId": 4375,
+#     "component": "PM10",
+#     "equipmentSerialNumber": "string",
+#     "timeValues": [
+#       {
+#         "fromTime": "2024-01-26T15:42:36.054Z",
+#         "toTime": "2024-01-26T15:43:36.054Z",
+#         "value": 5,
+#         "validity": 100,
+#         "instrumentFlag": 0
+#       }
+#     ]
+#   }
+# ]'
+
+		response = requests.post('https://localhost:7061/poc/stations/1179/measurement',
+                           headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined, verify=False)
 
 		# Clear the lists
 		pm10_time_values.clear()
