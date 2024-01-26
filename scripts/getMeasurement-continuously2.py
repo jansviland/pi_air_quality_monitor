@@ -54,8 +54,11 @@ while True:
 	# currentTime = datetime.datetime.now()
 	toTime = datetime.datetime.now()  # End time of measurement
 
-	# validity is the percentage of data points in a minute, 60 would be 100%, calculate the number of data points in a minute
-	coverage = int(60 / (toTime - fromTime).total_seconds() * 100)
+	# Calculate the total seconds of measurement
+	total_seconds = (toTime - fromTime).total_seconds()
+
+	# Corrected formula for coverage
+	coverage = int(total_seconds / 60 * 100)
 
 	print(f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%")
 
