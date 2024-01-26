@@ -78,6 +78,7 @@ while True:
 		print(f"PM2.5 request:")
 		pretty_print(pm25_request)
 
+		print("")
 		# TODO: Send the JSON payload to the API
 
 		# Clear the lists
