@@ -138,7 +138,7 @@ while True:
 
 		combined_dict = [pm10_request_dict, pm25_request_dict]
 
-		response = requests.post('https://localhost:7061/poc/stations/1179/measurement',
+		response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement',
                            headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
 
 		# Clear the lists
