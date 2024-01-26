@@ -19,8 +19,7 @@ class TimeValue:
         self.instrument_flag = instrument_flag
 
     def __str__(self):
-        # return f"TimeValue(from_time={self.from_time}, to_time={self.to_time}, value={self.value}, validity={self.validity}, instrument_flag={self.instrument_flag})"
-        return f'{"from_time": self.from_time, "to_time": self.to_time, "value": self.value, "validity": self.validity, "instrument_flag": self.instrument_flag}'
+        return f"TimeValue(from_time={self.from_time}, to_time={self.to_time}, value={self.value}, validity={self.validity}, instrument_flag={self.instrument_flag})"
 
     def __repr__(self):
         return self.__str__()
