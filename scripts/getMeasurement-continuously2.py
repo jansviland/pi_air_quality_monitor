@@ -57,15 +57,15 @@ while True:
 
 	print(f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}")
 
-	pm10_time_values.append(TimeValue(fromTime, toTime, pmten))
-	pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive))
+	pm10_time_values.append(TimeValue(fromTime, toTime, pmten, 100))
+	pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive, 100))
 
 	# when the lists contains x items, send the data to the API
 	if (pm10_time_values.__len__() >= 5):
 
 		# Create the JSON payload
-		pm10_request = RawValueRequest("123", "PM10", "raspberry-pi-jan", pm10_time_values, 100)
-		pm25_request = RawValueRequest("123", "PM2.5", "raspberry-pi-jan", pm25_time_values, 100)
+		pm10_request = RawValueRequest("123", "PM10", "raspberry-pi-jan", pm10_time_values)
+		pm25_request = RawValueRequest("123", "PM2.5", "raspberry-pi-jan", pm25_time_values)
 
 		# print the JSON payload, pretty
 		print("")
