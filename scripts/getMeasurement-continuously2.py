@@ -57,8 +57,11 @@ while True:
 
 	print(f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}")
 
-	pm10_time_values.append(TimeValue(fromTime, toTime, pmten, 100))
-	pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive, 100))
+	# validity is the percentage of data points in a minute, 60 would be 100%, calculate the number of data points in a minute
+	coverage = int(60 / (toTime - fromTime).total_seconds() * 100)
+
+	pm10_time_values.append(TimeValue(fromTime, toTime, pmten, coverage))
+	pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive, coverage))
 
 	# when the lists contains x items, send the data to the API
 	if (pm10_time_values.__len__() >= 5):
