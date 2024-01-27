@@ -114,7 +114,9 @@ def send_data_to_api():
 		combined_dict = [pm10_request_dict, pm25_request_dict]
 
 		try:
-			response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
+
+			response = requests.post('https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
+			# response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
 
 			print(f"Response status code: {response.status_code}")
 			print(f"Response content: {response.content}")
@@ -130,6 +132,9 @@ async def main():
 
 		data = []
 		for index in range(0,10):
+
+			# TODO: handle exception
+			# serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
 			datum = ser.read()
 			data.append(datum)
 
