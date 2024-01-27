@@ -115,7 +115,7 @@ def send_data_to_api():
 
 		try:
 
-			response = requests.post('https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
+			response = requests.post('https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/1178/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
 			# response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
 
 			print(f"Response status code: {response.status_code}")
