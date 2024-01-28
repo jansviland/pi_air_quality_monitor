@@ -6,18 +6,22 @@ import requests
 import portalocker
 import json
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-ser = serial.Serial('/dev/ttyUSB0')
+ser = serial.Serial("/dev/ttyUSB0")
 
 CLIENT_ID = "raspberry-pi-jan"
-CSV_PAYLOAD = '{pm2},{pm10},{client_id},{fromTime},{toTime}'
-CSV_HEADER = 'pm2,pm10,client_id,fromTime,toTime'
-APIKEY = os.getenv("XAPIKEY") # use command export XAPIKEY=asdyoukeyhere to set the environment variable
+CSV_PAYLOAD = "{pm2},{pm10},{client_id},{fromTime},{toTime}"
+CSV_HEADER = "pm2,pm10,client_id,fromTime,toTime"
+APIKEY = os.getenv(
+    "XAPIKEY"
+)  # use command export XAPIKEY=asdyoukeyhere to set the environment variable
 
 # Create temp arrays with TimeValue objects
 pm25_time_values = []
 pm10_time_values = []
+
 
 # Equivalent of your C# TimeValue class
 class TimeValue:
@@ -40,8 +44,9 @@ class TimeValue:
             "toTime": self.to_time.isoformat(),
             "value": self.value,
             "validity": self.validity,
-            "instrumentFlag": self.instrument_flag
+            "instrumentFlag": self.instrument_flag,
         }
+
 
 # Equivalent of your C# RawValueRequest class
 class RawValueRequest:
@@ -56,8 +61,9 @@ class RawValueRequest:
             "timeSeriesId": self.time_series_id,
             "component": self.component,
             "equipmentSerialNumber": self.equipment_serial_number,
-            "timeValues": [tv.to_dict() for tv in self.time_values]
+            "timeValues": [tv.to_dict() for tv in self.time_values],
         }
+
 
 def pretty_print(obj):
     if isinstance(obj, list):
@@ -66,8 +72,8 @@ def pretty_print(obj):
     else:
         pprint.pprint(obj.__dict__)
 
-def save_data_to_file(currentTime, data):
 
+def save_data_to_file(currentTime, data):
     year, month, day = currentTime.year, currentTime.month, currentTime.day
     base_path = f"{year}/{month:02d}/{day:02d}"
 
@@ -88,102 +94,108 @@ def save_data_to_file(currentTime, data):
             f.write(data)
             f.write("\n")
 
-        print(f"Saved data: \"{data}\" to file: \"{file_path}\"")
+        print(f'Saved data: "{data}" to file: "{file_path}"')
 
     except portalocker.exceptions.LockTimeout:
         print(f"Could not acquire lock on {file_path} within {timeout} seconds")
 
 
 def send_data_to_api():
+    # Create the JSON payload
+    pm10_request = RawValueRequest("4375", "PM10", CLIENT_ID, pm10_time_values)
+    pm25_request = RawValueRequest("4376", "PM2.5", CLIENT_ID, pm25_time_values)
 
-		# Create the JSON payload
-		pm10_request = RawValueRequest("4375", "PM10", CLIENT_ID, pm10_time_values)
-		pm25_request = RawValueRequest("4376", "PM2.5", CLIENT_ID, pm25_time_values)
+    combined = [pm10_request, pm25_request]
 
-		combined = [pm10_request, pm25_request]
+    print("")
+    print(f"request:")
+    pretty_print(combined)
+    print("")
 
-		print("")
-		print(f"request:")
-		pretty_print(combined)
-		print("")
+    # Convert your requests to dictionaries
+    pm10_request_dict = pm10_request.to_dict()
+    pm25_request_dict = pm25_request.to_dict()
 
-		# Convert your requests to dictionaries
-		pm10_request_dict = pm10_request.to_dict()
-		pm25_request_dict = pm25_request.to_dict()
+    combined_dict = [pm10_request_dict, pm25_request_dict]
 
-		combined_dict = [pm10_request_dict, pm25_request_dict]
+    try:
+        response = requests.post(
+            "https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/1178/measurement",
+            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+            json=combined_dict,
+            verify=False,
+        )
+        # response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
 
-		try:
+        print(f"Response status code: {response.status_code}")
+        print(f"Response content: {response.content}")
 
-			response = requests.post('https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/1178/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
-			# response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
+    except Exception as e:
+        print(f"Exception: {e}")
 
-			print(f"Response status code: {response.status_code}")
-			print(f"Response content: {response.content}")
-
-		except Exception as e:
-			print(f"Exception: {e}")
 
 async def main():
+    if APIKEY is None:
+        print("XAPIKEY environment variable not set")
+        exit(1)
 
-	while True:
+    while True:
+        fromTime = datetime.datetime.now()  # Start time of measurement
+        data = []
 
-		fromTime = datetime.datetime.now()  # Start time of measurement
+        for index in range(0, 10):
+            # TODO: handle exception
+            # serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
 
-		data = []
-		for index in range(0,10):
+            datum = ser.read()
+            data.append(datum)
 
-			# TODO: handle exception
-			# serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
-			datum = ser.read()
-			data.append(datum)
+        pmtwofive = int.from_bytes(b"".join(data[2:4]), byteorder="little") / 10
+        pmten = int.from_bytes(b"".join(data[4:6]), byteorder="little") / 10
 
-		pmtwofive = int.from_bytes(b''.join(data[2:4]), byteorder='little') / 10
-		pmten = int.from_bytes(b''.join(data[4:6]), byteorder='little') / 10
+        # currentTime = datetime.datetime.now()
+        toTime = datetime.datetime.now()  # End time of measurement
 
-		# currentTime = datetime.datetime.now()
-		toTime = datetime.datetime.now()  # End time of measurement
+        # Calculate the total seconds of measurement
+        total_seconds = (toTime - fromTime).total_seconds()
 
-		# Calculate the total seconds of measurement
-		total_seconds = (toTime - fromTime).total_seconds()
+        # Corrected formula for coverage
+        coverage = int(total_seconds / 60 * 100)
 
-		# Corrected formula for coverage
-		coverage = int(total_seconds / 60 * 100)
+        print(
+            f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%"
+        )
 
-		print(f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%")
+        pm10_time_values.append(TimeValue(fromTime, toTime, pmten, coverage))
+        pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive, coverage))
 
-		pm10_time_values.append(TimeValue(fromTime, toTime, pmten, coverage))
-		pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive, coverage))
+        cvs = CSV_PAYLOAD.format(
+            pm2=pmtwofive,
+            pm10=pmten,
+            client_id=CLIENT_ID,
+            fromTime=fromTime,
+            toTime=toTime,
+        )
 
-		cvs = CSV_PAYLOAD.format(pm2=pmtwofive, pm10=pmten, client_id=CLIENT_ID, fromTime=fromTime, toTime=toTime)
+        # Save data to file
+        save_data_to_file(fromTime, cvs)
 
-		# Save data to file
-		save_data_to_file(fromTime, cvs)
+        # when the lists contains x items, send the data to the API
+        if pm10_time_values.__len__() >= 5:
+            # only send between 08:30 - 15:30 monday - friday
+            # if (fromTime.hour >= 8 and fromTime.hour <= 15 and fromTime.weekday() < 5):
+            if fromTime.hour >= 8 and fromTime.hour <= 20:
+                # Send data to API
+                send_data_to_api()
 
-		# only send between 08:30 - 15:30 monday - friday
+            else:
+                # Handle gap in data when outside of working hours
+                print("Not sending data to API, outside of working hours")
 
-		# when the lists contains x items, send the data to the API
-		if (pm10_time_values.__len__() >= 5):
+            # Clear the lists
+            pm10_time_values.clear()
+            pm25_time_values.clear()
 
-			if (fromTime.hour >= 8 and fromTime.hour <= 20):
-			# if (fromTime.hour >= 8 and fromTime.hour <= 15 and fromTime.weekday() < 5):
-
-				# Send data to API
-				send_data_to_api()
-
-			else:
-
-				print("Not sending data to API, outside of working hours")
-
-			# Clear the lists
-			pm10_time_values.clear()
-			pm25_time_values.clear()
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-
-
-
