@@ -125,10 +125,16 @@ def send_data_to_api():
             json=combined_dict,
             verify=False,
         )
-        # response = requests.post('https://192.168.1.12:7061/poc/stations/1179/measurement', headers={'X-API-Key': APIKEY, 'Content-Type': 'application/json'}, json=combined_dict, verify=False)
+        print(f"MiljoDir Response status code: {response.status_code}")
 
-        print(f"Response status code: {response.status_code}")
-        print(f"Response content: {response.content}")
+        response = requests.post(
+            "https://192.168.1.12:7061/poc/stations/1179/measurement",
+            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+            json=combined_dict,
+            verify=False,
+        )
+        print(f"Local Network: Response status code: {response.status_code}")
+        print("")
 
     except Exception as e:
         print(f"Exception: {e}")
@@ -182,9 +188,9 @@ async def main():
 
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
-            # only send between 08:30 - 15:30 monday - friday
-            # if (fromTime.hour >= 8 and fromTime.hour <= 15 and fromTime.weekday() < 5):
-            if fromTime.hour >= 8 and fromTime.hour <= 20:
+            # only send between 08:00 - 16:00 monday - friday
+            if fromTime.hour >= 8 and fromTime.hour <= 16 and fromTime.weekday() < 5:
+                # if fromTime.hour >= 8 and fromTime.hour <= 20:
                 # Send data to API
                 send_data_to_api()
 
