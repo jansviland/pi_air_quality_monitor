@@ -58,9 +58,9 @@ class RawValueRequest:
 
     def to_dict(self):
         return {
-            "timeSeriesId": self.time_series_id,
+            "id": self.time_series_id,
             "component": self.component,
-            "equipmentSerialNumber": self.equipment_serial_number,
+            "serialNumber": self.equipment_serial_number,
             "timeValues": [tv.to_dict() for tv in self.time_values],
         }
 
@@ -127,14 +127,14 @@ def send_data_to_api():
         )
         print(f"MiljoDir Response status code: {response.status_code}")
 
-        response = requests.post(
-            "https://192.168.1.12:7061/poc/stations/1179/measurement",
-            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-            json=combined_dict,
-            verify=False,
-        )
-        print(f"Local Network: Response status code: {response.status_code}")
-        print("")
+        # response = requests.post(
+        #     "https://192.168.1.12:7061/poc/stations/1179/measurement",
+        #     headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+        #     json=combined_dict,
+        #     verify=False,
+        # )
+        # print(f"Local Network: Response status code: {response.status_code}")
+        # print("")
 
     except Exception as e:
         print(f"Exception: {e}")
@@ -146,7 +146,11 @@ async def main():
         exit(1)
 
     while True:
-        fromTime = datetime.datetime.now()  # Start time of measurement
+
+        # Start time of measurement
+        # fromTime = datetime.datetime.now()  
+        winter_time = datetime.timezone(datetime.timedelta(hours=1))  # Use Norwegian winter time (UTC+1)
+        from_time = datetime.datetime.now(winter_time)
         data = []
 
         for index in range(0, 10):
@@ -159,37 +163,38 @@ async def main():
         pmtwofive = int.from_bytes(b"".join(data[2:4]), byteorder="little") / 10
         pmten = int.from_bytes(b"".join(data[4:6]), byteorder="little") / 10
 
-        # currentTime = datetime.datetime.now()
-        toTime = datetime.datetime.now()  # End time of measurement
+        # to_time = datetime.datetime.now()  # End time of measurement
+        winter_time = datetime.timezone(datetime.timedelta(hours=1))  # Use Norwegian winter time (UTC+1)
+        to_time = datetime.datetime.now(winter_time)
 
         # Calculate the total seconds of measurement
-        total_seconds = (toTime - fromTime).total_seconds()
+        total_seconds = (to_time - from_time).total_seconds()
 
         # Corrected formula for coverage
         coverage = int(total_seconds / 60 * 100)
 
         print(
-            f"FromTime: {fromTime}, ToTime: {toTime}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%"
+            f"FromTime: {from_time}, ToTime: {to_time}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%"
         )
 
-        pm10_time_values.append(TimeValue(fromTime, toTime, pmten, coverage))
-        pm25_time_values.append(TimeValue(fromTime, toTime, pmtwofive, coverage))
+        pm10_time_values.append(TimeValue(from_time, to_time, pmten, coverage))
+        pm25_time_values.append(TimeValue(from_time, to_time, pmtwofive, coverage))
 
         cvs = CSV_PAYLOAD.format(
             pm2=pmtwofive,
             pm10=pmten,
             client_id=CLIENT_ID,
-            fromTime=fromTime,
-            toTime=toTime,
+            fromTime=from_time,
+            toTime=to_time,
         )
 
         # Save data to file
-        save_data_to_file(fromTime, cvs)
+        save_data_to_file(from_time, cvs)
 
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
-            if fromTime.hour >= 8 and fromTime.hour <= 16 and fromTime.weekday() < 5:
+            if from_time.hour >= 8 and from_time.hour <= 16 and from_time.weekday() < 5:
                 # if fromTime.hour >= 8 and fromTime.hour <= 20:
                 # Send data to API
                 send_data_to_api()
