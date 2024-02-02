@@ -127,14 +127,14 @@ def send_data_to_api():
         )
         print(f"MiljoDir Response status code: {response.status_code}")
 
-        # response = requests.post(
-        #     "https://192.168.1.12:7061/poc/stations/1179/measurement",
-        #     headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-        #     json=combined_dict,
-        #     verify=False,
-        # )
-        # print(f"Local Network: Response status code: {response.status_code}")
-        # print("")
+        response = requests.post(
+            "https://192.168.1.12:7061/poc/stations/1179/measurement",
+            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+            json=combined_dict,
+            verify=False,
+        )
+        print(f"Local Network: Response status code: {response.status_code}")
+        print("")
 
     except Exception as e:
         print(f"Exception: {e}")
@@ -146,10 +146,11 @@ async def main():
         exit(1)
 
     while True:
-
         # Start time of measurement
-        # fromTime = datetime.datetime.now()  
-        winter_time = datetime.timezone(datetime.timedelta(hours=1))  # Use Norwegian winter time (UTC+1)
+        # fromTime = datetime.datetime.now()
+        winter_time = datetime.timezone(
+            datetime.timedelta(hours=1)
+        )  # Use Norwegian winter time (UTC+1)
         from_time = datetime.datetime.now(winter_time)
         data = []
 
@@ -164,7 +165,9 @@ async def main():
         pmten = int.from_bytes(b"".join(data[4:6]), byteorder="little") / 10
 
         # to_time = datetime.datetime.now()  # End time of measurement
-        winter_time = datetime.timezone(datetime.timedelta(hours=1))  # Use Norwegian winter time (UTC+1)
+        winter_time = datetime.timezone(
+            datetime.timedelta(hours=1)
+        )  # Use Norwegian winter time (UTC+1)
         to_time = datetime.datetime.now(winter_time)
 
         # Calculate the total seconds of measurement
@@ -189,14 +192,16 @@ async def main():
         )
 
         # Save data to file
+        # TODO: do this as a background task, so we can continue to measure while saving data
         save_data_to_file(from_time, cvs)
 
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
-            if from_time.hour >= 8 and from_time.hour <= 16 and from_time.weekday() < 5:
+            if from_time.hour >= 7 and from_time.hour <= 15 and from_time.weekday() < 5:
                 # if fromTime.hour >= 8 and fromTime.hour <= 20:
                 # Send data to API
+                # TODO: to this as a background task, so we can continue to measure while sending data
                 send_data_to_api()
 
             else:
