@@ -18,6 +18,10 @@ APIKEY = os.getenv(
     "XAPIKEY"
 )  # use command export XAPIKEY=asdyoukeyhere to set the environment variable
 
+STATION_ID = 1178
+PM10_TIMESERIES_ID = 4375
+PM25_TIMESERIES_ID = 4376
+
 # Create temp arrays with TimeValue objects
 pm25_time_values = []
 pm10_time_values = []
@@ -100,10 +104,24 @@ def save_data_to_file(currentTime, data):
         print(f"Could not acquire lock on {file_path} within {timeout} seconds")
 
 
+def save_last_sent_time_to_file(combined):
+    # store last successful sent datetime
+    # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
+    # overwrite the file if it exists
+    for request in combined:
+        file_name = f"miljodir-station-{STATION_ID}-timeseries-{request.time_series_id}-lastSent.txt"
+        with open(file_name, "w") as f:
+            f.write(datetime.datetime.now().isoformat())
+
+
 def send_data_to_api():
     # Create the JSON payload
-    pm10_request = RawValueRequest("4375", "PM10", CLIENT_ID, pm10_time_values)
-    pm25_request = RawValueRequest("4376", "PM2.5", CLIENT_ID, pm25_time_values)
+    pm10_request = RawValueRequest(
+        PM10_TIMESERIES_ID, "PM10", CLIENT_ID, pm10_time_values
+    )
+    pm25_request = RawValueRequest(
+        PM25_TIMESERIES_ID, "PM2.5", CLIENT_ID, pm25_time_values
+    )
 
     combined = [pm10_request, pm25_request]
 
@@ -120,15 +138,18 @@ def send_data_to_api():
 
     try:
         response = requests.post(
-            "https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/1178/measurement",
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID}/measurement",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             json=combined_dict,
             verify=False,
         )
         print(f"MiljoDir Response status code: {response.status_code}")
 
+        if response.status_code == 200:
+            save_last_sent_time_to_file(combined)
+
         response = requests.post(
-            "https://192.168.1.12:7061/poc/stations/1179/measurement",
+            f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             json=combined_dict,
             verify=False,
