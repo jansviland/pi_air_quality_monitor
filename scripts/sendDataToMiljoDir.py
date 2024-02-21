@@ -110,11 +110,26 @@ def save_last_sent_time_to_file(combined):
     # overwrite the file if it exists
     for request in combined:
         file_name = f"miljodir-station-{STATION_ID}-timeseries-{request.time_series_id}-lastSent.txt"
+        print(f"Saving last sent time to file: {file_name}")
         with open(file_name, "w") as f:
             f.write(datetime.datetime.now().isoformat())
 
 
+def read_last_sent_time_from_file(timeSeriesId):
+    open(
+        f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r"
+    ).read()
+
+
 def send_data_to_api():
+
+    # Check last sent time
+    pm10_last_sent = read_last_sent_time_from_file(PM10_TIMESERIES_ID)
+    print(f"Last sent time for PM10: {pm10_last_sent}")
+
+    pm25_last_sent = read_last_sent_time_from_file(PM25_TIMESERIES_ID)
+    print(f"Last sent time for PM2.5: {pm25_last_sent}")
+
     # Create the JSON payload
     pm10_request = RawValueRequest(
         PM10_TIMESERIES_ID, "PM10", CLIENT_ID, pm10_time_values
