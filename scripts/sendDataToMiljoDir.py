@@ -226,10 +226,9 @@ def send_data_to_api():
     try:
 
         # get token
-        tokenResponse = requests.post(
+        tokenResponse = requests.get(
             f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/maskinporten-test/token",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-            json=combined_dict,
             verify=False,
         )
 
