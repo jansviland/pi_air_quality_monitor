@@ -135,10 +135,6 @@ def get_all_measurements_taken_today():
 
             values = line.split(",")
 
-            print(f"Parsing line: {line}")
-            print(f"Values: {values}")
-            print(f"Values[3]: {values[3]}")
-
             from_time = parser.parse(values[3])
             to_time = parser.parse(values[4])
 
@@ -231,7 +227,7 @@ def send_data_to_api():
 
         # get token
         tokenResponse = requests.post(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID}/poc/maskinporten-test/token",
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/maskinporten-test/token",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             json=combined_dict,
             verify=False,
