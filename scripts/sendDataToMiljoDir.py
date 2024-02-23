@@ -135,6 +135,10 @@ def get_all_measurements_taken_today():
 
             values = line.split(",")
 
+            print(f"Parsing line: {line}")
+            print(f"Values: {values}")
+            print(f"Values[3]: {values[3]}")
+
             from_time = parser.parse(values[3])
             to_time = parser.parse(values[4])
 
