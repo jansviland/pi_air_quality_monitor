@@ -222,14 +222,14 @@ def send_data_to_miljodir():
         if response.status_code == 200:
             save_last_sent_time_to_file(combined, lastFromTime)
 
-        response = requests.post(
-            f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
-            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-            json=combined_dict,
-            verify=False,
-        )
-        print(f"Local Network: Response status code: {response.status_code}")
-        print("")
+        # response = requests.post(
+        #     f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
+        #     headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+        #     json=combined_dict,
+        #     verify=False,
+        # )
+        # print(f"Local Network: Response status code: {response.status_code}")
+        # print("")
 
     except Exception as e:
         print(f"Exception: {e}")
@@ -335,16 +335,15 @@ async def main():
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
-            # if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
-            #     # if fromTime.hour >= 8 and fromTime.hour <= 20:
-            #     # Send data to API
-            #     # TODO: to this as a background task, so we can continue to measure while sending data
-            #     send_data_to_api()
-            # 
-            # else:
-            #     # Handle gap in data when outside of working hours
-            #     print("Not sending data to API, outside of working hours")
-            send_data_to_api()
+            if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
+                # if fromTime.hour >= 8 and fromTime.hour <= 20:
+                # Send data to API
+                # TODO: to this as a background task, so we can continue to measure while sending data
+                send_data_to_api()
+
+            else:
+                # Handle gap in data when outside of working hours
+                print("Not sending data to API, outside of working hours")
 
             # Clear the lists
             pm10_time_values.clear()
