@@ -163,7 +163,7 @@ def save_last_sent_time_to_file(combined):
 
 def read_last_sent_time_from_file(timeSeriesId):
     now_winter_time = get_now_as_winter_time()
-    lastSent = now_winter_time - dt.timedelta(days=30)  # default to 30 days ago
+    lastSent = now_winter_time - dt.timedelta(days=2)  # default to 2 days ago
 
     try:
         lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r").read()
@@ -248,22 +248,39 @@ def send_data_to_api():
         diffMinutes = diff.total_seconds() / 60
         print(f"Pm10 last sent: {pm10_last_sent}, diff: {diffMinutes} minutes")
 
-        # if date is different, get all data from yesterday and resend
+        # Convert to dates to remove the time component
+        date1 = pm10_last_sent.date()
+        date2 = pm10_time_values[0].from_time.date()
+
+        # Check if it's the same day (ignoring hours)
+        if date1 == date2:
+            print("Last sent and last measurement are on the same day.")
+
+            if diffMinutes > 30:
+                print("More than 30 minutes since last sent, get all data from today and resend")
+
+                # read measurements from file, will get all data for today, and send up to 24 hours of minute data
+                today = get_now_as_winter_time()
+                year, month, day = today.year, today.month, today.day
+
+                get_all_measurements_taken(year, month, day)
+        else:
+            print("The dates are not on the same day.")
+
+        # Calculate the exact day difference
+        day_difference = (date2 - date1).days
+        print(f"Exact day difference: {day_difference} day(s)")
+
+        # if it's not the same day, get the day difference and get the earlier data
+        # if it's 4 days ago, we go 4 days back and send all data from that day
+        # next check it will hopefully say last sent 3 days ago, and send all data from that day etc
+        # until all previous data is sent
         if pm10_time_values[0].from_time.day != pm10_last_sent.day:
-            print("Not the same day, get all data from yesterday and resend")
+            print(f"Not the same day, get all data from {day_difference} day(s) ago")
 
             # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
-            yesterday = get_now_as_winter_time() - dt.timedelta(days=1)
+            yesterday = get_now_as_winter_time() - dt.timedelta(days=day_difference)
             year, month, day = yesterday.year, yesterday.month, yesterday.day
-
-            get_all_measurements_taken(year, month, day)
-
-        elif diffMinutes > 30:
-            print("More than 30 minutes since last sent, get all data from today and resend")
-
-            # read measurements from file, will get all data for today, and send up to 24 hours of minute data
-            today = get_now_as_winter_time()
-            year, month, day = today.year, today.month, today.day
 
             get_all_measurements_taken(year, month, day)
 
@@ -320,15 +337,16 @@ async def main():
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
-            if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
-                # if fromTime.hour >= 8 and fromTime.hour <= 20:
-                # Send data to API
-                # TODO: to this as a background task, so we can continue to measure while sending data
-                send_data_to_api()
-
-            else:
-                # Handle gap in data when outside of working hours
-                print("Not sending data to API, outside of working hours")
+            # if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
+            #     # if fromTime.hour >= 8 and fromTime.hour <= 20:
+            #     # Send data to API
+            #     # TODO: to this as a background task, so we can continue to measure while sending data
+            #     send_data_to_api()
+            # 
+            # else:
+            #     # Handle gap in data when outside of working hours
+            #     print("Not sending data to API, outside of working hours")
+            send_data_to_api()
 
             # Clear the lists
             pm10_time_values.clear()
