@@ -166,7 +166,7 @@ def read_last_sent_time_from_file(timeSeriesId):
     lastSent = now_winter_time - dt.timedelta(days=2)  # default to 2 days ago
 
     try:
-        lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r").read()
+        lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r").read().strip()
         lastSent = dt.datetime.fromisoformat(lastSentString)
 
     except FileNotFoundError:
