@@ -38,7 +38,7 @@ class InputTimeValue:
         self.instrument_flag = instrument_flag
 
     def __str__(self):
-        return f"InputTimeValue(fromTime={self.from_time}, toTime={self.to_time}, value={self.value}, validity={self.validity}, instrumentFlag={self.instrument_flag})"
+        return f'{"fromTime": "{self.from_time.isoformat()}", "toTime": "{self.to_time.isoformat()}", "value": {self.value}, "validity": {self.validity}, "instrumentFlag": "{self.instrument_flag}"}'
 
     def __repr__(self):
         return self.__str__()
@@ -57,15 +57,15 @@ class InputTimeSeries:
     def __init__(self, time_series_id, component, equipment_serial_number, time_values):
         self.id = time_series_id
         self.component = component
-        self.equipment_serial_number = equipment_serial_number
-        self.time_values = time_values
+        self.serialNumber = equipment_serial_number
+        self.timeValues = time_values
 
     def to_dict(self):
         return {
             "id": self.id,
             "component": self.component,
-            "serialNumber": self.equipment_serial_number,
-            "timeValues": [tv.to_dict() for tv in self.time_values],
+            "serialNumber": self.serialNumber,
+            "timeValues": [tv.to_dict() for tv in self.timeValues],
         }
 
 
