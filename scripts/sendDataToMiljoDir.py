@@ -129,7 +129,7 @@ def get_all_measurements_taken_today():
         for line in content:
             print(line, end="")
             # skip the header
-            if line == CSV_HEADER:
+            if line.index("pm2") == 0:
                 continue
 
             values = line.split(",")
