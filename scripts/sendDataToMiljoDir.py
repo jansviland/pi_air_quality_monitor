@@ -22,13 +22,13 @@ STATION_ID = 1178
 PM10_TIMESERIES_ID = 4375
 PM25_TIMESERIES_ID = 4376
 
-# Create temp arrays with TimeValue objects
+# Create temp arrays with InputTimeValue objects
 pm25_time_values = []
 pm10_time_values = []
 
 
-# Equivalent of your C# TimeValue class
-class TimeValue:
+# Equivalent of your C# InputTimeValue class
+class InputTimeValue:
     def __init__(self, from_time, to_time, value, validity=None, instrument_flag=None):
         self.from_time = from_time
         self.to_time = to_time
@@ -37,7 +37,7 @@ class TimeValue:
         self.instrument_flag = instrument_flag
 
     def __str__(self):
-        return f"TimeValue(fromTime={self.from_time}, toTime={self.to_time}, value={self.value}, validity={self.validity}, instrumentFlag={self.instrument_flag})"
+        return f"InputTimeValue(fromTime={self.from_time}, toTime={self.to_time}, value={self.value}, validity={self.validity}, instrumentFlag={self.instrument_flag})"
 
     def __repr__(self):
         return self.__str__()
@@ -52,8 +52,7 @@ class TimeValue:
         }
 
 
-# Equivalent of your C# RawValueRequest class
-class RawValueRequest:
+class InputTimeSeries:
     def __init__(self, time_series_id, component, equipment_serial_number, time_values):
         self.time_series_id = time_series_id
         self.component = component
@@ -65,7 +64,7 @@ class RawValueRequest:
             "id": self.time_series_id,
             "component": self.component,
             "serialNumber": self.equipment_serial_number,
-            "timeValues": [tv.to_dict() for tv in self.time_values],
+            "InputTimeValues": [tv.to_dict() for tv in self.time_values],
         }
 
 
@@ -104,6 +103,47 @@ def save_data_to_file(currentTime, data):
         print(f"Could not acquire lock on {file_path} within {timeout} seconds")
 
 
+# read measurements from file, datetime is used to get measurement for that specific day
+def read_data_from_file(dayOfMeasurement):
+    year, month, day = dayOfMeasurement.year, dayOfMeasurement.month, dayOfMeasurement.day
+    base_path = f"{year}/{month:02d}/{day:02d}"
+    file_path = os.path.join(base_path, "measurements.csv")
+    try:
+        with open(file_path, "r") as f:
+            data = f.read()
+            print(f'Read data from file: "{file_path}"')
+            print(data)
+
+        pm10_time_values.clear()
+        pm25_time_values.clear()
+
+        # parse the data
+        for line in data:
+            print(line)
+            # skip the header
+            if line == CSV_HEADER:
+                continue
+
+            values = line.split(",")
+            from_time = dayOfMeasurement.datetime.strptime(values[3], "%Y-%m-%dT%H:%M:%S")
+            to_time = dayOfMeasurement.datetime.strptime(values[4], "%Y-%m-%dT%H:%M:%S")
+
+            # Calculate the total seconds of measurement
+            total_seconds = (to_time - from_time).total_seconds()
+
+            # Corrected formula for coverage
+            coverage = int(total_seconds / 60 * 100)
+
+            print(
+                f"FromTime: {from_time}, ToTime: {to_time}, Data points: PM2.5 = {values[0]}, PM10 = {values[1]}, Coverage: {coverage}%")
+
+            pm10_time_values.append(InputTimeValue(from_time, to_time, float(values[0]), coverage))
+            pm25_time_values.append(InputTimeValue(from_time, to_time, float(values[1]), coverage))
+
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+
+
 def save_last_sent_time_to_file(combined):
     # store last successful sent datetime
     # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
@@ -121,20 +161,49 @@ def read_last_sent_time_from_file(timeSeriesId):
     ).read()
 
 
-def send_data_to_api():
+# TODO: implement this, get jwt token and use this when sending measurements to the API
+def get_token():
+    response = requests.post(
+        f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/token",
+        headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+        verify=False,
+    )
+    print(f"MiljoDir Response status code: {response.status_code}")
 
+    if response.status_code == 200:
+        return response.json()["token"]
+    else:
+        return None
+
+
+def send_data_to_api():
     # Check last sent time
     pm10_last_sent = read_last_sent_time_from_file(PM10_TIMESERIES_ID)
     print(f"Last sent time for PM10: {pm10_last_sent}")
 
-    pm25_last_sent = read_last_sent_time_from_file(PM25_TIMESERIES_ID)
-    print(f"Last sent time for PM2.5: {pm25_last_sent}")
+    # pm25_last_sent = read_last_sent_time_from_file(PM25_TIMESERIES_ID)
+    # print(f"Last sent time for PM2.5: {pm25_last_sent}")
+
+    if pm10_last_sent is not None:
+        # compare last sent and pm10_time_values[0].from_time
+        diff = pm10_time_values[0].from_time - pm10_last_sent
+        diffMinutes = diff.total_seconds() / 60
+        print(f"Pm10 last sent: {pm10_last_sent}, diff: {diffMinutes} minutes")
+
+        if diffMinutes > 30:
+            print("More than 30 minutes since last sent, get additional data")
+
+            # send the last 48 hours of data
+            today = datetime.datetime.now()
+
+            # read measurements from file, will get all data for today, and send up to 24 hours of minute data
+            read_data_from_file(today)
 
     # Create the JSON payload
-    pm10_request = RawValueRequest(
+    pm10_request = InputTimeSeries(
         PM10_TIMESERIES_ID, "PM10", CLIENT_ID, pm10_time_values
     )
-    pm25_request = RawValueRequest(
+    pm25_request = InputTimeSeries(
         PM25_TIMESERIES_ID, "PM2.5", CLIENT_ID, pm25_time_values
     )
 
@@ -152,9 +221,23 @@ def send_data_to_api():
     combined_dict = [pm10_request_dict, pm25_request_dict]
 
     try:
+
+        # get token
+        tokenResponse = requests.post(
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID}/poc/maskinporten-test/token",
+            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+            json=combined_dict,
+            verify=False,
+        )
+
+        print(f"MiljoDir Response status code: {tokenResponse.status_code}")
+        print(f"Token response: {tokenResponse.json()}")
+
+        token = tokenResponse.json()["access_token"]
+
         response = requests.post(
             f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID}/measurement",
-            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+            headers={"Authorization": token, "Content-Type": "application/json"},
             json=combined_dict,
             verify=False,
         )
@@ -163,14 +246,14 @@ def send_data_to_api():
         if response.status_code == 200:
             save_last_sent_time_to_file(combined)
 
-        response = requests.post(
-            f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
-            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-            json=combined_dict,
-            verify=False,
-        )
-        print(f"Local Network: Response status code: {response.status_code}")
-        print("")
+        # response = requests.post(
+        #     f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
+        #     headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+        #     json=combined_dict,
+        #     verify=False,
+        # )
+        # print(f"Local Network: Response status code: {response.status_code}")
+        # print("")
 
     except Exception as e:
         print(f"Exception: {e}")
@@ -216,8 +299,8 @@ async def main():
             f"FromTime: {from_time}, ToTime: {to_time}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%"
         )
 
-        pm10_time_values.append(TimeValue(from_time, to_time, pmten, coverage))
-        pm25_time_values.append(TimeValue(from_time, to_time, pmtwofive, coverage))
+        pm10_time_values.append(InputTimeValue(from_time, to_time, pmten, coverage))
+        pm25_time_values.append(InputTimeValue(from_time, to_time, pmtwofive, coverage))
 
         cvs = CSV_PAYLOAD.format(
             pm2=pmtwofive,
