@@ -1,10 +1,10 @@
 import asyncio
 import os
 import pprint
-import serial, time, datetime
+import serial
+import datetime as dt
 import requests
 import portalocker
-import json
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -69,8 +69,8 @@ class InputTimeSeries:
 
 
 def get_now_as_winter_time():
-    return datetime.datetime.now(
-        datetime.timezone(datetime.timedelta(hours=1))
+    return dt.datetime.now(
+        dt.timezone(dt.timedelta(hours=1))
     )  # Use Norwegian winter time (UTC+1)
 
 
@@ -110,7 +110,9 @@ def save_data_to_file(currentTime, data):
 
 
 # read measurements from file, datetime is used to get measurement for that specific day
-def read_data_from_file(dayOfMeasurement):
+def get_all_measurements_taken_today():
+    dayOfMeasurement = get_now_as_winter_time()
+
     year, month, day = dayOfMeasurement.year, dayOfMeasurement.month, dayOfMeasurement.day
     base_path = f"{year}/{month:02d}/{day:02d}"
     file_path = os.path.join(base_path, "measurements.csv")
@@ -131,8 +133,8 @@ def read_data_from_file(dayOfMeasurement):
                 continue
 
             values = line.split(",")
-            from_time = dayOfMeasurement.datetime.strptime(values[3], "%Y-%m-%dT%H:%M:%S")
-            to_time = dayOfMeasurement.datetime.strptime(values[4], "%Y-%m-%dT%H:%M:%S")
+            from_time = dt.datetime.strptime(values[3], "%Y-%m-%dT%H:%M:%S")
+            to_time = dt.datetime.strptime(values[4], "%Y-%m-%dT%H:%M:%S")
 
             # Calculate the total seconds of measurement
             total_seconds = (to_time - from_time).total_seconds()
@@ -163,13 +165,12 @@ def save_last_sent_time_to_file(combined):
 
 
 def read_last_sent_time_from_file(timeSeriesId):
-
     now_winter_time = get_now_as_winter_time()
-    lastSent = now_winter_time - datetime.timedelta(days=30)
+    lastSent = now_winter_time - dt.timedelta(days=30)  # default to 30 days ago
 
     try:
         lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r").read()
-        lastSent = datetime.datetime.fromisoformat(lastSentString)
+        lastSent = dt.datetime.fromisoformat(lastSentString)
 
     except FileNotFoundError:
         print(f"File not found: miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt")
@@ -177,21 +178,6 @@ def read_last_sent_time_from_file(timeSeriesId):
     print(f"Last sent time for timeseries {timeSeriesId}: {lastSent}")
 
     return lastSent
-
-
-# TODO: implement this, get jwt token and use this when sending measurements to the API
-def get_token():
-    response = requests.post(
-        f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/token",
-        headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-        verify=False,
-    )
-    print(f"MiljoDir Response status code: {response.status_code}")
-
-    if response.status_code == 200:
-        return response.json()["token"]
-    else:
-        return None
 
 
 def send_data_to_api():
@@ -212,8 +198,7 @@ def send_data_to_api():
             print("More than 30 minutes since last sent, get all data from today and resend")
 
             # read measurements from file, will get all data for today, and send up to 24 hours of minute data
-            today = get_now_as_winter_time()
-            read_data_from_file(today)
+            get_all_measurements_taken_today()
 
     # Create the JSON payload
     pm10_request = InputTimeSeries(
@@ -325,7 +310,7 @@ async def main():
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
-            if from_time.hour >= 7 and from_time.hour <= 15 and from_time.weekday() < 5:
+            if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
                 # if fromTime.hour >= 8 and fromTime.hour <= 20:
                 # Send data to API
                 # TODO: to this as a background task, so we can continue to measure while sending data
