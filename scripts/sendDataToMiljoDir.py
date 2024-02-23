@@ -119,16 +119,15 @@ def get_all_measurements_taken_today():
     file_path = os.path.join(base_path, "measurements.csv")
     try:
         with open(file_path, "r") as f:
-            data = f.read()
+            content = f.readlines()
             print(f'Read data from file: "{file_path}"')
-            print(data)
 
         pm10_time_values.clear()
         pm25_time_values.clear()
 
         # parse the data
-        for line in data:
-            print(line)
+        for line in content:
+            print(line, end="")
             # skip the header
             if line == CSV_HEADER:
                 continue
