@@ -156,9 +156,17 @@ def save_last_sent_time_to_file(combined):
 
 
 def read_last_sent_time_from_file(timeSeriesId):
-    open(
-        f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r"
-    ).read()
+    # if file not found, return 30 days ago
+    lastSent = datetime.datetime.now() - datetime.timedelta(days=30)
+    try:
+        lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r").read()
+        lastSent = datetime.datetime.fromisoformat(lastSentString)
+
+    except FileNotFoundError:
+        print(f"File not found: miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt")
+
+    print(f"Last sent time for timeseries {timeSeriesId}: {lastSent}")
+    return lastSent
 
 
 # TODO: implement this, get jwt token and use this when sending measurements to the API
