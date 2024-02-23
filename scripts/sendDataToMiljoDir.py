@@ -147,7 +147,7 @@ def get_all_measurements_taken(year, month, day):
         print(f"File not found: {file_path}")
 
 
-def save_last_sent_time_to_file(combined):
+def save_last_sent_time_to_file(combined, lastSent):
     # store last successful sent datetime
     # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
     # overwrite the file if it exists
@@ -155,8 +155,7 @@ def save_last_sent_time_to_file(combined):
         file_name = f"miljodir-station-{STATION_ID}-timeseries-{request.time_series_id}-lastSent.txt"
         print(f"Saving last sent time to file: {file_name}")
         with open(file_name, "w") as f:
-            nowWinterTime = get_now_as_winter_time().isoformat()
-            f.write(nowWinterTime)
+            f.write(lastSent.isoformat())
 
 
 def read_last_sent_time_from_file(timeSeriesId):
@@ -219,8 +218,9 @@ def send_data_to_miljodir():
         )
         print(f"MiljoDir Response status code: {response.status_code}")
 
+        lastFromTime = pm10_time_values[pm10_time_values.__len__() - 1].from_time
         if response.status_code == 200:
-            save_last_sent_time_to_file(combined)
+            save_last_sent_time_to_file(combined, lastFromTime)
 
         response = requests.post(
             f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
