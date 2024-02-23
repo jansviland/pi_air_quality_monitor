@@ -222,14 +222,14 @@ def send_data_to_miljodir():
         if response.status_code == 200:
             save_last_sent_time_to_file(combined)
 
-        # response = requests.post(
-        #     f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
-        #     headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-        #     json=combined_dict,
-        #     verify=False,
-        # )
-        # print(f"Local Network: Response status code: {response.status_code}")
-        # print("")
+        response = requests.post(
+            f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
+            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+            json=combined_dict,
+            verify=False,
+        )
+        print(f"Local Network: Response status code: {response.status_code}")
+        print("")
 
     except Exception as e:
         print(f"Exception: {e}")
