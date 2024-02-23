@@ -128,8 +128,9 @@ def get_all_measurements_taken_today():
         # parse the data
         for line in content:
             print(line, end="")
+
             # skip the header
-            if line.index("pm2") == 0:
+            if line.startswith("pm2"):
                 continue
 
             values = line.split(",")
