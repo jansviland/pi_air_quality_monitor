@@ -6,6 +6,7 @@ import datetime as dt
 import requests
 import portalocker
 import urllib3
+from dateutil import parser
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -133,8 +134,9 @@ def get_all_measurements_taken_today():
                 continue
 
             values = line.split(",")
-            from_time = dt.datetime.strptime(values[3], "%Y-%m-%dT%H:%M:%S")
-            to_time = dt.datetime.strptime(values[4], "%Y-%m-%dT%H:%M:%S")
+
+            from_time = parser.parse(values[3])
+            to_time = parser.parse(values[4])
 
             # Calculate the total seconds of measurement
             total_seconds = (to_time - from_time).total_seconds()
