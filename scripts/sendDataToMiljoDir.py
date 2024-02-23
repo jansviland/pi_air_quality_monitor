@@ -163,10 +163,9 @@ def save_last_sent_time_to_file(combined):
 
 
 def read_last_sent_time_from_file(timeSeriesId):
-    # if file not found, return 30 days ago
 
     now_winter_time = get_now_as_winter_time()
-    lastSent = now_winter_time - now_winter_time.timedelta(days=30)
+    lastSent = now_winter_time - datetime.timedelta(days=30)
 
     try:
         lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r").read()
