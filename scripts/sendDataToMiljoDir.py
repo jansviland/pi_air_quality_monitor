@@ -144,9 +144,6 @@ def get_all_measurements_taken_today():
             # Corrected formula for coverage
             coverage = int(total_seconds / 60 * 100)
 
-            print(
-                f"FromTime: {from_time}, ToTime: {to_time}, Data points: PM2.5 = {values[0]}, PM10 = {values[1]}, Coverage: {coverage}%")
-
             pm10_time_values.append(InputTimeValue(from_time, to_time, float(values[0]), coverage))
             pm25_time_values.append(InputTimeValue(from_time, to_time, float(values[1]), coverage))
 
@@ -225,7 +222,7 @@ def send_data_to_api():
 
     try:
 
-        # get token
+        # get access_token
         tokenResponse = requests.get(
             f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/maskinporten-test/token",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
@@ -235,11 +232,11 @@ def send_data_to_api():
         print(f"MiljoDir Response status code: {tokenResponse.status_code}")
         print(f"Token response: {tokenResponse.json()}")
 
-        token = tokenResponse.json()["access_token"]
+        access_token = tokenResponse.json()["access_token"]
 
         response = requests.post(
             f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID}/measurement",
-            headers={"Authorization": token, "Content-Type": "application/json"},
+            headers={"Authorization": "Bearer " + access_token, "Content-Type": "application/json"},
             json=combined_dict,
             verify=False,
         )
