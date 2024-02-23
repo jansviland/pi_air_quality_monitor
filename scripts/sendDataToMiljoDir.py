@@ -38,7 +38,13 @@ class InputTimeValue:
         self.instrument_flag = instrument_flag
 
     def __str__(self):
-        return f'{"fromTime": "{self.from_time.isoformat()}", "toTime": "{self.to_time.isoformat()}", "value": {self.value}, "validity": {self.validity}, "instrumentFlag": "{self.instrument_flag}"}'
+        return '{{"fromTime": "{}", "toTime": "{}", "value": {}, "validity": {}, "instrumentFlag": "{}"}}'.format(
+            self.from_time.isoformat(),
+            self.to_time.isoformat(),
+            self.value,
+            self.validity,
+            self.instrument_flag if self.instrument_flag is not None else ""
+        )
 
     def __repr__(self):
         return self.__str__()
