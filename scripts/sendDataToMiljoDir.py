@@ -55,17 +55,17 @@ class InputTimeValue:
 
 class InputTimeSeries:
     def __init__(self, time_series_id, component, equipment_serial_number, time_values):
-        self.time_series_id = time_series_id
+        self.id = time_series_id
         self.component = component
         self.equipment_serial_number = equipment_serial_number
         self.time_values = time_values
 
     def to_dict(self):
         return {
-            "id": self.time_series_id,
+            "id": self.id,
             "component": self.component,
             "serialNumber": self.equipment_serial_number,
-            "InputTimeValues": [tv.to_dict() for tv in self.time_values],
+            "timeValues": [tv.to_dict() for tv in self.time_values],
         }
 
 
@@ -335,15 +335,16 @@ async def main():
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
-            if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
-                # if fromTime.hour >= 8 and fromTime.hour <= 20:
-                # Send data to API
-                # TODO: to this as a background task, so we can continue to measure while sending data
-                send_data_to_api()
-
-            else:
-                # Handle gap in data when outside of working hours
-                print("Not sending data to API, outside of working hours")
+            # if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
+            #     # if fromTime.hour >= 8 and fromTime.hour <= 20:
+            #     # Send data to API
+            #     # TODO: to this as a background task, so we can continue to measure while sending data
+            #     send_data_to_api()
+            # 
+            # else:
+            #     # Handle gap in data when outside of working hours
+            #     print("Not sending data to API, outside of working hours")
+            send_data_to_api()
 
             # Clear the lists
             pm10_time_values.clear()
