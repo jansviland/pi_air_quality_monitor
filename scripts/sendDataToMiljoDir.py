@@ -112,9 +112,7 @@ def save_data_to_file(currentTime, data):
 
 # read measurements from file, datetime is used to get measurement for that specific day
 def get_all_measurements_taken(year, month, day):
-    dayOfMeasurement = get_now_as_winter_time()
 
-    year, month, day = dayOfMeasurement.year, dayOfMeasurement.month, dayOfMeasurement.day
     base_path = f"{year}/{month:02d}/{day:02d}"
     file_path = os.path.join(base_path, "measurements.csv")
     try:
@@ -279,8 +277,8 @@ def send_data_to_api():
             print(f"Not the same day, get all data from {day_difference} day(s) ago")
 
             # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
-            yesterday = get_now_as_winter_time() - dt.timedelta(days=day_difference)
-            year, month, day = yesterday.year, yesterday.month, yesterday.day
+            previousDay = get_now_as_winter_time() - dt.timedelta(days=day_difference)
+            year, month, day = previousDay.year, previousDay.month, previousDay.day
 
             get_all_measurements_taken(year, month, day)
 
