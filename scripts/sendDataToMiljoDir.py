@@ -111,7 +111,7 @@ def save_data_to_file(currentTime, data):
 
 
 # read measurements from file, datetime is used to get measurement for that specific day
-def get_all_measurements_taken_today():
+def get_all_measurements_taken(year, month, day):
     dayOfMeasurement = get_now_as_winter_time()
 
     year, month, day = dayOfMeasurement.year, dayOfMeasurement.month, dayOfMeasurement.day
@@ -177,26 +177,7 @@ def read_last_sent_time_from_file(timeSeriesId):
     return lastSent
 
 
-def send_data_to_api():
-    # Check last sent time
-    pm10_last_sent = read_last_sent_time_from_file(PM10_TIMESERIES_ID)
-    print(f"Last sent time for PM10: {pm10_last_sent}")
-
-    # pm25_last_sent = read_last_sent_time_from_file(PM25_TIMESERIES_ID)
-    # print(f"Last sent time for PM2.5: {pm25_last_sent}")
-
-    if pm10_last_sent is not None:
-        # compare last sent and pm10_time_values[0].from_time
-        diff = pm10_time_values[0].from_time - pm10_last_sent
-        diffMinutes = diff.total_seconds() / 60
-        print(f"Pm10 last sent: {pm10_last_sent}, diff: {diffMinutes} minutes")
-
-        if diffMinutes > 30:
-            print("More than 30 minutes since last sent, get all data from today and resend")
-
-            # read measurements from file, will get all data for today, and send up to 24 hours of minute data
-            get_all_measurements_taken_today()
-
+def send_data_to_miljodir():
     # Create the JSON payload
     pm10_request = InputTimeSeries(
         PM10_TIMESERIES_ID, "PM10", CLIENT_ID, pm10_time_values
@@ -254,6 +235,39 @@ def send_data_to_api():
 
     except Exception as e:
         print(f"Exception: {e}")
+
+
+def send_data_to_api():
+    # Check last sent time
+    pm10_last_sent = read_last_sent_time_from_file(PM10_TIMESERIES_ID)
+    print(f"Last sent time for PM10: {pm10_last_sent}")
+
+    if pm10_last_sent is not None:
+        # compare last sent and pm10_time_values[0].from_time
+        diff = pm10_time_values[0].from_time - pm10_last_sent
+        diffMinutes = diff.total_seconds() / 60
+        print(f"Pm10 last sent: {pm10_last_sent}, diff: {diffMinutes} minutes")
+
+        # if date is different, get all data from yesterday and resend
+        if pm10_time_values[0].from_time.day != pm10_last_sent.day:
+            print("Not the same day, get all data from yesterday and resend")
+
+            # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
+            yesterday = get_now_as_winter_time() - dt.timedelta(days=1)
+            year, month, day = yesterday.year, yesterday.month, yesterday.day
+
+            get_all_measurements_taken(year, month, day)
+
+        elif diffMinutes > 30:
+            print("More than 30 minutes since last sent, get all data from today and resend")
+
+            # read measurements from file, will get all data for today, and send up to 24 hours of minute data
+            today = get_now_as_winter_time()
+            year, month, day = today.year, today.month, today.day
+
+            get_all_measurements_taken(year, month, day)
+
+    send_data_to_miljodir()
 
 
 async def main():
