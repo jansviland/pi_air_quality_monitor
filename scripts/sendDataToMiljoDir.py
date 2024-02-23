@@ -27,7 +27,7 @@ pm25_time_values = []
 pm10_time_values = []
 
 
-# Equivalent of your C# InputTimeValue class
+# Equivalent C# InputTimeValue class
 class InputTimeValue:
     def __init__(self, from_time, to_time, value, validity=None, instrument_flag=None):
         self.from_time = from_time
@@ -66,6 +66,12 @@ class InputTimeSeries:
             "serialNumber": self.equipment_serial_number,
             "InputTimeValues": [tv.to_dict() for tv in self.time_values],
         }
+
+
+def get_now_as_winter_time():
+    return datetime.datetime.now(
+        datetime.timezone(datetime.timedelta(hours=1))
+    )  # Use Norwegian winter time (UTC+1)
 
 
 def pretty_print(obj):
@@ -152,12 +158,16 @@ def save_last_sent_time_to_file(combined):
         file_name = f"miljodir-station-{STATION_ID}-timeseries-{request.time_series_id}-lastSent.txt"
         print(f"Saving last sent time to file: {file_name}")
         with open(file_name, "w") as f:
-            f.write(datetime.datetime.now().isoformat())
+            nowWinterTime = get_now_as_winter_time().isoformat()
+            f.write(nowWinterTime)
 
 
 def read_last_sent_time_from_file(timeSeriesId):
     # if file not found, return 30 days ago
-    lastSent = datetime.datetime.now() - datetime.timedelta(days=30)
+
+    now_winter_time = get_now_as_winter_time()
+    lastSent = now_winter_time - now_winter_time.timedelta(days=30)
+
     try:
         lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt", "r").read()
         lastSent = datetime.datetime.fromisoformat(lastSentString)
@@ -166,6 +176,7 @@ def read_last_sent_time_from_file(timeSeriesId):
         print(f"File not found: miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt")
 
     print(f"Last sent time for timeseries {timeSeriesId}: {lastSent}")
+
     return lastSent
 
 
@@ -199,12 +210,10 @@ def send_data_to_api():
         print(f"Pm10 last sent: {pm10_last_sent}, diff: {diffMinutes} minutes")
 
         if diffMinutes > 30:
-            print("More than 30 minutes since last sent, get additional data")
-
-            # send the last 48 hours of data
-            today = datetime.datetime.now()
+            print("More than 30 minutes since last sent, get all data from today and resend")
 
             # read measurements from file, will get all data for today, and send up to 24 hours of minute data
+            today = get_now_as_winter_time()
             read_data_from_file(today)
 
     # Create the JSON payload
@@ -274,11 +283,7 @@ async def main():
 
     while True:
         # Start time of measurement
-        # fromTime = datetime.datetime.now()
-        winter_time = datetime.timezone(
-            datetime.timedelta(hours=1)
-        )  # Use Norwegian winter time (UTC+1)
-        from_time = datetime.datetime.now(winter_time)
+        from_time = get_now_as_winter_time()
         data = []
 
         for index in range(0, 10):
@@ -291,11 +296,7 @@ async def main():
         pmtwofive = int.from_bytes(b"".join(data[2:4]), byteorder="little") / 10
         pmten = int.from_bytes(b"".join(data[4:6]), byteorder="little") / 10
 
-        # to_time = datetime.datetime.now()  # End time of measurement
-        winter_time = datetime.timezone(
-            datetime.timedelta(hours=1)
-        )  # Use Norwegian winter time (UTC+1)
-        to_time = datetime.datetime.now(winter_time)
+        to_time = get_now_as_winter_time()
 
         # Calculate the total seconds of measurement
         total_seconds = (to_time - from_time).total_seconds()
