@@ -157,18 +157,21 @@ def get_all_measurements_taken(year, month, day):
             pm25_time_values.append(InputTimeValue(from_time, to_time, float(values[1]), coverage))
 
     except FileNotFoundError:
+
+        pm10_time_values.clear()
+        pm25_time_values.clear()
+
         print(f"File not found: {file_path}")
 
 
-def save_last_sent_time_to_file(combined, lastSent):
+def save_last_sent_time_to_file(timeseriesId, lastSent):
     # store last successful sent datetime
     # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
     # overwrite the file if it exists
-    for input_timeseries in combined:
-        file_name = f"miljodir-station-{STATION_ID}-timeseries-{input_timeseries.id}-lastSent.txt"
-        print(f"Saving last sent time to file: {file_name}")
-        with open(file_name, "w") as f:
-            f.write(lastSent.isoformat())
+    file_name = f"miljodir-station-{STATION_ID}-timeseries-{timeseriesId}-lastSent.txt"
+    print(f"Saving last sent time to file: {file_name}")
+    with open(file_name, "w") as f:
+        f.write(lastSent.isoformat())
 
 
 def read_last_sent_time_from_file(timeSeriesId):
@@ -234,7 +237,8 @@ def send_data_to_miljodir():
 
         lastFromTime = pm10_time_values[pm10_time_values.__len__() - 1].from_time
         if response.status_code == 200:
-            save_last_sent_time_to_file(combined, lastFromTime)
+            save_last_sent_time_to_file(PM10_TIMESERIES_ID, lastFromTime)
+            save_last_sent_time_to_file(PM25_TIMESERIES_ID, lastFromTime)
 
         response = requests.post(
             f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
@@ -276,27 +280,38 @@ def send_data_to_api():
                 year, month, day = today.year, today.month, today.day
 
                 get_all_measurements_taken(year, month, day)
+                send_data_to_miljodir()
+
+            else:
+                # just send the last measurement
+                send_data_to_miljodir()
         else:
             print("The dates are not on the same day.")
 
-        # Calculate the exact day difference
-        day_difference = (date2 - date1).days
-        print(f"Exact day difference: {day_difference} day(s)")
+            # Calculate the exact day difference
+            day_difference = (date2 - date1).days
+            print(f"Exact day difference: {day_difference} day(s)")
 
-        # if it's not the same day, get the day difference and get the earlier data
-        # if it's 4 days ago, we go 4 days back and send all data from that day
-        # next check it will hopefully say last sent 3 days ago, and send all data from that day etc
-        # until all previous data is sent
-        if pm10_time_values[0].from_time.day != pm10_last_sent.day:
-            print(f"Not the same day, get all data from {day_difference} day(s) ago")
+            # if it's not the same day, get the day difference and get the earlier data
+            # if it's 4 days ago, we go 4 days back and send all data from that day
+            # next check it will hopefully say last sent 3 days ago, and send all data from that day etc
+            # until all previous data is sent
+            if pm10_time_values[0].from_time.day != pm10_last_sent.day:
+                print(f"Not the same day, get all data from {day_difference} day(s) ago")
 
-            # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
-            previousDay = get_now_as_winter_time() - dt.timedelta(days=day_difference)
-            year, month, day = previousDay.year, previousDay.month, previousDay.day
+                # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
+                previousDay = get_now_as_winter_time() - dt.timedelta(days=day_difference)
+                year, month, day = previousDay.year, previousDay.month, previousDay.day
 
-            get_all_measurements_taken(year, month, day)
+                get_all_measurements_taken(year, month, day)
 
-    send_data_to_miljodir()
+                send_data_to_miljodir()
+
+                # manually set last sent time to the from time of the last measurement, to avoid sending the same data again
+                nextDay = previousDay + dt.timedelta(days=1)
+
+                save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
+                save_last_sent_time_to_file(PM10_TIMESERIES_ID, nextDay)
 
 
 async def main():
