@@ -60,8 +60,8 @@ class InputTimeValue:
 
 
 class InputTimeSeries:
-    def __init__(self, time_series_id, component, equipment_serial_number, time_values):
-        self.id = time_series_id
+    def __init__(self, id, component, equipment_serial_number, time_values):
+        self.id = id
         self.component = component
         self.serialNumber = equipment_serial_number
         self.timeValues = time_values
@@ -164,8 +164,8 @@ def save_last_sent_time_to_file(combined, lastSent):
     # store last successful sent datetime
     # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
     # overwrite the file if it exists
-    for request in combined:
-        file_name = f"miljodir-station-{STATION_ID}-timeseries-{request.time_series_id}-lastSent.txt"
+    for input_timeseries in combined:
+        file_name = f"miljodir-station-{STATION_ID}-timeseries-{input_timeseries.id}-lastSent.txt"
         print(f"Saving last sent time to file: {file_name}")
         with open(file_name, "w") as f:
             f.write(lastSent.isoformat())
@@ -190,14 +190,14 @@ def read_last_sent_time_from_file(timeSeriesId):
 
 def send_data_to_miljodir():
     # Create the JSON payload
-    pm10_request = InputTimeSeries(
+    pm10_timeseries = InputTimeSeries(
         PM10_TIMESERIES_ID, "PM10", CLIENT_ID, pm10_time_values
     )
-    pm25_request = InputTimeSeries(
+    pm25_timeseries = InputTimeSeries(
         PM25_TIMESERIES_ID, "PM2.5", CLIENT_ID, pm25_time_values
     )
 
-    combined = [pm10_request, pm25_request]
+    combined = [pm10_timeseries, pm25_timeseries]
 
     print("")
     print(f"request:")
@@ -205,8 +205,8 @@ def send_data_to_miljodir():
     print("")
 
     # Convert your requests to dictionaries
-    pm10_request_dict = pm10_request.to_dict()
-    pm25_request_dict = pm25_request.to_dict()
+    pm10_request_dict = pm10_timeseries.to_dict()
+    pm25_request_dict = pm25_timeseries.to_dict()
 
     combined_dict = [pm10_request_dict, pm25_request_dict]
 
