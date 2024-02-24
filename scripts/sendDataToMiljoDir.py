@@ -169,7 +169,7 @@ def save_last_sent_time_to_file(timeseriesId, lastSent):
     # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
     # overwrite the file if it exists
     file_name = f"miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeseriesId}-lastSent.txt"
-    print(f"Saving last sent time to file: {file_name}")
+    print(f"Saving last sent time {lastSent}, to file: {file_name}")
     with open(file_name, "w") as f:
         f.write(lastSent.isoformat())
 
@@ -199,6 +199,8 @@ def send_data_to_miljodir():
     pm25_timeseries = InputTimeSeries(
         PM25_TIMESERIES_ID, "PM2.5", CLIENT_ID, pm25_time_values
     )
+
+    # TODO: filter out invalid data, where validity is 0 for example
 
     combined = [pm10_timeseries, pm25_timeseries]
 
@@ -365,17 +367,15 @@ async def main():
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
 
-            # if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
-            #     # if fromTime.hour >= 8 and fromTime.hour <= 20:
-            #     # Send data to API
-            #     # TODO: to this as a background task, so we can continue to measure while sending data
-            #     send_data_to_api()
-            # 
-            # else:
-            #     # Handle gap in data when outside of working hours
-            #     print("Not sending data to API, outside of working hours")
+            if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
+                # if fromTime.hour >= 8 and fromTime.hour <= 20:
+                # Send data to API
+                # TODO: to this as a background task, so we can continue to measure while sending data
+                send_data_to_api()
 
-            send_data_to_api()
+            else:
+                # Handle gap in data when outside of working hours
+                print("Not sending data to API, outside of working hours")
 
             # Clear the lists
             pm10_time_values.clear()
