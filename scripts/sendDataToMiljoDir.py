@@ -19,7 +19,7 @@ APIKEY = os.getenv(
     "XAPIKEY"
 )  # use command export XAPIKEY=asdyoukeyhere to set the environment variable
 
-STATION_ID = 1178
+STATION_ID_MILJODIR = 1178
 PM10_TIMESERIES_ID = 4375
 PM25_TIMESERIES_ID = 4376
 
@@ -168,7 +168,7 @@ def save_last_sent_time_to_file(timeseriesId, lastSent):
     # store last successful sent datetime
     # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
     # overwrite the file if it exists
-    file_name = f"miljodir-station-{STATION_ID}-timeseries-{timeseriesId}-lastSent.txt"
+    file_name = f"miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeseriesId}-lastSent.txt"
     print(f"Saving last sent time to file: {file_name}")
     with open(file_name, "w") as f:
         f.write(lastSent.isoformat())
@@ -179,12 +179,12 @@ def read_last_sent_time_from_file(timeSeriesId):
     lastSent = now_winter_time - dt.timedelta(days=2)  # default to 2 days ago
 
     try:
-        lastSentString = open(f"miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt",
+        lastSentString = open(f"miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeSeriesId}-lastSent.txt",
                               "r").read().strip()
         lastSent = dt.datetime.fromisoformat(lastSentString)
 
     except FileNotFoundError:
-        print(f"File not found: miljodir-station-{STATION_ID}-timeseries-{timeSeriesId}-lastSent.txt")
+        print(f"File not found: miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeSeriesId}-lastSent.txt")
 
     print(f"Last sent time for timeseries {timeSeriesId}: {lastSent}")
 
@@ -228,7 +228,7 @@ def send_data_to_miljodir():
         access_token = tokenResponse.json()["access_token"]
 
         response = requests.post(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID}/measurement",
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID_MILJODIR}/measurement",
             headers={"Authorization": "Bearer " + access_token, "Content-Type": "application/json"},
             json=combined_dict,
             verify=False,
@@ -241,7 +241,7 @@ def send_data_to_miljodir():
             save_last_sent_time_to_file(PM25_TIMESERIES_ID, lastFromTime)
 
         response = requests.post(
-            f"https://192.168.1.12:7061/poc/stations/{STATION_ID}/measurement",
+            f"https://192.168.1.12:7061/poc/stations/1179/measurement",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             json=combined_dict,
             verify=False,
