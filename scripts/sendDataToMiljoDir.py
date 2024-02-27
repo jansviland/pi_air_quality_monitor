@@ -128,6 +128,7 @@ def save_data_to_file(currentTime, data):
 def get_all_measurements_taken(year, month, day):
     base_path = f"{year}/{month:02d}/{day:02d}"
     file_path = os.path.join(base_path, "measurements.csv")
+
     try:
         with open(file_path, "r") as f:
             content = f.readlines()
@@ -360,31 +361,36 @@ async def main():
         pm10_time_values.append(InputTimeValue(from_time, to_time, pmten, coverage))
         pm25_time_values.append(InputTimeValue(from_time, to_time, pmtwofive, coverage))
 
-        cvs = CSV_PAYLOAD.format(
-            pm2=pmtwofive,
-            pm10=pmten,
-            client_id=CLIENT_ID,
-            fromTime=from_time,
-            toTime=to_time,
-        )
+        # only save if the data is valid
+        if coverage > 10:
+            cvs = CSV_PAYLOAD.format(
+                pm2=pmtwofive,
+                pm10=pmten,
+                client_id=CLIENT_ID,
+                fromTime=from_time,
+                toTime=to_time,
+            )
 
-        # Save data to file
-        # TODO: do this as a background task, so we can continue to measure while saving data
-        save_data_to_file(from_time, cvs)
+            # TODO: do this as a background task, so we can continue to measure while saving data
+            # Save data to file
+            save_data_to_file(from_time, cvs)
+        else:
+            print("Invalid data, coverage less than 10%, not saving to file")
 
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
             # only send between 08:00 - 16:00 monday - friday
 
-            if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
-                # if fromTime.hour >= 8 and fromTime.hour <= 20:
-                # Send data to API
-                # TODO: to this as a background task, so we can continue to measure while sending data
-                send_data_to_api()
-
-            else:
-                # Handle gap in data when outside of working hours
-                print("Not sending data to API, outside of working hours")
+            # if 7 <= from_time.hour <= 15 and from_time.weekday() < 5:
+            #     # if fromTime.hour >= 8 and fromTime.hour <= 20:
+            #     # Send data to API
+            #     # TODO: to this as a background task, so we can continue to measure while sending data
+            #     send_data_to_api()
+            # 
+            # else:
+            #     # Handle gap in data when outside of working hours
+            #     print("Not sending data to API, outside of working hours")
+            send_data_to_api()
 
             # Clear the lists
             pm10_time_values.clear()
