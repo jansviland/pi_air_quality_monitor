@@ -192,15 +192,24 @@ def read_last_sent_time_from_file(timeSeriesId):
 
 
 def send_data_to_miljodir():
+    # filter out invalid data, where validity is less than 10 (10%)
+    filtered_pm10_time_values = []
+    for tv in pm10_time_values:
+        if tv.validity > 10:
+            pm10_time_values.append(tv)
+
+    filtered_pm25_time_values = []
+    for tv in pm25_time_values:
+        if tv.validity > 10:
+            filtered_pm25_time_values.append(tv)
+
     # Create the JSON payload
     pm10_timeseries = InputTimeSeries(
-        PM10_TIMESERIES_ID, "PM10", CLIENT_ID, pm10_time_values
+        PM10_TIMESERIES_ID, "PM10", CLIENT_ID, filtered_pm10_time_values
     )
     pm25_timeseries = InputTimeSeries(
-        PM25_TIMESERIES_ID, "PM2.5", CLIENT_ID, pm25_time_values
+        PM25_TIMESERIES_ID, "PM2.5", CLIENT_ID, filtered_pm25_time_values
     )
-
-    # TODO: filter out invalid data, where validity is 0 for example
 
     combined = [pm10_timeseries, pm25_timeseries]
 
