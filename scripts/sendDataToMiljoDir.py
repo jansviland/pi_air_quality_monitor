@@ -358,11 +358,12 @@ async def main():
             f"FromTime: {from_time}, ToTime: {to_time}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%"
         )
 
-        pm10_time_values.append(InputTimeValue(from_time, to_time, pmten, coverage))
-        pm25_time_values.append(InputTimeValue(from_time, to_time, pmtwofive, coverage))
-
-        # only save if the data is valid
+        # only save and send data if coverage is above 10%
         if coverage > 10:
+
+            pm10_time_values.append(InputTimeValue(from_time, to_time, pmten, coverage))
+            pm25_time_values.append(InputTimeValue(from_time, to_time, pmtwofive, coverage))
+
             cvs = CSV_PAYLOAD.format(
                 pm2=pmtwofive,
                 pm10=pmten,
