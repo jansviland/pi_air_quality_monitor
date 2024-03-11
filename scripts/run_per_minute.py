@@ -29,11 +29,10 @@ async def main():
 
         await asyncio.sleep(30)
 
-        to_time = dt.datetime.now(tz)
-        to_time = to_time.replace(second=0, microsecond=0)
+        to_time = from_time + dt.timedelta(seconds=60)
 
         # Calculate the total seconds of measurement
-        total_seconds = (to_time - from_time).total_seconds()
+        total_seconds = (dt.datetime.now(tz) - from_time).total_seconds()
 
         # Corrected formula for coverage
         coverage = int(total_seconds / 60 * 100)

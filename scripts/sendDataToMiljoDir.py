@@ -360,14 +360,12 @@ async def main():
         pmten = int.from_bytes(b"".join(data[4:6]), byteorder="little") / 10
 
         to_time = from_time + dt.timedelta(minutes=1)
-        # to_time = to_time.replace(second=0, microsecond=0)
 
         # Calculate the total seconds of measurement
-        # total_seconds = (to_time - from_time).total_seconds()
+        total_seconds = (dt.datetime.now(tz) - from_time).total_seconds()
 
         # Corrected formula for coverage
-        # coverage = int(total_seconds / 60 * 100)
-        coverage = 100
+        coverage = int(total_seconds / 60 * 100)
 
         print(
             f"FromTime: {from_time}, ToTime: {to_time}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%"
