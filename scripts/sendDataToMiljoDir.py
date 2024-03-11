@@ -7,10 +7,13 @@ import requests
 import portalocker
 import urllib3
 from dateutil import parser
+from pytz import timezone
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 ser = serial.Serial("/dev/ttyUSB0")
+
+tz = timezone("Etc/GMT-1")
 
 CLIENT_ID = "raspberry-pi-jan"
 CSV_PAYLOAD = "{pm2},{pm10},{client_id},{fromTime},{toTime}"
@@ -81,12 +84,6 @@ class InputTimeSeries:
             "serialNumber": self.serialNumber,
             "timeValues": [tv.to_dict() for tv in self.timeValues],
         }
-
-
-def get_now_as_winter_time():
-    return dt.datetime.now(
-        dt.timezone(dt.timedelta(hours=1))
-    )  # Use Norwegian winter time (UTC+1)
 
 
 def pretty_print(obj):
@@ -176,7 +173,7 @@ def save_last_sent_time_to_file(timeseriesId, lastSent):
 
 
 def read_last_sent_time_from_file(timeSeriesId):
-    now_winter_time = get_now_as_winter_time()
+    now_winter_time = dt.datetime.now(tz)
     lastSent = now_winter_time - dt.timedelta(days=2)  # default to 2 days ago
 
     try:
@@ -288,7 +285,7 @@ def send_data_to_api():
                 print("More than 30 minutes since last sent, get all data from today and resend")
 
                 # read measurements from file, will get all data for today, and send up to 24 hours of minute data
-                today = get_now_as_winter_time()
+                today = dt.datetime.now(tz)
                 year, month, day = today.year, today.month, today.day
 
                 get_all_measurements_taken(year, month, day)
@@ -312,7 +309,7 @@ def send_data_to_api():
                 print(f"Not the same day, get all data from {day_difference} day(s) ago")
 
                 # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
-                previousDay = get_now_as_winter_time() - dt.timedelta(days=day_difference)
+                previousDay = dt.datetime.now(tz) - dt.timedelta(days=day_difference)
                 year, month, day = previousDay.year, previousDay.month, previousDay.day
 
                 get_all_measurements_taken(year, month, day)
@@ -332,10 +329,26 @@ async def main():
         exit(1)
 
     while True:
-        # Start time of measurement
-        from_time = get_now_as_winter_time()
-        data = []
 
+        # Get the current time in the specified timezone
+        now = dt.datetime.now(tz)
+
+        # Calculate the seconds until the next whole minute
+        seconds_until_next_minute = 60 - now.second
+        print("Seconds until the next whole minute:", seconds_until_next_minute)
+
+        # Wait until the start of the next whole minute
+        await asyncio.sleep(seconds_until_next_minute)
+
+        # Start time of measurement (aligned with the whole minute)
+        from_time = dt.datetime.now(tz)
+        from_time = from_time.replace(second=0, microsecond=0)
+
+        print("from_time:", from_time)
+        print("Collecting and processing data...")
+
+        # [Your data collection and processing code goes here]
+        data = []
         for index in range(0, 10):
             # TODO: handle exception
             # serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
@@ -346,7 +359,8 @@ async def main():
         pmtwofive = int.from_bytes(b"".join(data[2:4]), byteorder="little") / 10
         pmten = int.from_bytes(b"".join(data[4:6]), byteorder="little") / 10
 
-        to_time = get_now_as_winter_time()
+        to_time = dt.datetime.now(tz)
+        to_time = to_time.replace(second=0, microsecond=0)
 
         # Calculate the total seconds of measurement
         total_seconds = (to_time - from_time).total_seconds()

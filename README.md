@@ -38,6 +38,7 @@ pip install portalocker
 pip install azure-iot-device
 pip install pyserial
 pip install asyncio
+pip install pytz
 ```
 
 2.  Install .NET 6 (for AirQuality.Console)
