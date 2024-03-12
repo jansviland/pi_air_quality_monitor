@@ -372,24 +372,25 @@ async def main():
         )
 
         # only save and send data if coverage is above 10%
-        if coverage > 10:
+        # if coverage > 10:
 
-            pm10_time_values.append(InputTimeValue(from_time, to_time, pmten, coverage))
-            pm25_time_values.append(InputTimeValue(from_time, to_time, pmtwofive, coverage))
+        pm10_time_values.append(InputTimeValue(from_time, to_time, pmten, coverage))
+        pm25_time_values.append(InputTimeValue(from_time, to_time, pmtwofive, coverage))
 
-            cvs = CSV_PAYLOAD.format(
-                pm2=pmtwofive,
-                pm10=pmten,
-                client_id=CLIENT_ID,
-                fromTime=from_time,
-                toTime=to_time,
-            )
+        cvs = CSV_PAYLOAD.format(
+            pm2=pmtwofive,
+            pm10=pmten,
+            client_id=CLIENT_ID,
+            fromTime=from_time,
+            toTime=to_time,
+        )
 
-            # TODO: do this as a background task, so we can continue to measure while saving data
-            # Save data to file
-            save_data_to_file(from_time, cvs)
-        else:
-            print("Invalid data, coverage less than 10%, not saving to file")
+        # TODO: do this as a background task, so we can continue to measure while saving data
+        # Save data to file
+        save_data_to_file(from_time, cvs)
+
+        # else:
+        #     print("Invalid data, coverage less than 10%, not saving to file")
 
         # when the lists contains x items, send the data to the API
         if pm10_time_values.__len__() >= 5:
