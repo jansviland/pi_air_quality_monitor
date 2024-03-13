@@ -33,20 +33,20 @@ pm10_time_values = []
 
 # Equivalent C# InputTimeValue class
 class InputTimeValue:
-    def __init__(self, from_time, to_time, value, validity=None, instrument_flag=None):
+    def __init__(self, from_time, to_time, value, data_coverage=None, instrument_flag=None):
         self.from_time = from_time
         self.to_time = to_time
         self.value = value
-        self.validity = validity if validity is not None else -9900
-        self.instrument_flag = instrument_flag
+        self.dataCoverage = data_coverage if data_coverage is not None else -9900
+        # self.instrument_flag = instrument_flag
 
     def __str__(self):
-        return '{{"fromTime": "{}", "toTime": "{}", "value": {}, "validity": {}, "instrumentFlag": "{}"}}'.format(
+        return '{{"fromTime": "{}", "toTime": "{}", "value": {}, "dataCoverage": {}}}'.format(
             self.from_time.isoformat(),
             self.to_time.isoformat(),
             self.value,
-            self.validity,
-            self.instrument_flag if self.instrument_flag is not None else ""
+            self.dataCoverage,
+            # self.instrument_flag if self.instrument_flag is not None else ""
         )
 
     def __repr__(self):
@@ -57,8 +57,8 @@ class InputTimeValue:
             "fromTime": self.from_time.isoformat(),
             "toTime": self.to_time.isoformat(),
             "value": self.value,
-            "validity": self.validity,
-            "instrumentFlag": self.instrument_flag,
+            "dataCoverage": self.dataCoverage,
+            # "instrumentFlag": self.instrument_flag,
         }
 
 
@@ -190,15 +190,15 @@ def read_last_sent_time_from_file(timeSeriesId):
 
 
 def send_data_to_miljodir():
-    # TODO: filter out invalid data, where validity is less than 10 (10%)
+    # TODO: filter out invalid data, where dataCoverage is less than 10 (10%)
     # filtered_pm10_time_values = []
     # for tv in pm10_time_values:
-    #     if tv.validity > 10:
+    #     if tv.dataCoverage > 10:
     #         pm10_time_values.append(tv)
     # 
     # filtered_pm25_time_values = []
     # for tv in pm25_time_values:
-    #     if tv.validity > 10:
+    #     if tv.dataCoverage > 10:
     #         filtered_pm25_time_values.append(tv)
 
     # Create the JSON payload
@@ -316,7 +316,8 @@ def send_data_to_api():
 
                 send_data_to_miljodir()
 
-                # manually set last sent time to the from time of the last measurement, to avoid sending the same data again
+                # manually set last sent time to the from time of the last measurement
+                # to avoid sending the same data again
                 nextDay = previousDay + dt.timedelta(days=1)
 
                 save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
@@ -362,10 +363,12 @@ async def main():
         to_time = from_time + dt.timedelta(minutes=1)
 
         # Calculate the total seconds of measurement
-        total_seconds = (dt.datetime.now(tz) - from_time).total_seconds()
+        # total_seconds = (dt.datetime.now(tz) - from_time).total_seconds()
 
         # Corrected formula for coverage
-        coverage = int(total_seconds / 60 * 100)
+        # coverage = int(total_seconds / 60 * 100)
+
+        coverage = 100
 
         print(
             f"FromTime: {from_time}, ToTime: {to_time}, Data points: PM2.5 = {pmtwofive}, PM10 = {pmten}, Coverage: {coverage}%"
