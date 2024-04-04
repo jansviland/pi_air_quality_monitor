@@ -87,6 +87,38 @@ class InputTimeSeries:
             "timeValues": [tv.to_dict() for tv in self.timeValues],
         }
 
+    def fill_gaps(self):
+        filled_time_values = []
+        previous_to_time = None
+
+        for time_value in self.timeValues:
+            if previous_to_time is None:
+                previous_to_time = time_value.from_time
+                filled_time_values.append(time_value)
+                continue
+
+            gap_start = previous_to_time + dt.timedelta(hours=1)
+            gap_end = time_value.from_time
+
+            if gap_start < gap_end:
+                filled_time_values.extend(self._create_fill_values(gap_start, gap_end))
+
+            filled_time_values.append(time_value)
+            previous_to_time = time_value.from_time
+
+        self.timeValues = filled_time_values
+
+    # fill in missing values with -9900
+    def _create_fill_values(self, gap_start, gap_end):
+        fill_values = []
+        current_time = gap_start
+        while current_time < gap_end:
+            print(f"Creating fill value for {current_time}")
+            fill_values.append(
+                InputTimeValue(from_time=current_time, to_time=current_time + dt.timedelta(hours=1), value=-9900))
+            current_time += dt.timedelta(hours=1)
+        return fill_values
+
 
 class TimeSeriesLastReceived:
     def __init__(self, time_series_id: int, component: str, last_from_time_received: Optional[str] = None):
@@ -284,6 +316,12 @@ def send_data_to_miljodir():
     print(f"request:")
     pretty_print(combined)
     print("")
+
+    # TODO: also need to fill gaps from the last sent time to the first from_time in the list
+
+    # fill gaps
+    pm25_timeseries.fill_gaps()
+    pm10_timeseries.fill_gaps()
 
     # Convert your requests to dictionaries
     pm10_request_dict = pm10_timeseries.to_dict()
