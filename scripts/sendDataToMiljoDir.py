@@ -6,7 +6,6 @@ import datetime as dt
 import requests
 import portalocker
 import urllib3
-import uuid
 from dateutil import parser
 from pytz import timezone
 from typing import Optional
@@ -90,11 +89,10 @@ class InputTimeSeries:
 
 
 class TimeSeriesLastReceived:
-    def __init__(self, time_series_id: int, component: str, aqts_guid: Optional[uuid.UUID] = None,
-                 last_from_time_received: Optional[str] = None):
+    def __init__(self, time_series_id: int, component: str, last_from_time_received: Optional[str] = None):
         self.timeSeriesId = time_series_id
         self.component = component
-        self.aqtsGuid = aqts_guid if aqts_guid else uuid.uuid4()
+        # self.aqtsGuid = aqts_guid if aqts_guid else uuid.uuid4()
         self.lastFromTimeReceived = last_from_time_received if last_from_time_received else ""
 
 
@@ -205,10 +203,10 @@ def parse_last_received_array(response_json: List[dict]) -> List[TimeSeriesLastR
     time_series_list = []
     for item in response_json:
         time_series = TimeSeriesLastReceived(
-            time_series_id=item['TimeSeriesId'],
-            component=item['Component'],
-            aqts_guid=item['AqtsGuid'],
-            last_from_time_received=item.get('LastFromTimeReceived', '')
+            time_series_id=item['timeSeriesId'],
+            component=item['component'],
+            # aqts_guid=item['AqtsGuid'],
+            last_from_time_received=item.get('lastFromTimeReceived', '')
         )
         time_series_list.append(time_series)
     return time_series_list
@@ -247,7 +245,7 @@ def get_last_received_miljodir():
             for time_series in time_series_objects:
                 print("Time Series ID:", time_series.timeSeriesId)
                 print("Component:", time_series.component)
-                print("AqtsGuid:", time_series.aqtsGuid)
+                # print("AqtsGuid:", time_series.aqtsGuid)
                 print("LastFromTimeReceived:", time_series.lastFromTimeReceived)
 
                 parsedLastFromReceived = dt.datetime.fromisoformat(time_series.lastFromTimeReceived)
