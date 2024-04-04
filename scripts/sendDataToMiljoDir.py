@@ -189,6 +189,39 @@ def read_last_sent_time_from_file(timeSeriesId):
     return lastSent
 
 
+def get_last_received_miljodir():
+    try:
+        # get access_token
+        tokenResponse = requests.get(
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/maskinporten-test/token",
+            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+            verify=False,
+        )
+
+        print(f"MiljoDir Response status code: {tokenResponse.status_code}")
+        print(f"Token response: {tokenResponse.json()}")
+
+        access_token = tokenResponse.json()["access_token"]
+
+        response = requests.get(
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID_MILJODIR}/last-received",
+            headers={"Authorization": "Bearer " + access_token, "Content-Type": "application/json"},
+            verify=False,
+        )
+        print(f"MiljoDir Response status code: {response.status_code}")
+
+        if response.status_code == 200:
+            lastReceivedString = response.json()["lastReceived"]
+            lastReceived = dt.datetime.fromisoformat(lastReceivedString)
+
+            print(f"Last received time from Miljødirektoratet: {lastReceived}")
+
+        return lastReceived
+
+    except Exception as e:
+        print(f"Exception: {e}")
+
+
 def send_data_to_miljodir():
     # TODO: filter out invalid data, where dataCoverage is less than 10 (10%)
     # filtered_pm10_time_values = []
@@ -264,8 +297,12 @@ def send_data_to_miljodir():
 
 def send_data_to_api():
     # Check last sent time
-    pm10_last_sent = read_last_sent_time_from_file(PM10_TIMESERIES_ID)
-    print(f"Last sent time for PM10: {pm10_last_sent}")
+
+    # get last received from Miljødirektoratet
+    pm10_last_sent = get_last_received_miljodir()
+
+    # pm10_last_sent = read_last_sent_time_from_file(PM10_TIMESERIES_ID)
+    # print(f"Last sent time for PM10: {pm10_last_sent}")
 
     if pm10_last_sent is not None:
         # compare last sent and pm10_time_values[0].from_time
@@ -281,7 +318,7 @@ def send_data_to_api():
         if date1 == date2:
             print("Last sent and last measurement are on the same day.")
 
-            if diffMinutes > 30:
+            if diffMinutes > 20:
                 print("More than 30 minutes since last sent, get all data from today and resend")
 
                 # read measurements from file, will get all data for today, and send up to 24 hours of minute data
@@ -312,7 +349,10 @@ def send_data_to_api():
                 previousDay = dt.datetime.now(tz) - dt.timedelta(days=day_difference)
                 year, month, day = previousDay.year, previousDay.month, previousDay.day
 
+                print(f"Get all measurements from: {year}-{month}-{day}")
                 get_all_measurements_taken(year, month, day)
+
+                # TODO: make sure there is no gap in the data, for every hour missing, fill with -9900
 
                 send_data_to_miljodir()
 
