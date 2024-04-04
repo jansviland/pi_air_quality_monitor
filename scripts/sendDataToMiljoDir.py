@@ -6,8 +6,11 @@ import datetime as dt
 import requests
 import portalocker
 import urllib3
+import uuid
 from dateutil import parser
 from pytz import timezone
+from typing import Optional
+from typing import List
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -84,6 +87,15 @@ class InputTimeSeries:
             "serialNumber": self.serialNumber,
             "timeValues": [tv.to_dict() for tv in self.timeValues],
         }
+
+
+class TimeSeriesLastReceived:
+    def __init__(self, time_series_id: int, component: str, aqts_guid: Optional[uuid.UUID] = None,
+                 last_from_time_received: Optional[str] = None):
+        self.timeSeriesId = time_series_id
+        self.component = component
+        self.aqtsGuid = aqts_guid if aqts_guid else uuid.uuid4()
+        self.lastFromTimeReceived = last_from_time_received if last_from_time_received else ""
 
 
 def pretty_print(obj):
@@ -189,6 +201,19 @@ def read_last_sent_time_from_file(timeSeriesId):
     return lastSent
 
 
+def parse_last_received_array(response_json: List[dict]) -> List[TimeSeriesLastReceived]:
+    time_series_list = []
+    for item in response_json:
+        time_series = TimeSeriesLastReceived(
+            time_series_id=item['TimeSeriesId'],
+            component=item['Component'],
+            aqts_guid=item['AqtsGuid'],
+            last_from_time_received=item.get('LastFromTimeReceived', '')
+        )
+        time_series_list.append(time_series)
+    return time_series_list
+
+
 def get_last_received_miljodir():
     try:
         # get access_token
@@ -211,10 +236,23 @@ def get_last_received_miljodir():
         print(f"MiljoDir Response status code: {response.status_code}")
 
         if response.status_code == 200:
-            lastReceivedString = response.json()["lastReceived"]
-            lastReceived = dt.datetime.fromisoformat(lastReceivedString)
 
-            print(f"Last received time from Miljødirektoratet: {lastReceived}")
+            # parse array with TimeSeriesLastReceived objects
+            time_series_json = response.json()
+            time_series_objects = parse_last_received_array(time_series_json)
+
+            lastReceived = dt.datetime.now(tz) - dt.timedelta(days=4)  # default to 4 days ago
+
+            # Now you can work with the list of TimeSeriesLastReceived objects
+            for time_series in time_series_objects:
+                print("Time Series ID:", time_series.timeSeriesId)
+                print("Component:", time_series.component)
+                print("AqtsGuid:", time_series.aqtsGuid)
+                print("LastFromTimeReceived:", time_series.lastFromTimeReceived)
+
+                parsedLastFromReceived = dt.datetime.fromisoformat(time_series.lastFromTimeReceived)
+                if (parsedLastFromReceived > lastReceived):
+                    lastReceived = parsedLastFromReceived
 
         return lastReceived
 
