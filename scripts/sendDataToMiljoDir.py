@@ -35,7 +35,9 @@ pm10_time_values = []
 
 # Equivalent C# InputTimeValue class
 class InputTimeValue:
-    def __init__(self, from_time, to_time, value, data_coverage=None, instrument_flag=None):
+    def __init__(
+        self, from_time, to_time, value, data_coverage=None, instrument_flag=None
+    ):
         self.from_time = from_time
         self.to_time = to_time
         self.value = value
@@ -76,7 +78,7 @@ class InputTimeSeries:
             self.id,
             self.component,
             self.serialNumber,
-            [tv.__str__() for tv in self.timeValues]
+            [tv.__str__() for tv in self.timeValues],
         )
 
     def to_dict(self):
@@ -115,17 +117,29 @@ class InputTimeSeries:
         while current_time < gap_end:
             print(f"Creating fill value for {current_time}")
             fill_values.append(
-                InputTimeValue(from_time=current_time, to_time=current_time + dt.timedelta(hours=1), value=-9900))
+                InputTimeValue(
+                    from_time=current_time,
+                    to_time=current_time + dt.timedelta(hours=1),
+                    value=-9900,
+                )
+            )
             current_time += dt.timedelta(hours=1)
         return fill_values
 
 
 class TimeSeriesLastReceived:
-    def __init__(self, time_series_id: int, component: str, last_from_time_received: Optional[str] = None):
+    def __init__(
+        self,
+        time_series_id: int,
+        component: str,
+        last_from_time_received: Optional[str] = None,
+    ):
         self.timeSeriesId = time_series_id
         self.component = component
         # self.aqtsGuid = aqts_guid if aqts_guid else uuid.uuid4()
-        self.lastFromTimeReceived = last_from_time_received if last_from_time_received else ""
+        self.lastFromTimeReceived = (
+            last_from_time_received if last_from_time_received else ""
+        )
 
 
 def pretty_print(obj):
@@ -193,8 +207,12 @@ def get_all_measurements_taken(year, month, day):
             # Corrected formula for coverage
             coverage = int(total_seconds / 60 * 100)
 
-            pm10_time_values.append(InputTimeValue(from_time, to_time, float(values[0]), coverage))
-            pm25_time_values.append(InputTimeValue(from_time, to_time, float(values[1]), coverage))
+            pm10_time_values.append(
+                InputTimeValue(from_time, to_time, float(values[0]), coverage)
+            )
+            pm25_time_values.append(
+                InputTimeValue(from_time, to_time, float(values[1]), coverage)
+            )
 
     except FileNotFoundError:
 
@@ -208,7 +226,9 @@ def save_last_sent_time_to_file(timeseriesId, lastSent):
     # store last successful sent datetime
     # name should be "nilu-station-" + stationId + "-timeseries-" + timeSeriesId + "-lastSent.txt";
     # overwrite the file if it exists
-    file_name = f"miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeseriesId}-lastSent.txt"
+    file_name = (
+        f"miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeseriesId}-lastSent.txt"
+    )
     print(f"Saving last sent time {lastSent}, to file: {file_name}")
     with open(file_name, "w") as f:
         f.write(lastSent.isoformat())
@@ -219,26 +239,36 @@ def read_last_sent_time_from_file(timeSeriesId):
     lastSent = now_winter_time - dt.timedelta(days=2)  # default to 2 days ago
 
     try:
-        lastSentString = open(f"miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeSeriesId}-lastSent.txt",
-                              "r").read().strip()
+        lastSentString = (
+            open(
+                f"miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeSeriesId}-lastSent.txt",
+                "r",
+            )
+            .read()
+            .strip()
+        )
         lastSent = dt.datetime.fromisoformat(lastSentString)
 
     except FileNotFoundError:
-        print(f"File not found: miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeSeriesId}-lastSent.txt")
+        print(
+            f"File not found: miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeSeriesId}-lastSent.txt"
+        )
 
     print(f"Last sent time for timeseries {timeSeriesId}: {lastSent}")
 
     return lastSent
 
 
-def parse_last_received_array(response_json: List[dict]) -> List[TimeSeriesLastReceived]:
+def parse_last_received_array(
+    response_json: List[dict],
+) -> List[TimeSeriesLastReceived]:
     time_series_list = []
     for item in response_json:
         time_series = TimeSeriesLastReceived(
-            time_series_id=item['timeSeriesId'],
-            component=item['component'],
+            time_series_id=item["timeSeriesId"],
+            component=item["component"],
             # aqts_guid=item['AqtsGuid'],
-            last_from_time_received=item.get('lastFromTimeReceived', '')
+            last_from_time_received=item.get("lastFromTimeReceived", ""),
         )
         time_series_list.append(time_series)
     return time_series_list
@@ -246,9 +276,13 @@ def parse_last_received_array(response_json: List[dict]) -> List[TimeSeriesLastR
 
 def get_last_received_miljodir():
     try:
+
+        print(
+            "GET: https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token"
+        )
         # get access_token
         tokenResponse = requests.get(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/maskinporten-test/token",
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             verify=False,
         )
@@ -259,9 +293,15 @@ def get_last_received_miljodir():
         access_token = tokenResponse.json()["access_token"]
 
         response = requests.get(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID_MILJODIR}/last-received",
-            headers={"Authorization": "Bearer " + access_token, "Content-Type": "application/json"},
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/last-received",
+            headers={
+                "Authorization": "Bearer " + access_token,
+                "Content-Type": "application/json",
+            },
             verify=False,
+        )
+        print(
+            f"GET: https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/last-received"
         )
         print(f"MiljoDir Response status code: {response.status_code}")
 
@@ -271,7 +311,9 @@ def get_last_received_miljodir():
             time_series_json = response.json()
             time_series_objects = parse_last_received_array(time_series_json)
 
-            lastReceived = dt.datetime.now(tz) - dt.timedelta(days=4)  # default to 4 days ago
+            lastReceived = dt.datetime.now(tz) - dt.timedelta(
+                days=4
+            )  # default to 4 days ago
 
             # Now you can work with the list of TimeSeriesLastReceived objects
             for time_series in time_series_objects:
@@ -280,8 +322,10 @@ def get_last_received_miljodir():
                 # print("AqtsGuid:", time_series.aqtsGuid)
                 print("LastFromTimeReceived:", time_series.lastFromTimeReceived)
 
-                parsedLastFromReceived = dt.datetime.fromisoformat(time_series.lastFromTimeReceived)
-                if (parsedLastFromReceived > lastReceived):
+                parsedLastFromReceived = dt.datetime.fromisoformat(
+                    time_series.lastFromTimeReceived
+                )
+                if parsedLastFromReceived > lastReceived:
                     lastReceived = parsedLastFromReceived
 
         return lastReceived
@@ -296,7 +340,7 @@ def send_data_to_miljodir():
     # for tv in pm10_time_values:
     #     if tv.dataCoverage > 10:
     #         pm10_time_values.append(tv)
-    # 
+    #
     # filtered_pm25_time_values = []
     # for tv in pm25_time_values:
     #     if tv.dataCoverage > 10:
@@ -333,7 +377,7 @@ def send_data_to_miljodir():
 
         # get access_token
         tokenResponse = requests.get(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/maskinporten-test/token",
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token",
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             verify=False,
         )
@@ -344,8 +388,11 @@ def send_data_to_miljodir():
         access_token = tokenResponse.json()["access_token"]
 
         response = requests.post(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/poc/stations/{STATION_ID_MILJODIR}/measurement",
-            headers={"Authorization": "Bearer " + access_token, "Content-Type": "application/json"},
+            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/measurements",
+            headers={
+                "Authorization": "Bearer " + access_token,
+                "Content-Type": "application/json",
+            },
             json=combined_dict,
             verify=False,
         )
@@ -356,14 +403,14 @@ def send_data_to_miljodir():
             save_last_sent_time_to_file(PM10_TIMESERIES_ID, lastFromTime)
             save_last_sent_time_to_file(PM25_TIMESERIES_ID, lastFromTime)
 
-        response = requests.post(
-            f"https://192.168.1.12:7061/poc/stations/1179/measurement",
-            headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
-            json=combined_dict,
-            verify=False,
-        )
-        print(f"Local Network: Response status code: {response.status_code}")
-        print("")
+        # response = requests.post(
+        #     f"https://192.168.1.12:7061/provider/stations/1179/measurements",
+        #     headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
+        #     json=combined_dict,
+        #     verify=False,
+        # )
+        # print(f"Local Network: Response status code: {response.status_code}")
+        # print("")
 
     except Exception as e:
         print(f"Exception: {e}")
@@ -393,7 +440,9 @@ def send_data_to_api():
             print("Last sent and last measurement are on the same day.")
 
             if diffMinutes > 20:
-                print("More than 30 minutes since last sent, get all data from today and resend")
+                print(
+                    "More than 30 minutes since last sent, get all data from today and resend"
+                )
 
                 # read measurements from file, will get all data for today, and send up to 24 hours of minute data
                 today = dt.datetime.now(tz)
@@ -417,7 +466,9 @@ def send_data_to_api():
             # next check it will hopefully say last sent 3 days ago, and send all data from that day etc
             # until all previous data is sent
             if pm10_time_values[0].from_time.day != pm10_last_sent.day:
-                print(f"Not the same day, get all data from {day_difference} day(s) ago")
+                print(
+                    f"Not the same day, get all data from {day_difference} day(s) ago"
+                )
 
                 # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
                 previousDay = dt.datetime.now(tz) - dt.timedelta(days=day_difference)
