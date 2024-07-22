@@ -128,18 +128,17 @@ class InputTimeSeries:
 
 
 class TimeSeriesLastReceived:
+
     def __init__(
         self,
         time_series_id: int,
         component: str,
-        last_from_time_received: Optional[str] = None,
+        lastReceived: Optional[str] = None,
     ):
         self.timeSeriesId = time_series_id
         self.component = component
         # self.aqtsGuid = aqts_guid if aqts_guid else uuid.uuid4()
-        self.lastFromTimeReceived = (
-            last_from_time_received if last_from_time_received else ""
-        )
+        self.lastReceived = lastReceived if lastReceived else ""
 
 
 def pretty_print(obj):
@@ -268,7 +267,7 @@ def parse_last_received_array(
             time_series_id=item["timeSeriesId"],
             component=item["component"],
             # aqts_guid=item['AqtsGuid'],
-            last_from_time_received=item.get("lastFromTimeReceived", ""),
+            lastReceived=item.get("lastReceived", ""),
         )
         time_series_list.append(time_series)
     return time_series_list
@@ -320,10 +319,10 @@ def get_last_received_miljodir():
                 print("Time Series ID:", time_series.timeSeriesId)
                 print("Component:", time_series.component)
                 # print("AqtsGuid:", time_series.aqtsGuid)
-                print("LastFromTimeReceived:", time_series.lastFromTimeReceived)
+                print("lastReceived:", time_series.lastReceived)
 
                 parsedLastFromReceived = dt.datetime.fromisoformat(
-                    time_series.lastFromTimeReceived
+                    time_series.lastReceived
                 )
                 if parsedLastFromReceived > lastReceived:
                     lastReceived = parsedLastFromReceived
