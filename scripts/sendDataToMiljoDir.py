@@ -276,12 +276,15 @@ def parse_last_received_array(
 def get_last_received_miljodir():
     try:
 
-        print(
-            "GET: https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token"
-        )
+        # update the APIKEY from the environment variable in case it has changed
+        APIKEY = os.getenv("XAPIKEY")
+
+        tokenUrl = f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token"
+        print("GET: {tokenUrl}")
+
         # get access_token
         tokenResponse = requests.get(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token",
+            tokenUrl,
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             verify=False,
         )
@@ -291,16 +294,18 @@ def get_last_received_miljodir():
 
         access_token = tokenResponse.json()["access_token"]
 
+        lastReceivedUrl = f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/last-received"
+        print(
+            f"GET: {lastReceivedUrl}, headers: {{Authorization: Bearer {access_token}, Content-Type: application/json}}"
+        )
+
         response = requests.get(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/last-received",
+            lastReceivedUrl,
             headers={
                 "Authorization": "Bearer " + access_token,
                 "Content-Type": "application/json",
             },
             verify=False,
-        )
-        print(
-            f"GET: https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/last-received"
         )
         print(f"MiljoDir Response status code: {response.status_code}")
 
@@ -374,9 +379,15 @@ def send_data_to_miljodir():
 
     try:
 
+        # update the APIKEY from the environment variable in case it has changed
+        APIKEY = os.getenv("XAPIKEY")
+
+        tokenUrl = f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token"
+        print("GET: {tokenUrl}")
+
         # get access_token
         tokenResponse = requests.get(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token",
+            tokenUrl,
             headers={"X-API-Key": APIKEY, "Content-Type": "application/json"},
             verify=False,
         )
@@ -386,8 +397,13 @@ def send_data_to_miljodir():
 
         access_token = tokenResponse.json()["access_token"]
 
+        measurementUrl = f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/measurements"
+        print(
+            f"POST: {measurementUrl}, headers: {{Authorization: Bearer {access_token}, Content-Type: application/json}}"
+        )
+
         response = requests.post(
-            f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/stations/{STATION_ID_MILJODIR}/measurements",
+            measurementUrl,
             headers={
                 "Authorization": "Bearer " + access_token,
                 "Content-Type": "application/json",
