@@ -181,6 +181,17 @@ def save_data_to_file(currentTime, data):
         print(traceback.format_exc())
 
 
+def fileExist(year, month, day):
+    base_path = f"{year}/{month:02d}/{day:02d}"
+    file_path = os.path.join(base_path, "measurements.csv")
+
+    try:
+        with open(file_path, "r") as f:
+            return True
+    except FileNotFoundError:
+        return False
+
+
 # read measurements from file, datetime is used to get measurement for that specific day
 def get_all_measurements_taken(year, month, day):
     base_path = f"{year}/{month:02d}/{day:02d}"
@@ -220,16 +231,16 @@ def get_all_measurements_taken(year, month, day):
 
     except FileNotFoundError:
 
-        pm10_time_values.clear()
-        pm25_time_values.clear()
+        # pm10_time_values.clear()
+        # pm25_time_values.clear()
 
         print(f"File not found: {file_path}")
 
         # if file not found, set last sent to the next day (and then attempt to send data again for the next day)
-        nextDay = dt.datetime(year, month, day) + dt.timedelta(days=1)
+        # nextDay = dt.datetime(year, month, day) + dt.timedelta(days=1)
 
-        save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
-        save_last_sent_time_to_file(PM10_TIMESERIES_ID, nextDay)
+        # save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
+        # save_last_sent_time_to_file(PM10_TIMESERIES_ID, nextDay)
 
     except Exception as e:
         print(f"Exception: {e}")
@@ -511,11 +522,11 @@ def send_data_to_api():
                 year, month, day = previousDay.year, previousDay.month, previousDay.day
 
                 print(f"Get all measurements from: {year}-{month}-{day}")
-                get_all_measurements_taken(year, month, day)
 
-                # TODO: make sure there is no gap in the data, for every hour missing, fill with -9900
-
-                send_data_to_miljodir()
+                fileExist = fileExist(year, month, day)
+                if (fileExist):
+                    get_all_measurements_taken(year, month, day)
+                    send_data_to_miljodir()
 
                 # manually set last sent time to the from time of the last measurement
                 # to avoid sending the same data again
