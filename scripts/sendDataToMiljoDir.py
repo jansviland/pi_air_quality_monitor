@@ -280,7 +280,7 @@ def get_last_received_miljodir():
         APIKEY = os.getenv("XAPIKEY")
 
         tokenUrl = f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token"
-        print("GET: {tokenUrl}")
+        print(f"GET: {tokenUrl}, headers: {{X-API-Key: {APIKEY}}}")
 
         # get access_token
         tokenResponse = requests.get(
@@ -383,7 +383,7 @@ def send_data_to_miljodir():
         APIKEY = os.getenv("XAPIKEY")
 
         tokenUrl = f"https://luftmalinger-api.d.aks.miljodirektoratet.no/provider/maskinporten/token"
-        print("GET: {tokenUrl}")
+        print(f"GET: {tokenUrl}, headers: {{X-API-Key: {APIKEY}}}")
 
         # get access_token
         tokenResponse = requests.get(
