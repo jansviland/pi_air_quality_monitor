@@ -1,6 +1,7 @@
 import asyncio
 import os
 import pprint
+import traceback
 import serial
 import datetime as dt
 import requests
@@ -175,6 +176,10 @@ def save_data_to_file(currentTime, data):
     except portalocker.exceptions.LockTimeout:
         print(f"Could not acquire lock on {file_path} within {timeout} seconds")
 
+    except Exception as e:
+        print(f"Exception: {e}")
+        print(traceback.format_exc())
+
 
 # read measurements from file, datetime is used to get measurement for that specific day
 def get_all_measurements_taken(year, month, day):
@@ -226,6 +231,10 @@ def get_all_measurements_taken(year, month, day):
         save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
         save_last_sent_time_to_file(PM10_TIMESERIES_ID, nextDay)
 
+    except Exception as e:
+        print(f"Exception: {e}")
+        print(traceback.format_exc())
+
 
 def save_last_sent_time_to_file(timeseriesId, lastSent):
     # store last successful sent datetime
@@ -258,6 +267,10 @@ def read_last_sent_time_from_file(timeSeriesId):
         print(
             f"File not found: miljodir-station-{STATION_ID_MILJODIR}-timeseries-{timeSeriesId}-lastSent.txt"
         )
+
+    except Exception as e:
+        print(f"Exception: {e}")
+        print(traceback.format_exc())
 
     print(f"Last sent time for timeseries {timeSeriesId}: {lastSent}")
 
@@ -342,6 +355,7 @@ def get_last_received_miljodir():
 
     except Exception as e:
         print(f"Exception: {e}")
+        print(traceback.format_exc())
 
 
 def send_data_to_miljodir():
@@ -435,6 +449,7 @@ def send_data_to_miljodir():
 
     except Exception as e:
         print(f"Exception: {e}")
+        print(traceback.format_exc())
 
 
 def send_data_to_api():
