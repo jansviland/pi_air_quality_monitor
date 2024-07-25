@@ -220,6 +220,12 @@ def get_all_measurements_taken(year, month, day):
 
         print(f"File not found: {file_path}")
 
+        # if file not found, set last sent to the next day (and then attempt to send data again for the next day)
+        nextDay = dt.datetime(year, month, day) + dt.timedelta(days=1)
+
+        save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
+        save_last_sent_time_to_file(PM10_TIMESERIES_ID, nextDay)
+
 
 def save_last_sent_time_to_file(timeseriesId, lastSent):
     # store last successful sent datetime
