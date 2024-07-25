@@ -482,58 +482,74 @@ def send_data_to_api():
         date1 = pm10_last_sent.date()
         date2 = pm10_time_values[0].from_time.date()
 
-        # Check if it's the same day (ignoring hours)
-        if date1 == date2:
-            print("Last sent and last measurement are on the same day.")
+        if diffMinutes > 20:
+            print(
+                "More than 30 minutes since last sent, get all data from today and resend"
+            )
 
-            if diffMinutes > 20:
-                print(
-                    "More than 30 minutes since last sent, get all data from today and resend"
-                )
+            # read measurements from file, will get all data for today, and send up to 24 hours of minute data
+            today = dt.datetime.now(tz)
+            year, month, day = today.year, today.month, today.day
 
-                # read measurements from file, will get all data for today, and send up to 24 hours of minute data
-                today = dt.datetime.now(tz)
-                year, month, day = today.year, today.month, today.day
+            get_all_measurements_taken(year, month, day)
+            send_data_to_miljodir()
 
-                get_all_measurements_taken(year, month, day)
-                send_data_to_miljodir()
-
-            else:
-                # just send the last measurement
-                send_data_to_miljodir()
         else:
-            print("The dates are not on the same day.")
+            # just send the last measurement
+            send_data_to_miljodir()
 
-            # Calculate the exact day difference
-            day_difference = (date2 - date1).days
-            print(f"Exact day difference: {day_difference} day(s)")
+        # # Check if it's the same day (ignoring hours)
+        # if date1 == date2:
+        #     print("Last sent and last measurement are on the same day.")
 
-            # if it's not the same day, get the day difference and get the earlier data
-            # if it's 4 days ago, we go 4 days back and send all data from that day
-            # next check it will hopefully say last sent 3 days ago, and send all data from that day etc
-            # until all previous data is sent
-            if pm10_time_values[0].from_time.day != pm10_last_sent.day:
-                print(
-                    f"Not the same day, get all data from {day_difference} day(s) ago"
-                )
+        #     if diffMinutes > 20:
+        #         print(
+        #             "More than 30 minutes since last sent, get all data from today and resend"
+        #         )
 
-                # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
-                previousDay = dt.datetime.now(tz) - dt.timedelta(days=day_difference)
-                year, month, day = previousDay.year, previousDay.month, previousDay.day
+        #         # read measurements from file, will get all data for today, and send up to 24 hours of minute data
+        #         today = dt.datetime.now(tz)
+        #         year, month, day = today.year, today.month, today.day
 
-                print(f"Get all measurements from: {year}-{month}-{day}")
+        #         get_all_measurements_taken(year, month, day)
+        #         send_data_to_miljodir()
 
-                exist = fileExist(year, month, day)
-                if (exist):
-                    get_all_measurements_taken(year, month, day)
-                    send_data_to_miljodir()
+        #     else:
+        #         # just send the last measurement
+        #         send_data_to_miljodir()
+        # else:
+        #     print("The dates are not on the same day.")
 
-                # manually set last sent time to the from time of the last measurement
-                # to avoid sending the same data again
-                nextDay = previousDay + dt.timedelta(days=1)
+        #     # Calculate the exact day difference
+        #     day_difference = (date2 - date1).days
+        #     print(f"Exact day difference: {day_difference} day(s)")
 
-                save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
-                save_last_sent_time_to_file(PM10_TIMESERIES_ID, nextDay)
+        #     # if it's not the same day, get the day difference and get the earlier data
+        #     # if it's 4 days ago, we go 4 days back and send all data from that day
+        #     # next check it will hopefully say last sent 3 days ago, and send all data from that day etc
+        #     # until all previous data is sent
+        #     if pm10_time_values[0].from_time.day != pm10_last_sent.day:
+        #         print(
+        #             f"Not the same day, get all data from {day_difference} day(s) ago"
+        #         )
+
+        #         # read measurements from file, will get all data for yesterday, and send up to 24 hours of minute data
+        #         previousDay = dt.datetime.now(tz) - dt.timedelta(days=day_difference)
+        #         year, month, day = previousDay.year, previousDay.month, previousDay.day
+
+        #         print(f"Get all measurements from: {year}-{month}-{day}")
+
+        #         exist = fileExist(year, month, day)
+        #         if (exist):
+        #             get_all_measurements_taken(year, month, day)
+        #             send_data_to_miljodir()
+
+        #         # manually set last sent time to the from time of the last measurement
+        #         # to avoid sending the same data again
+        #         nextDay = previousDay + dt.timedelta(days=1)
+
+        #         save_last_sent_time_to_file(PM25_TIMESERIES_ID, nextDay)
+        #         save_last_sent_time_to_file(PM10_TIMESERIES_ID, nextDay)
 
 
 async def main():
