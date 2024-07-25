@@ -523,8 +523,8 @@ def send_data_to_api():
 
                 print(f"Get all measurements from: {year}-{month}-{day}")
 
-                fileExist = fileExist(year, month, day)
-                if (fileExist):
+                exist = fileExist(year, month, day)
+                if (exist):
                     get_all_measurements_taken(year, month, day)
                     send_data_to_miljodir()
 
