@@ -339,6 +339,9 @@ def get_last_received_miljodir():
         )
         print(f"MiljoDir Response status code: {response.status_code}")
 
+        # set last received to 1 hour ago by default
+        lastReceived = dt.datetime.now(tz) - dt.timedelta(hours=1)
+
         if response.status_code == 200:
 
             # parse array with TimeSeriesLastReceived objects
